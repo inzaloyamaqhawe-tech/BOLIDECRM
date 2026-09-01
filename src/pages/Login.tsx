@@ -67,7 +67,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4">
       <div className="w-full max-w-sm">
-        <img src="/bolide-logo.jpg" alt="Bolide" className="mx-auto mb-8 h-10 w-auto object-contain" />
+        <img src={`${import.meta.env.BASE_URL}bolide-logo.jpg`} alt="Bolide" className="mx-auto mb-8 h-10 w-auto object-contain" />
         <div className="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">{children}</div>
       </div>
     </div>

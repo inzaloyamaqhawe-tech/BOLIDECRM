@@ -12,6 +12,31 @@
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <!--
+      Pairs with public/404.html: decodes the real path GitHub Pages
+      couldn't serve directly (a deep link or refresh on a client-side
+      route) back into the URL bar before React Router mounts and reads it.
+    -->
+    <script>
+      (function (l) {
+        if (l.search[1] === "p" && l.search[2] === "=") {
+          var decoded = l.search
+            .slice(1)
+            .split("&")
+            .map(function (s) {
+              return s.replace(/~and~/g, "&");
+            });
+          window.history.replaceState(
+            null,
+            "",
+            l.pathname.slice(0, -1) +
+              decoded[0].slice(2) +
+              (decoded[1] ? "?" + decoded[1].slice(2) : "") +
+              l.hash
+          );
+        }
+      })(window.location);
+    </script>
   </head>
   <body>
     <div id="root"></div>

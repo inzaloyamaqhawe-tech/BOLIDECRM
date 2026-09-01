@@ -14,7 +14,7 @@ const NAV = [
 export function Sidebar() {
   return (
     <aside className="flex h-full w-64 shrink-0 flex-col border-r border-neutral-200 bg-white px-4 py-6">
-      <img src="/bolide-logo.jpg" alt="Bolide" className="mb-8 h-9 w-auto object-contain object-left" />
+      <img src={`${import.meta.env.BASE_URL}bolide-logo.jpg`} alt="Bolide" className="mb-8 h-9 w-auto object-contain object-left" />
 
       <nav className="flex flex-1 flex-col gap-1">
         {NAV.map(({ to, label, icon: Icon, end }) => (
