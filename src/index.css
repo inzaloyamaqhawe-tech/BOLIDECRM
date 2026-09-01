@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gradient-brand: linear-gradient(90deg, oklch(0.62 0.25 0) 0%, oklch(0.68 0.24 25) 50%, oklch(0.74 0.19 55) 100%);
+  --shadow-brand: 0 20px 60px -20px oklch(0.62 0.25 0 / 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Outfit", "Plus Jakarta Sans", system-ui, sans-serif;
+  background: #fafafa;
+  color: #171717;
+  -webkit-font-smoothing: antialiased;
+}
+
+.input {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e5e5;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.15s;
+}
+.input:focus {
+  border-color: #a3a3a3;
+}
+.input:disabled {
+  cursor: not-allowed;
+}
+
+.bg-brand-gradient {
+  background-image: var(--gradient-brand);
+}
+
+.text-brand-gradient {
+  background-image: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.shadow-brand {
+  box-shadow: var(--shadow-brand);
+}
+
+/* Scrollbar polish for kanban columns */
+.scroll-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 999px;
+}
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
