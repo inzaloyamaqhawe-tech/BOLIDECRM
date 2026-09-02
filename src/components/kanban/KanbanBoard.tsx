@@ -1,8 +1,9 @@
 import { DragDropContext, Droppable, type DropResult } from "@hello-pangea/dnd";
 import type { Deal, StageKey } from "../../types";
-import { STAGES } from "../../lib/seed-data";
-import { moveDealStage } from "../../lib/store";
+import { getDeal, getStagesLive, logActivity, moveDealStage, updateDeal } from "../../lib/store";
+import { useCrm } from "../../lib/use-store";
 import { formatZAR } from "../../lib/format";
+import { useAuth } from "../../lib/auth";
 import { KanbanCard } from "./KanbanCard";
 
 const STAGE_DOT: Record<StageKey, string> = {
@@ -15,16 +16,34 @@ const STAGE_DOT: Record<StageKey, string> = {
 };
 
 export function KanbanBoard({ deals, onOpenDeal }: { deals: Deal[]; onOpenDeal: (deal: Deal) => void }) {
+  const { user } = useAuth();
+  const stages = useCrm(getStagesLive);
+
   function handleDragEnd(result: DropResult) {
     const { destination, draggableId } = result;
     if (!destination) return;
-    moveDealStage(draggableId, destination.droppableId as StageKey);
+    const targetStage = destination.droppableId as StageKey;
+
+    if (targetStage === "lost") {
+      // Dropping straight into Lost still needs a reason — same requirement
+      // as changing the stage from inside the deal modal — so it's asked
+      // for here too rather than silently losing that context.
+      const reason = window.prompt("Why was this deal lost? (price, timing, went with a competitor…)");
+      if (!reason || !reason.trim()) return; // cancelled — leave the card where it was
+      const deal = getDeal(draggableId);
+      if (!deal) return;
+      updateDeal(draggableId, { stage: "lost", lostReason: reason.trim() });
+      logActivity(draggableId, "stage-change", `Marked Lost — ${reason.trim()}`, user?.id);
+      return;
+    }
+
+    moveDealStage(draggableId, targetStage);
   }
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <div className="flex gap-4 overflow-x-auto pb-4 scroll-thin">
-        {STAGES.map((stage) => {
+        {stages.map((stage) => {
           const stageDeals = deals.filter((d) => d.stage === stage.key);
           const onceOffTotal = stageDeals.reduce((sum, d) => sum + d.onceOff, 0);
           const mrrTotal = stageDeals.reduce((sum, d) => sum + d.mrr, 0);

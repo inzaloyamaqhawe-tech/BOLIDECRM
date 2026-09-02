@@ -53,11 +53,11 @@ export const STAGES: Stage[] = [
 ];
 
 export const SEED_USERS: User[] = [
-  { id: "u-khudusela", name: "Khudusela Pitje", email: "khudu.pitje@newgx.co.za", passwordHash: "" },
-  { id: "u-ravani", name: "Ravani Reddi", email: "ravani@newgx.co.za", passwordHash: "" },
-  { id: "u-suhail", name: "Suhail Asvat", email: "suhail@airnergize.co.za", passwordHash: "" },
-  { id: "u-langelihle", name: "Langelihle Ngidi", email: "langa@bolide.co.za", passwordHash: "" },
-  { id: "u-gianna", name: "Gianna de Figueiredo", email: "gianna@bolide.co.za", passwordHash: "" },
+  { id: "u-khudusela", name: "Khudusela Pitje", email: "khudu.pitje@newgx.co.za", passwordHash: "", role: "admin" },
+  { id: "u-ravani", name: "Ravani Reddi", email: "ravani@newgx.co.za", passwordHash: "", role: "rep" },
+  { id: "u-suhail", name: "Suhail Asvat", email: "suhail@airnergize.co.za", passwordHash: "", role: "rep" },
+  { id: "u-langelihle", name: "Langelihle Ngidi", email: "langa@bolide.co.za", passwordHash: "", role: "admin" },
+  { id: "u-gianna", name: "Gianna de Figueiredo", email: "gianna@bolide.co.za", passwordHash: "", role: "rep" },
 ];
 
 export const SEED_COMPANIES: Company[] = [

@@ -75,6 +75,7 @@ export interface Deal {
   id: string;
   title: string;
   companyId: string;
+  primaryContactId?: string;
   site?: string;
   division: DivisionKey;
   segment?: Segment;
@@ -85,6 +86,9 @@ export interface Deal {
   ownerId: string;
   closeDate?: string; // ISO date
   notes?: string;
+  /** Only meaningful once stage === "lost" — captured at the moment it's lost
+   * so a reason isn't just implied by the deal quietly disappearing. */
+  lostReason?: string;
   secureDetails?: SecureDealDetails;
   energyDetails?: EnergyDealDetails;
   waterDetails?: WaterDealDetails;
@@ -92,21 +96,50 @@ export interface Deal {
   updatedAt: string;
 }
 
+export type UserRole = "admin" | "rep";
+
 export interface User {
   id: string;
   name: string;
   email: string;
   passwordHash: string;
+  role: UserRole;
 }
 
-export type ActivityType = "note" | "call" | "task" | "stage-change";
+export type ActivityType = "note" | "call" | "task" | "stage-change" | "update" | "system";
 
+/** An audit-trail entry. Most are tied to a deal (`dealId`); a few — like
+ * merging two companies — are tied to a company instead (`companyId`).
+ * `getAllActivities()` is the project-wide feed either way. */
 export interface Activity {
   id: string;
-  dealId: string;
+  dealId?: string;
+  companyId?: string;
   type: ActivityType;
   body: string;
   userId: string;
+  createdAt: string;
+}
+
+export interface Task {
+  id: string;
+  title: string;
+  dueDate?: string; // ISO date
+  dealId?: string;
+  done: boolean;
+  createdAt: string;
+}
+
+/** A file attached to a deal (quote PDF, contract, photo). Stored as a data
+ * URL — fine at the size a browser's storage can hold, and it's the only
+ * option without a backend to upload to. */
+export interface Attachment {
+  id: string;
+  dealId: string;
+  filename: string;
+  mimeType: string;
+  size: number;
+  dataUrl: string;
   createdAt: string;
 }
 

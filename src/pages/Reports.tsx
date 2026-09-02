@@ -1,5 +1,6 @@
-import { Fragment } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Printer } from "lucide-react";
 import { useDeals, useUsers } from "../lib/use-store";
 import { DIVISIONS } from "../lib/seed-data";
 import { formatCompact, formatZAR } from "../lib/format";
@@ -13,9 +14,32 @@ const DIVISION_HEX: Record<string, string> = {
   saas: "#9B7CE8",
 };
 
+type RangeKey = "all" | "month" | "quarter" | "year";
+const RANGES: { key: RangeKey; label: string }[] = [
+  { key: "all", label: "All time" },
+  { key: "month", label: "This month" },
+  { key: "quarter", label: "This quarter" },
+  { key: "year", label: "This year" },
+];
+
+function withinRange(iso: string, range: RangeKey): boolean {
+  if (range === "all") return true;
+  const d = new Date(iso);
+  const now = new Date();
+  if (range === "year") return d.getFullYear() === now.getFullYear();
+  if (range === "month") return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  // quarter
+  const q = Math.floor(now.getMonth() / 3);
+  const dq = Math.floor(d.getMonth() / 3);
+  return d.getFullYear() === now.getFullYear() && dq === q;
+}
+
 export function ReportsPage() {
-  const deals = useDeals();
+  const allDeals = useDeals();
   const users = useUsers();
+  const [range, setRange] = useState<RangeKey>("all");
+
+  const deals = useMemo(() => allDeals.filter((d) => withinRange(d.createdAt, range)), [allDeals, range]);
 
   const byDivision = DIVISIONS.map((d) => ({
     key: d.key,
@@ -62,9 +86,36 @@ export function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-black text-neutral-900">Reports</h1>
-        <p className="text-sm text-neutral-500">Revenue, recurring trend and team performance</p>
+      <div className="flex flex-wrap items-start justify-between gap-3 no-print">
+        <div>
+          <h1 className="text-3xl font-black text-neutral-900">Reports</h1>
+          <p className="text-sm text-neutral-500">Revenue, recurring trend and team performance</p>
+        </div>
+        <button
+          onClick={() => window.print()}
+          className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm font-semibold hover:border-neutral-400"
+        >
+          <Printer className="h-4 w-4" /> Export PDF
+        </button>
+      </div>
+
+      <div className="hidden print:block">
+        <h1 className="text-2xl font-black">Bolide CRM — Reports</h1>
+        <p className="text-sm text-neutral-500">{RANGES.find((r) => r.key === range)?.label} · Generated {new Date().toLocaleDateString("en-ZA")}</p>
+      </div>
+
+      <div className="flex flex-wrap gap-1.5 no-print">
+        {RANGES.map((r) => (
+          <button
+            key={r.key}
+            onClick={() => setRange(r.key)}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+              range === r.key ? "bg-brand-gradient text-white shadow-brand" : "border border-neutral-200 text-neutral-600 hover:border-neutral-400"
+            }`}
+          >
+            {r.label}
+          </button>
+        ))}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

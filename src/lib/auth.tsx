@@ -113,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { ok: true as const };
     }
 
-    const created = createUser({ name: name.trim(), email: email.trim().toLowerCase(), passwordHash });
+    const created = createUser({ name: name.trim(), email: email.trim().toLowerCase(), passwordHash, role: "rep" });
     setUser(created);
     persistSession(created);
     return { ok: true as const };

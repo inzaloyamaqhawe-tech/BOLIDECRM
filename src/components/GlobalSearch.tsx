@@ -91,7 +91,7 @@ export function GlobalSearch() {
                   title={c.name}
                   subtitle={c.industry}
                   onClick={() => {
-                    navigate(`/companies?open=${c.id}`);
+                    navigate(`/companies/${c.id}`);
                     setOpen(false);
                     setQuery("");
                   }}

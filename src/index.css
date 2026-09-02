@@ -57,6 +57,24 @@ body {
   box-shadow: var(--shadow-brand);
 }
 
+/* Print (Reports → Export PDF): drop the app chrome, let content flow onto
+   the page instead of staying trapped in a scroll container. */
+@media print {
+  aside,
+  header,
+  .no-print {
+    display: none !important;
+  }
+  main {
+    overflow: visible !important;
+    height: auto !important;
+    padding: 0 !important;
+  }
+  body {
+    background: white;
+  }
+}
+
 /* Scrollbar polish for kanban columns */
 .scroll-thin::-webkit-scrollbar {
   width: 8px;

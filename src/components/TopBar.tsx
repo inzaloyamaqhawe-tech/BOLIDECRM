@@ -1,26 +1,29 @@
 import { useState } from "react";
-import { Plus, LogOut } from "lucide-react";
+import { Plus, LogOut, Menu } from "lucide-react";
 import { DIVISIONS } from "../lib/seed-data";
 import { useAuth } from "../lib/auth";
 import { Avatar } from "./Avatar";
 import { GlobalSearch } from "./GlobalSearch";
 import { DealModal } from "./DealModal";
 
-export function TopBar() {
+export function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
   const { user, logout } = useAuth();
   const [showNewDeal, setShowNewDeal] = useState(false);
 
   return (
     <header className="border-b border-neutral-200 bg-white">
-      <div className="flex items-center gap-4 px-6 py-3">
+      <div className="flex flex-wrap items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6">
+        <button onClick={onOpenNav} className="text-neutral-500 lg:hidden">
+          <Menu className="h-5 w-5" />
+        </button>
         <GlobalSearch />
         <div className="flex-1" />
         <button
           type="button"
           onClick={() => setShowNewDeal(true)}
-          className="inline-flex items-center gap-2 rounded-full bg-brand-gradient px-5 py-2.5 text-sm font-bold text-white shadow-brand transition hover:brightness-110"
+          className="inline-flex items-center gap-2 rounded-full bg-brand-gradient px-4 py-2.5 text-sm font-bold text-white shadow-brand transition hover:brightness-110 sm:px-5"
         >
-          <Plus className="h-4 w-4" /> New deal
+          <Plus className="h-4 w-4" /> <span className="hidden sm:inline">New deal</span>
         </button>
         {user && (
           <div className="group relative">
@@ -39,10 +42,10 @@ export function TopBar() {
         )}
       </div>
 
-      <div className="flex items-center gap-2 px-6 pb-3 text-xs">
-        <span className="font-bold uppercase tracking-widest text-neutral-400">Divisions</span>
+      <div className="flex items-center gap-2 overflow-x-auto px-4 pb-3 text-xs scroll-thin sm:px-6">
+        <span className="shrink-0 font-bold uppercase tracking-widest text-neutral-400">Divisions</span>
         {DIVISIONS.map((d) => (
-          <span key={d.key} className="rounded-full bg-neutral-100 px-2.5 py-1 font-semibold text-neutral-600">
+          <span key={d.key} className="shrink-0 rounded-full bg-neutral-100 px-2.5 py-1 font-semibold text-neutral-600">
             {d.name.replace("Bolide ", "")}
           </span>
         ))}

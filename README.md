@@ -36,6 +36,54 @@ addresses (matches the reference app's Settings → Access list).
   catalogue (cost prices Bolide pays), pipeline stage probabilities, and the
   actual team list all come from `src/lib/seed-data.ts`.
 
+## Second round — deal workflow, admin/rep roles, and polish
+
+- **Notes & activity feed on a deal** — a deal modal now has a live notes
+  thread (`logActivity`, previously built but never wired to any UI) plus
+  every stage change, edit, and duplication logs itself automatically. A
+  project-wide version of the same feed lives under Settings → Activity log.
+- **Lost-reason capture** — moving a deal to Lost (from the modal *or* by
+  dragging it on the Pipeline board) now requires a short reason before it's
+  accepted, instead of the deal just quietly disappearing from view.
+- **Duplicate deal** — clones a deal (fresh id, reset to Lead) for a
+  near-identical site under the same or a different client.
+- **File attachments** — quotes/contracts attach directly to a deal, stored
+  in IndexedDB (`src/lib/attachments.ts`) rather than `localStorage`, since a
+  scanned PDF would blow through localStorage's ~5-10MB quota fast.
+- **Bulk actions on the Deals table** — select rows, bulk-change stage or
+  owner, export just the selection to CSV.
+- **Company detail page** (`/companies/:id`) — a company's full deal list,
+  contacts, and company-level activity, instead of cards-only with no
+  drill-down.
+- **Duplicate-company protection** — typing a company name close to (but not
+  exactly matching) an existing one now surfaces a "Did you mean…?" nudge
+  before it creates a near-duplicate record; a "Merge duplicates" tool on the
+  Companies page folds an accidental duplicate's deals/contacts back into one.
+- **A deal's primary contact** is now a real field (`Deal.primaryContactId`),
+  not just "someone at that company."
+- **Divisions, product lines, and pipeline stages are editable** from
+  Settings (admins only) — a small persisted override layer on top of the
+  seed data, so the existing division/stage *keys* (wired into colours,
+  Kanban columns, dashboard buckets) stay stable while their labels,
+  descriptions, product lines, and win probabilities can change.
+- **Admin/rep roles** — a first pass at permissions. Deleting a deal and
+  editing Settings reference data are admin-only; this is enforced in the UI
+  only (there's no backend yet to enforce it server-side — see Known
+  limitations).
+- **Reports**: date-range filter (all-time/month/quarter/year) and an
+  "Export PDF" button (`window.print()` with print-specific CSS — no new
+  dependency for something the browser already does).
+- **Tasks & follow-ups** (`/tasks`) — reminders optionally linked to a deal,
+  with overdue ones flagged distinctly. Dashboard surfaces overdue follow-ups
+  and upcoming ones, and close-dates that have quietly passed are flagged
+  the same way under "Closing soon."
+- **Undo on delete** — deleting a deal no longer uses a plain `confirm()`
+  dialog; it's removed immediately with a toast offering "Undo" for a few
+  seconds (`src/lib/toast.tsx`), restoring the exact same record if clicked.
+- **Mobile-responsive layout** — the sidebar becomes a slide-over drawer
+  below the `lg` breakpoint instead of a fixed 256px column with nowhere to
+  go on a phone.
+
 ## Architecture — written for the Shopfront integration
 
 The previous review couldn't see the source, which made it hard to plan how
@@ -80,3 +128,10 @@ main thing this rebuild optimises for:
 - "Invite teammate" creates a placeholder account (shown as "Invited" under
   Settings → Access) that the invited person claims by signing up with that
   same email — there's no real email delivery without a backend to send from.
+- Admin/rep permissions are UI-only right now — anyone comfortable editing
+  their own browser's `localStorage` could bypass them. Fine for an internal
+  tool among a trusted small team; not a substitute for real server-side
+  auth once this is opened up further.
+- Attachments live in each browser's own IndexedDB, so a file attached on
+  one device isn't visible from another until there's a real backend to
+  store it centrally — same underlying limitation as the rest of the data.
