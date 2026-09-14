@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Plus, LogOut, Menu } from "lucide-react";
 import { DIVISIONS } from "../lib/seed-data";
 import { useAuth } from "../lib/auth";
@@ -9,6 +9,21 @@ import { DealModal } from "./DealModal";
 export function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
   const { user, logout } = useAuth();
   const [showNewDeal, setShowNewDeal] = useState(false);
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
+
+  // Click-to-toggle instead of hover: the dropdown sits a few pixels below
+  // the avatar, so moving the cursor down to reach "Sign out" crossed out of
+  // the hover area and closed the menu first — clicking is reliable
+  // regardless of that gap.
+  useEffect(() => {
+    if (!showAccountMenu) return;
+    function onClickOutside(e: MouseEvent) {
+      if (accountMenuRef.current && !accountMenuRef.current.contains(e.target as Node)) setShowAccountMenu(false);
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [showAccountMenu]);
 
   return (
     <header className="border-b border-neutral-200 bg-white">
@@ -26,18 +41,25 @@ export function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
           <Plus className="h-4 w-4" /> <span className="hidden sm:inline">New deal</span>
         </button>
         {user && (
-          <div className="group relative">
-            <Avatar name={user.name} size={36} />
-            <div className="absolute right-0 top-full z-20 mt-2 hidden w-48 rounded-xl border border-neutral-200 bg-white p-2 shadow-xl group-hover:block">
-              <div className="px-2 py-1.5 text-sm font-semibold text-neutral-800">{user.name}</div>
-              <div className="truncate px-2 pb-2 text-xs text-neutral-400">{user.email}</div>
-              <button
-                onClick={logout}
-                className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm font-semibold text-red-600 hover:bg-red-50"
-              >
-                <LogOut className="h-3.5 w-3.5" /> Sign out
-              </button>
-            </div>
+          <div className="relative" ref={accountMenuRef}>
+            <button type="button" onClick={() => setShowAccountMenu((v) => !v)} className="block rounded-full">
+              <Avatar name={user.name} size={36} />
+            </button>
+            {showAccountMenu && (
+              <div className="absolute right-0 top-full z-20 mt-2 w-48 rounded-xl border border-neutral-200 bg-white p-2 shadow-xl">
+                <div className="px-2 py-1.5 text-sm font-semibold text-neutral-800">{user.name}</div>
+                <div className="truncate px-2 pb-2 text-xs text-neutral-400">{user.email}</div>
+                <button
+                  onClick={() => {
+                    setShowAccountMenu(false);
+                    logout();
+                  }}
+                  className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm font-semibold text-red-600 hover:bg-red-50"
+                >
+                  <LogOut className="h-3.5 w-3.5" /> Sign out
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
