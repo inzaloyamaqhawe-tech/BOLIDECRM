@@ -1,19 +1,34 @@
 import { Draggable } from "@hello-pangea/dnd";
-import { MapPin } from "lucide-react";
+import { MapPin, Trash2 } from "lucide-react";
 import type { Deal } from "../../types";
 import { DivisionBadge } from "../DivisionBadge";
 import { formatZAR } from "../../lib/format";
 import { useCompanies } from "../../lib/use-store";
+import { deleteDeal, restoreDeal } from "../../lib/store";
+import { useToast } from "../../lib/toast";
 
 /**
  * A single Pipeline card. Dragging still moves it between stages; clicking
  * (rather than dragging) now opens the same deal detail/edit view used from
  * the Deals table, so a quote's customer, products and pricing can be
- * reviewed without needing to move it to Negotiation first.
+ * reviewed without needing to move it to Negotiation first. The trash icon
+ * deletes it directly, one click, without needing to open that modal first
+ * — per client request, this works the same as Delete on the Deals table.
  */
 export function KanbanCard({ deal, index, onOpen }: { deal: Deal; index: number; onOpen: (deal: Deal) => void }) {
   const companies = useCompanies();
+  const { show: showToast } = useToast();
   const company = companies.find((c) => c.id === deal.companyId);
+
+  function handleDelete(e: React.MouseEvent) {
+    e.stopPropagation();
+    const snapshot = deal;
+    deleteDeal(snapshot.id);
+    showToast(`"${snapshot.title}" deleted`, {
+      label: "Undo",
+      onClick: () => restoreDeal(snapshot),
+    });
+  }
 
   return (
     <Draggable draggableId={deal.id} index={index}>
@@ -23,11 +38,24 @@ export function KanbanCard({ deal, index, onOpen }: { deal: Deal; index: number;
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           onClick={() => onOpen(deal)}
-          className={`mb-3 cursor-pointer rounded-xl border border-neutral-200 bg-white p-4 transition hover:border-pink-300 hover:shadow-md ${
+          className={`relative mb-3 cursor-pointer rounded-xl border border-neutral-200 bg-white p-4 transition hover:border-pink-300 hover:shadow-md ${
             snapshot.isDragging ? "shadow-lg ring-2 ring-pink-300" : ""
           }`}
         >
-          <div className="mb-2 flex items-start justify-between gap-2">
+          {/* Always visible, not hover-only — a hover-revealed icon would
+              never appear on touch devices, and this app is used on phones. */}
+          <button
+            type="button"
+            onClick={handleDelete}
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            aria-label="Delete deal"
+            className="absolute right-2 top-2 rounded-full p-1 text-neutral-300 transition hover:bg-red-50 hover:text-red-600"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+
+          <div className="mb-2 flex items-start justify-between gap-2 pr-5">
             <h3 className="text-sm font-bold leading-snug text-neutral-900">{deal.title}</h3>
             <DivisionBadge division={deal.division} />
           </div>

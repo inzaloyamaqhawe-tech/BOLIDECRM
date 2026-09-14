@@ -26,6 +26,11 @@ import { useToast } from "../lib/toast";
 
 const SEGMENTS: Segment[] = ["Commercial", "Industrial", "Forecourt", "MDU"];
 
+// Fixed per client request (email, Sep 2026) — Product Line is a plain
+// dropdown of these four now, not a free-text field suggesting a division's
+// product lines.
+const PRODUCT_LINES = ["Water", "Security", "Solar", "Fibre"];
+
 interface Props {
   /** Pass an existing deal to edit/view it; omit to create a new one. */
   deal?: Deal;
@@ -108,7 +113,6 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
     getAttachments(deal.id).then(setAttachments);
   }, [deal]);
 
-  const divisionMeta = divisions.find((d) => d.key === division)!;
   const companyContacts = deal ? getContactsByCompany(deal.companyId) : [];
   const similarCompany = !isNew
     ? undefined
@@ -360,12 +364,17 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
           </Field>
 
           <Field label="Product line">
-            <input list="product-lines" value={productLine} onChange={(e) => setProductLine(e.target.value)} className="input" />
-            <datalist id="product-lines">
-              {divisionMeta.productLines.map((p) => (
-                <option key={p} value={p} />
+            <select value={productLine} onChange={(e) => setProductLine(e.target.value)} className="input">
+              <option value="">—</option>
+              {PRODUCT_LINES.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
               ))}
-            </datalist>
+              {productLine && !PRODUCT_LINES.includes(productLine) && (
+                <option value={productLine}>{productLine} (legacy)</option>
+              )}
+            </select>
           </Field>
 
           <Field label="Stage">
@@ -523,11 +532,9 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
           <div className="flex items-center gap-4">
             {!isNew && (
               <>
-                {user?.role === "admin" && (
-                  <button type="button" onClick={handleDelete} className="text-sm font-semibold text-red-600 hover:underline">
-                    Delete deal
-                  </button>
-                )}
+                <button type="button" onClick={handleDelete} className="text-sm font-semibold text-red-600 hover:underline">
+                  Delete deal
+                </button>
                 <button type="button" onClick={handleDuplicate} className="inline-flex items-center gap-1.5 text-sm font-semibold text-neutral-500 hover:text-neutral-800">
                   <Copy className="h-3.5 w-3.5" /> Duplicate
                 </button>

@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Download, Search, X } from "lucide-react";
+import { Download, Search, Trash2, X } from "lucide-react";
 import type { Deal, Segment, StageKey } from "../types";
 import { useCompanies, useCrm, useDeals, useUsers } from "../lib/use-store";
-import { getDeal, getStagesLive, logActivity, updateDeal } from "../lib/store";
+import { deleteDeal, getDeal, getStagesLive, logActivity, restoreDeal, updateDeal } from "../lib/store";
 import { useAuth } from "../lib/auth";
+import { useToast } from "../lib/toast";
 import { DivisionBadge } from "../components/DivisionBadge";
 import { DealModal } from "../components/DealModal";
 import { formatDate, formatZAR } from "../lib/format";
@@ -17,6 +18,7 @@ export function DealsPage() {
   const users = useUsers();
   const stages = useCrm(getStagesLive);
   const { user } = useAuth();
+  const { show: showToast } = useToast();
   const [query, setQuery] = useState("");
   const [segment, setSegment] = useState<Segment | "All">("All");
   const [params, setParams] = useSearchParams();
@@ -119,6 +121,23 @@ export function DealsPage() {
     setSelected(new Set());
   }
 
+  function handleDeleteRow(e: React.MouseEvent, deal: Deal) {
+    e.stopPropagation();
+    deleteDeal(deal.id);
+    showToast(`"${deal.title}" deleted`, {
+      label: "Undo",
+      onClick: () => restoreDeal(deal),
+    });
+  }
+
+  function bulkDelete() {
+    const toDelete = deals.filter((d) => selected.has(d.id));
+    if (!confirm(`Delete ${toDelete.length} deal(s)? This can't be undone.`)) return;
+    toDelete.forEach((d) => deleteDeal(d.id));
+    setSelected(new Set());
+    showToast(`${toDelete.length} deal(s) deleted`);
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -196,6 +215,12 @@ export function DealsPage() {
           >
             <Download className="h-3.5 w-3.5" /> Export selected
           </button>
+          <button
+            onClick={bulkDelete}
+            className="inline-flex items-center gap-1.5 rounded-full border border-red-300 bg-white px-3 py-1.5 text-xs font-semibold text-red-600"
+          >
+            <Trash2 className="h-3.5 w-3.5" /> Delete selected
+          </button>
           <button onClick={() => setSelected(new Set())} className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-pink-700">
             <X className="h-3.5 w-3.5" /> Clear
           </button>
@@ -219,6 +244,7 @@ export function DealsPage() {
               <th className="px-4 py-3 text-right">ARR</th>
               <th className="px-4 py-3">Owner</th>
               <th className="px-4 py-3">Close</th>
+              <th className="w-10 px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
@@ -245,11 +271,16 @@ export function DealsPage() {
                 <td className="px-4 py-3 text-right">{formatZAR(d.mrr * 12)}</td>
                 <td className="px-4 py-3 text-neutral-500">{ownerName(d.ownerId)}</td>
                 <td className="px-4 py-3 text-neutral-400">{formatDate(d.closeDate)}</td>
+                <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                  <button onClick={(e) => handleDeleteRow(e, d)} aria-label="Delete deal" className="text-neutral-300 hover:text-red-600">
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={11} className="px-4 py-10 text-center text-neutral-400">
+                <td colSpan={12} className="px-4 py-10 text-center text-neutral-400">
                   No deals match your filters.
                 </td>
               </tr>
