@@ -36,6 +36,28 @@ addresses (matches the reference app's Settings → Access list).
   catalogue (cost prices Bolide pays), pipeline stage probabilities, and the
   actual team list all come from `src/lib/seed-data.ts`.
 
+## Fifth round — real Energy pipeline from the client's own Lead Tracker
+
+- **The placeholder Energy deals are gone.** `SEED_DEALS` used to have four
+  synthetic Energy entries (ALT Piet Retief/Ganyesa/Ekuphumleni, BP Kew) with
+  made-up solar/BESS numbers. They're replaced with all 30 real leads from
+  the client's own `Lead Tracker v1.xlsx` (Sep 2026) — same company names,
+  assigned engineers (now `ownerId`), Bank Model Status, Capex-PPA/Rental,
+  and PPA/Rental IRR the client already tracks. Nine new prospect companies
+  were added for sites that don't map onto an existing company (PIC and
+  several standalone properties).
+- **Stage is inferred, not given** — the spreadsheet has no CRM "stage"
+  column, so it's derived from Approved/Proposal Sent: Declined or a
+  "Closed…" note → Lost, Approved → Negotiation, proposal sent on a date →
+  Quote, "Pending Send" → Qualified, otherwise Lead. This is a best-effort
+  mapping, not something the client confirmed — flag it to them if a deal's
+  stage looks wrong.
+- **A migration (`migrateLeadTrackerDeals` in `store.ts`) removes the old
+  placeholder deals and adds the real ones for anyone who already opened the
+  CRM** — same reasoning as the Herman/Welcome user migration: editing
+  `SEED_DEALS` only affects a brand-new browser, and QA/the client already
+  have their own saved `localStorage` copy of the old placeholder data.
+
 ## Fourth round — scalable lists (search + pagination everywhere)
 
 - **Tasks' "linked deal" picker is now a searchable dropdown**

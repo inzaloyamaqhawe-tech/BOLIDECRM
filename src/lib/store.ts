@@ -106,6 +106,26 @@ function migrateNewSeedUsers() {
 }
 migrateNewSeedUsers();
 
+/** Swaps the old placeholder Energy deals for the client's real pipeline
+ * from their own "Lead Tracker v1.xlsx" (Sep 2026) — same reasoning as
+ * `migrateNewSeedUsers()`: anyone who already opened the CRM has their own
+ * saved `deals`/`companies` and would otherwise keep the old zero-value
+ * placeholder leads (d-11..d-14) forever, never seeing the real numbers. */
+const OLD_PLACEHOLDER_ENERGY_DEAL_IDS = ["d-11", "d-12", "d-13", "d-14"];
+function migrateLeadTrackerDeals() {
+  const existingCompanies = load<Company[]>(KEYS.companies, SEED_COMPANIES);
+  const missingCompanies = SEED_COMPANIES.filter((c) => !existingCompanies.some((ec) => ec.id === c.id));
+  if (missingCompanies.length > 0) save(KEYS.companies, [...existingCompanies, ...missingCompanies]);
+
+  const existingDeals = load<Deal[]>(KEYS.deals, SEED_DEALS);
+  const withoutPlaceholders = existingDeals.filter((d) => !OLD_PLACEHOLDER_ENERGY_DEAL_IDS.includes(d.id));
+  const missingDeals = SEED_DEALS.filter((d) => d.id.startsWith("d-e") && !withoutPlaceholders.some((ed) => ed.id === d.id));
+  if (withoutPlaceholders.length !== existingDeals.length || missingDeals.length > 0) {
+    save(KEYS.deals, [...withoutPlaceholders, ...missingDeals]);
+  }
+}
+migrateLeadTrackerDeals();
+
 function uid(prefix: string) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }
