@@ -94,6 +94,18 @@ function seedIfEmpty() {
 }
 seedIfEmpty();
 
+/** Adds any seed users that don't exist yet — runs every load, not just on
+ * an empty store. `seedIfEmpty()` alone only populates a brand-new browser;
+ * anyone already using the CRM keeps their own saved `users` list forever,
+ * so a new team member added to SEED_USERS later (e.g. Herman Ras, Welcome
+ * Nyathi) would never actually show up for existing users without this. */
+function migrateNewSeedUsers() {
+  const existing = load<User[]>(KEYS.users, SEED_USERS);
+  const missing = SEED_USERS.filter((seedUser) => !existing.some((u) => u.id === seedUser.id));
+  if (missing.length > 0) save(KEYS.users, [...existing, ...missing]);
+}
+migrateNewSeedUsers();
+
 function uid(prefix: string) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }

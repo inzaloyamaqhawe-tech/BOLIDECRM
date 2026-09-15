@@ -71,11 +71,28 @@ export interface WaterDealDetails {
   litresPerDay?: number;
 }
 
+export type BankModelStatus = "Modelled" | "Not Modelled";
+
+/** Solar/PPA financing fields — added at the client's request (Sep 2026) to
+ * match their existing Lead Tracker spreadsheet's "Financing" columns. */
+export interface FinancingDetails {
+  bankModelStatus?: BankModelStatus;
+  contractSignatureDate?: string; // ISO date
+  operationsStartDate?: string; // ISO date
+  capexPpa?: number; // ZAR, incl. contingency
+  capexRental?: number; // ZAR, incl. contingency
+  ppaIrr?: number; // percentage, e.g. 20 for 20%
+  rentalIrr?: number; // percentage
+}
+
 export interface Deal {
   id: string;
   title: string;
   companyId: string;
   primaryContactId?: string;
+  /** Free-text contact name — the client wanted to just type a name here
+   * rather than needing a full Contact record with an email created first. */
+  primaryContactName?: string;
   site?: string;
   division: DivisionKey;
   segment?: Segment;
@@ -92,6 +109,7 @@ export interface Deal {
   secureDetails?: SecureDealDetails;
   energyDetails?: EnergyDealDetails;
   waterDetails?: WaterDealDetails;
+  financingDetails?: FinancingDetails;
   createdAt: string;
   updatedAt: string;
 }

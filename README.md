@@ -36,6 +36,32 @@ addresses (matches the reference app's Settings → Access list).
   catalogue (cost prices Bolide pays), pipeline stage probabilities, and the
   actual team list all come from `src/lib/seed-data.ts`.
 
+## Third round — delete function, Product Line dropdown, financing fields
+
+- **Delete is no longer admin-gated.** Client feedback (email, Sep 2026) was
+  that they couldn't delete from Pipeline — the earlier admin-only
+  restriction was our own scope call, not something they'd asked for. Any
+  logged-in user can now delete a deal, from the modal, a one-click icon on
+  a Pipeline card, or a row/bulk action on the Deals table.
+- **Product Line is a fixed dropdown**: Water, Security, Solar, Fibre — no
+  longer free text against a division's suggested list. An existing deal
+  whose value doesn't match one of the four (e.g. seed data's "Hybrid Solar
+  + BESS") shows as a "(legacy)" option rather than disappearing.
+- **Primary contact is now a plain typed name** (`Deal.primaryContactName`),
+  not a dropdown requiring a full Contact record (with an email) to exist
+  first — client just wants to type who they're dealing with.
+- **New Financing fields on Energy deals**, matching the client's own Lead
+  Tracker spreadsheet columns: Bank Model Status (Modelled/Not Modelled),
+  Contract Signature Date, Operations Start Date, Capex – PPA, Capex –
+  Rental, PPA IRR, Rental IRR. Shown alongside the existing Energy-specific
+  fields when a deal's division is Energy.
+- **Herman Ras and Welcome Nyathi added as owners** (Engineering team,
+  matching their existing spreadsheet's "Assigned Engineer" column). Because
+  `SEED_USERS` only seeds a brand-new/empty store, `store.ts` now also runs
+  a small one-time migration on every load that back-fills any seed user
+  missing from an *existing* saved user list — otherwise a team member added
+  here later would never show up for someone already using the CRM.
+
 ## Second round — deal workflow, admin/rep roles, and polish
 
 - **Notes & activity feed on a deal** — a deal modal now has a live notes

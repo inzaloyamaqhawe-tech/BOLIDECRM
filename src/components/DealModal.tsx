@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { X, Copy, Paperclip, Download, Trash2, Send, CalendarClock } from "lucide-react";
-import type { Activity, Attachment, Deal, DivisionKey, Segment, StageKey } from "../types";
+import type { BankModelStatus, Activity, Attachment, Deal, DivisionKey, Segment, StageKey } from "../types";
 import {
   cloneDeal,
   createCompany,
-  createContact,
   createDeal,
   createTask,
   deleteDeal,
   getActivities,
-  getContactsByCompany,
   getDivisions,
   getStagesLive,
   logActivity,
@@ -17,7 +15,7 @@ import {
   subscribe,
   updateDeal,
 } from "../lib/store";
-import { useCompanies, useContacts, useUsers } from "../lib/use-store";
+import { useCompanies, useUsers } from "../lib/use-store";
 import { formatZAR, formatDate, findSimilarName } from "../lib/format";
 import { addAttachment, deleteAttachment, formatFileSize, getAttachments } from "../lib/attachments";
 import { DivisionBadge } from "./DivisionBadge";
@@ -51,7 +49,6 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
   const { user } = useAuth();
   const { show: showToast } = useToast();
   const companies = useCompanies();
-  const contacts = useContacts();
   const users = useUsers();
   const isNew = !deal;
   const divisions = getDivisions();
@@ -59,7 +56,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
 
   const [title, setTitle] = useState(deal?.title ?? "");
   const [companyName, setCompanyName] = useState(() => companies.find((c) => c.id === deal?.companyId)?.name ?? "");
-  const [primaryContactId, setPrimaryContactId] = useState(deal?.primaryContactId ?? "");
+  const [primaryContactName, setPrimaryContactName] = useState(deal?.primaryContactName ?? "");
   const [division, setDivision] = useState<DivisionKey>(deal?.division ?? defaultDivision ?? "secure");
   const [segment, setSegment] = useState<Segment | "">(deal?.segment ?? "");
   const [site, setSite] = useState(deal?.site ?? "");
@@ -79,10 +76,15 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
   const [ratePerKwh, setRatePerKwh] = useState(deal?.energyDetails?.ratePerKwh?.toString() ?? "");
   const [litresPerDay, setLitresPerDay] = useState(deal?.waterDetails?.litresPerDay?.toString() ?? "");
 
+  const [bankModelStatus, setBankModelStatus] = useState<BankModelStatus | "">(deal?.financingDetails?.bankModelStatus ?? "");
+  const [contractSignatureDate, setContractSignatureDate] = useState(deal?.financingDetails?.contractSignatureDate ?? "");
+  const [operationsStartDate, setOperationsStartDate] = useState(deal?.financingDetails?.operationsStartDate ?? "");
+  const [capexPpa, setCapexPpa] = useState(deal?.financingDetails?.capexPpa?.toString() ?? "");
+  const [capexRental, setCapexRental] = useState(deal?.financingDetails?.capexRental?.toString() ?? "");
+  const [ppaIrr, setPpaIrr] = useState(deal?.financingDetails?.ppaIrr?.toString() ?? "");
+  const [rentalIrr, setRentalIrr] = useState(deal?.financingDetails?.rentalIrr?.toString() ?? "");
+
   const [error, setError] = useState("");
-  const [addingContact, setAddingContact] = useState(false);
-  const [newContactName, setNewContactName] = useState("");
-  const [newContactEmail, setNewContactEmail] = useState("");
 
   const [activities, setActivities] = useState<Activity[]>([]);
   const [newNote, setNewNote] = useState("");
@@ -113,7 +115,6 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
     getAttachments(deal.id).then(setAttachments);
   }, [deal]);
 
-  const companyContacts = deal ? getContactsByCompany(deal.companyId) : [];
   const similarCompany = !isNew
     ? undefined
     : findSimilarName(
@@ -145,7 +146,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
     const payload = {
       title: title.trim(),
       companyId: finalCompanyId,
-      primaryContactId: primaryContactId || undefined,
+      primaryContactName: primaryContactName.trim() || undefined,
       site: site.trim() || undefined,
       division,
       segment: segment || undefined,
@@ -170,6 +171,18 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
             }
           : undefined,
       waterDetails: division === "water" ? { litresPerDay: Number(litresPerDay) || undefined } : undefined,
+      financingDetails:
+        division === "energy"
+          ? {
+              bankModelStatus: bankModelStatus || undefined,
+              contractSignatureDate: contractSignatureDate || undefined,
+              operationsStartDate: operationsStartDate || undefined,
+              capexPpa: Number(capexPpa) || undefined,
+              capexRental: Number(capexRental) || undefined,
+              ppaIrr: Number(ppaIrr) || undefined,
+              rentalIrr: Number(rentalIrr) || undefined,
+            }
+          : undefined,
     };
 
     if (isNew) {
@@ -217,15 +230,6 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
     const due = window.prompt("Due date (YYYY-MM-DD), or leave blank:");
     createTask({ title: title.trim(), dueDate: due?.trim() || undefined, dealId: deal.id });
     showToast("Follow-up added — see it under Tasks");
-  }
-
-  function handleAddContact() {
-    if (!deal || !newContactName.trim() || !newContactEmail.trim()) return;
-    const contact = createContact({ companyId: deal.companyId, name: newContactName.trim(), email: newContactEmail.trim() });
-    setPrimaryContactId(contact.id);
-    setAddingContact(false);
-    setNewContactName("");
-    setNewContactEmail("");
   }
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -307,36 +311,14 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
             )}
           </Field>
 
-          {!isNew && (
-            <Field label="Primary contact" span={2}>
-              {addingContact ? (
-                <div className="flex flex-wrap gap-2">
-                  <input value={newContactName} onChange={(e) => setNewContactName(e.target.value)} className="input" placeholder="Name" />
-                  <input value={newContactEmail} onChange={(e) => setNewContactEmail(e.target.value)} className="input" placeholder="Email" type="email" />
-                  <button type="button" onClick={handleAddContact} className="whitespace-nowrap text-xs font-semibold text-pink-600">
-                    Save contact
-                  </button>
-                  <button type="button" onClick={() => setAddingContact(false)} className="whitespace-nowrap text-xs font-semibold text-neutral-500">
-                    Cancel
-                  </button>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <select value={primaryContactId} onChange={(e) => setPrimaryContactId(e.target.value)} className="input">
-                    <option value="">—</option>
-                    {companyContacts.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name} ({c.email})
-                      </option>
-                    ))}
-                  </select>
-                  <button type="button" onClick={() => setAddingContact(true)} className="whitespace-nowrap text-xs font-semibold text-pink-600">
-                    + New
-                  </button>
-                </div>
-              )}
-            </Field>
-          )}
+          <Field label="Primary contact" span={2}>
+            <input
+              value={primaryContactName}
+              onChange={(e) => setPrimaryContactName(e.target.value)}
+              className="input"
+              placeholder="e.g. Jane Doe"
+            />
+          </Field>
 
           <Field label="Site">
             <input value={site} onChange={(e) => setSite(e.target.value)} className="input" placeholder="e.g. Kingsburgh" />
@@ -447,6 +429,33 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
               </Field>
               <Field label="Rate (R/kWh)">
                 <input type="number" step="0.01" value={ratePerKwh} onChange={(e) => setRatePerKwh(e.target.value)} className="input" />
+              </Field>
+
+              <div className="sm:col-span-2 -mb-2 mt-2 text-xs font-bold uppercase tracking-widest text-neutral-400">Financing</div>
+              <Field label="Bank model status">
+                <select value={bankModelStatus} onChange={(e) => setBankModelStatus(e.target.value as BankModelStatus | "")} className="input">
+                  <option value="">—</option>
+                  <option value="Modelled">Modelled</option>
+                  <option value="Not Modelled">Not Modelled</option>
+                </select>
+              </Field>
+              <Field label="Contract signature date">
+                <input type="date" value={contractSignatureDate} onChange={(e) => setContractSignatureDate(e.target.value)} className="input" />
+              </Field>
+              <Field label="Operations start date">
+                <input type="date" value={operationsStartDate} onChange={(e) => setOperationsStartDate(e.target.value)} className="input" />
+              </Field>
+              <Field label="Capex – PPA (incl. cont.)">
+                <input type="number" value={capexPpa} onChange={(e) => setCapexPpa(e.target.value)} className="input" />
+              </Field>
+              <Field label="Capex – Rental (incl. cont.)">
+                <input type="number" value={capexRental} onChange={(e) => setCapexRental(e.target.value)} className="input" />
+              </Field>
+              <Field label="PPA IRR (%)">
+                <input type="number" step="0.1" value={ppaIrr} onChange={(e) => setPpaIrr(e.target.value)} className="input" />
+              </Field>
+              <Field label="Rental IRR (%)">
+                <input type="number" step="0.1" value={rentalIrr} onChange={(e) => setRentalIrr(e.target.value)} className="input" />
               </Field>
             </>
           )}

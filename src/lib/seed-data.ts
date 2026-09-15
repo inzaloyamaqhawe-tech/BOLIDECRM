@@ -58,6 +58,8 @@ export const SEED_USERS: User[] = [
   { id: "u-suhail", name: "Suhail Asvat", email: "suhail@airnergize.co.za", passwordHash: "", role: "rep" },
   { id: "u-langelihle", name: "Langelihle Ngidi", email: "langa@bolide.co.za", passwordHash: "", role: "admin" },
   { id: "u-gianna", name: "Gianna de Figueiredo", email: "gianna@bolide.co.za", passwordHash: "", role: "rep" },
+  { id: "u-herman", name: "Herman Ras", email: "herman@bolide.co.za", passwordHash: "", role: "rep" },
+  { id: "u-welcome", name: "Welcome Nyathi", email: "welcome@bolide.co.za", passwordHash: "", role: "rep" },
 ];
 
 export const SEED_COMPANIES: Company[] = [
