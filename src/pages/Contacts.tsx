@@ -1,13 +1,35 @@
-import { useState } from "react";
-import { Mail, Phone, Plus, Users, X } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Mail, Phone, Plus, Search, Users, X } from "lucide-react";
 import { useCompanies, useContacts } from "../lib/use-store";
 import { createContact } from "../lib/store";
 import { Avatar } from "../components/Avatar";
+import { Pagination } from "../components/Pagination";
 
 export function ContactsPage() {
   const contacts = useContacts();
   const companies = useCompanies();
   const [showAdd, setShowAdd] = useState(false);
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+
+  const companyName = (id: string) => companies.find((c) => c.id === id)?.name ?? "";
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return contacts;
+    return contacts.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.email.toLowerCase().includes(q) ||
+        (c.role ?? "").toLowerCase().includes(q) ||
+        companyName(c.companyId).toLowerCase().includes(q)
+    );
+  }, [contacts, query, companies]);
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, pageCount);
+  const paged = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div className="space-y-4">
@@ -24,14 +46,30 @@ export function ContactsPage() {
         </button>
       </div>
 
+      {contacts.length > 0 && (
+        <div className="relative w-full max-w-xs">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+          <input
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setPage(1);
+            }}
+            placeholder="Search contacts, companies…"
+            className="w-full rounded-full border border-neutral-200 py-2 pl-9 pr-3 text-sm outline-none focus:border-pink-400"
+          />
+        </div>
+      )}
+
       {contacts.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-neutral-200 bg-white p-16 text-center text-neutral-400">
           <Users className="mx-auto mb-2 h-8 w-8" />
           No contacts yet. Add the people you deal with at each company.
         </div>
       ) : (
+        <>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {contacts.map((c) => {
+          {paged.map((c) => {
             const company = companies.find((co) => co.id === c.companyId);
             return (
               <div key={c.id} className="flex items-start gap-3 rounded-2xl border border-neutral-200 bg-white p-4">
@@ -56,7 +94,21 @@ export function ContactsPage() {
               </div>
             );
           })}
+          {filtered.length === 0 && (
+            <div className="col-span-full py-10 text-center text-sm text-neutral-400">No contacts match "{query}"</div>
+          )}
         </div>
+        <Pagination
+          page={currentPage}
+          pageSize={pageSize}
+          total={filtered.length}
+          onPageChange={setPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setPage(1);
+          }}
+        />
+        </>
       )}
 
       {showAdd && <AddContactModal onClose={() => setShowAdd(false)} />}

@@ -3,6 +3,7 @@ import { CheckCircle2, Circle, Plus, Trash2 } from "lucide-react";
 import { useCrm, useDeals } from "../lib/use-store";
 import { createTask, deleteTask, getTasks, setTaskDone } from "../lib/store";
 import { formatDate } from "../lib/format";
+import { DealPickerDropdown } from "../components/DealPickerDropdown";
 import type { Task } from "../types";
 
 const todayIso = () => new Date().toISOString().slice(0, 10);
@@ -49,14 +50,7 @@ export function TasksPage() {
             className="input flex-1 min-w-[220px]"
           />
           <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className="input w-auto" />
-          <select value={dealId} onChange={(e) => setDealId(e.target.value)} className="input w-auto">
-            <option value="">No linked deal</option>
-            {deals.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.title}
-              </option>
-            ))}
-          </select>
+          <DealPickerDropdown deals={deals} value={dealId} onChange={setDealId} />
           <button onClick={addTask} className="inline-flex items-center gap-1.5 rounded-full bg-brand-gradient px-4 py-2 text-sm font-bold text-white shadow-brand">
             <Plus className="h-4 w-4" /> Add
           </button>

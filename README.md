@@ -36,6 +36,21 @@ addresses (matches the reference app's Settings → Access list).
   catalogue (cost prices Bolide pays), pipeline stage probabilities, and the
   actual team list all come from `src/lib/seed-data.ts`.
 
+## Fourth round — scalable lists (search + pagination everywhere)
+
+- **Tasks' "linked deal" picker is now a searchable dropdown**
+  (`DealPickerDropdown`), not a native `<select>` — a plain option list of
+  every deal stops being usable once there are hundreds/thousands of them
+  (the client's own Lead Tracker is already close to that), and a native
+  select can render itself *above* the trigger depending on scroll position.
+  This one always opens downward and filters as you type.
+- **Contacts now has live search** (name, email, role, company) — it had
+  none before, unlike Deals which already searched deal/site/company.
+- **Deals and Contacts both paginate**, default 25 rows, adjustable to
+  10/50/100 (`src/components/Pagination.tsx`) — rendering every row
+  unpaginated was fine at seed-data scale but won't be once real pipeline
+  data accumulates.
+
 ## Third round — delete function, Product Line dropdown, financing fields
 
 - **Delete is no longer admin-gated.** Client feedback (email, Sep 2026) was

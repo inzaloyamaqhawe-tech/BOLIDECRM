@@ -8,6 +8,7 @@ import { useAuth } from "../lib/auth";
 import { useToast } from "../lib/toast";
 import { DivisionBadge } from "../components/DivisionBadge";
 import { DealModal } from "../components/DealModal";
+import { Pagination } from "../components/Pagination";
 import { formatDate, formatZAR } from "../lib/format";
 
 const SEGMENTS: Segment[] = ["Commercial", "Industrial", "Forecourt", "MDU"];
@@ -23,6 +24,8 @@ export function DealsPage() {
   const [segment, setSegment] = useState<Segment | "All">("All");
   const [params, setParams] = useSearchParams();
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   const openId = params.get("open");
   const [selectedDeal, setSelectedDeal] = useState<Deal | undefined>(openId ? getDeal(openId) : undefined);
@@ -44,13 +47,17 @@ export function DealsPage() {
     });
   }, [deals, query, segment, companies]);
 
-  const allVisibleSelected = filtered.length > 0 && filtered.every((d) => selected.has(d.id));
+  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, pageCount);
+  const paged = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const allVisibleSelected = paged.length > 0 && paged.every((d) => selected.has(d.id));
 
   function toggleAll() {
     if (allVisibleSelected) {
       setSelected(new Set());
     } else {
-      setSelected(new Set(filtered.map((d) => d.id)));
+      setSelected(new Set(paged.map((d) => d.id)));
     }
   }
 
@@ -158,16 +165,34 @@ export function DealsPage() {
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
           <input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setPage(1);
+            }}
             placeholder="Search deals, sites, companies…"
             className="w-full rounded-full border border-neutral-200 py-2 pl-9 pr-3 text-sm outline-none focus:border-pink-400"
           />
         </div>
         <span className="text-xs font-bold uppercase tracking-widest text-neutral-400">Segment</span>
         <div className="flex gap-1.5">
-          <SegmentPill label="All" active={segment === "All"} onClick={() => setSegment("All")} />
+          <SegmentPill
+            label="All"
+            active={segment === "All"}
+            onClick={() => {
+              setSegment("All");
+              setPage(1);
+            }}
+          />
           {SEGMENTS.map((s) => (
-            <SegmentPill key={s} label={s} active={segment === s} onClick={() => setSegment(s)} />
+            <SegmentPill
+              key={s}
+              label={s}
+              active={segment === s}
+              onClick={() => {
+                setSegment(s);
+                setPage(1);
+              }}
+            />
           ))}
         </div>
       </div>
@@ -248,7 +273,7 @@ export function DealsPage() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((d) => (
+            {paged.map((d) => (
               <tr key={d.id} onClick={() => setSelectedDeal(d)} className="cursor-pointer border-b border-neutral-50 hover:bg-neutral-50">
                 <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                   <input type="checkbox" checked={selected.has(d.id)} onChange={() => toggleOne(d.id)} />
@@ -288,6 +313,17 @@ export function DealsPage() {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        page={currentPage}
+        pageSize={pageSize}
+        total={filtered.length}
+        onPageChange={setPage}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setPage(1);
+        }}
+      />
 
       {selectedDeal && <DealModal deal={selectedDeal} onClose={closeModal} />}
     </div>
