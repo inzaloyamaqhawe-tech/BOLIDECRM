@@ -68,7 +68,7 @@ export function KanbanBoard({ deals, onOpenDeal }: { deals: Deal[]; onOpenDeal: 
                   <div
                     ref={provided.innerRef}
                     {...provided.droppableProps}
-                    className={`min-h-[120px] rounded-xl p-1 transition ${snapshot.isDraggingOver ? "bg-pink-50" : ""}`}
+                    className={`min-h-[120px] max-h-[65vh] overflow-y-auto scroll-thin rounded-xl p-1 transition ${snapshot.isDraggingOver ? "bg-pink-50" : ""}`}
                   >
                     {stageDeals.map((deal, index) => (
                       <KanbanCard key={deal.id} deal={deal} index={index} onOpen={onOpenDeal} />
