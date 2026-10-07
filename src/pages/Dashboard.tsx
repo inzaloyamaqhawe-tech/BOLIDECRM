@@ -1,3 +1,4 @@
+import { StageTitle } from "../components/StageTitle";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Wallet, Target, Repeat, TrendingUp, Trophy, Percent, AlertTriangle } from "lucide-react";
 import { useActivities, useCompanies, useCrm, useDeals } from "../lib/use-store";
@@ -33,6 +34,9 @@ export function DashboardPage() {
   const arrPipeline = mrrPipeline * 12;
 
   const now = new Date();
+  const monthKey = (iso: string) => new Intl.DateTimeFormat("en-ZA", { timeZone: "Africa/Johannesburg", year: "numeric", month: "2-digit" }).format(new Date(iso));
+  const receivedThisMonth = deals.filter(d => monthKey(d.receivedAt ?? d.createdAt) === monthKey(now.toISOString()));
+  const monthlyStages = stages.map(stage => ({ stage, count: deals.filter(d => d.stage === stage.key && monthKey(d.stageChangedAt ?? d.createdAt) === monthKey(now.toISOString())).length }));
   const wonThisMonth = deals.filter((d) => d.stage === "won" && new Date(d.updatedAt).getMonth() === now.getMonth() && new Date(d.updatedAt).getFullYear() === now.getFullYear());
   const wonThisMonthValue = wonThisMonth.reduce((s, d) => s + d.onceOff, 0);
 
@@ -90,6 +94,15 @@ export function DashboardPage() {
         <KpiCard icon={<Trophy className="h-5 w-5" />} label="Deals won this month" value={String(wonThisMonth.length)} sub={`${formatZAR(wonThisMonthValue)} total contract value`} />
         <KpiCard icon={<Percent className="h-5 w-5" />} label="Win rate" value={`${winRate}%`} sub={`${wonCount} won / ${closedCount} closed`} />
       </div>
+
+      <section className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4">
+        <h2 className="font-bold">Work this month</h2>
+        <p className="mb-3 text-xs text-neutral-500">Leads received and current stages entered this month · Johannesburg time</p>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-xl border border-neutral-200 bg-white p-4"><div className="text-xs text-neutral-500">Total leads received</div><div className="mt-2 text-3xl font-black">{receivedThisMonth.length}</div></div>
+          {monthlyStages.map(({stage,count}) => <div key={stage.key} className="rounded-xl border border-neutral-200 bg-white p-4"><div className="text-xs text-neutral-500"><StageTitle stage={stage}/></div><div className="mt-2 text-3xl font-black">{count}</div></div>)}
+        </div>
+      </section>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <ChartCard title="Pipeline value by division" sub="Total contract value, excl. VAT">

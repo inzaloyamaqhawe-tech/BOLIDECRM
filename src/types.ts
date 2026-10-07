@@ -20,11 +20,12 @@ export interface Division {
   productLines: string[];
 }
 
-export type StageKey = "lead" | "qualified" | "quote" | "negotiation" | "won" | "lost";
+export type StageKey = "lead" | "qualified" | "quote" | "final_proposal" | "negotiation" | "won" | "lost";
 
 export interface Stage {
   key: StageKey;
   label: string;
+  description?: string;
   probability: number; // 0-100
 }
 
@@ -106,6 +107,9 @@ export interface Deal {
   /** Only meaningful once stage === "lost" — captured at the moment it's lost
    * so a reason isn't just implied by the deal quietly disappearing. */
   lostReason?: string;
+  receivedAt?: string;
+  proposalSentAt?: string;
+  stageChangedAt?: string;
   secureDetails?: SecureDealDetails;
   energyDetails?: EnergyDealDetails;
   waterDetails?: WaterDealDetails;
@@ -121,6 +125,7 @@ export interface User {
   name: string;
   email: string;
   passwordHash: string;
+  registered?: boolean;
   role: UserRole;
 }
 

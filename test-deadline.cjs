@@ -1,0 +1,13 @@
+const fs=require('fs'),ts=require('typescript'),assert=require('assert');
+const code=ts.transpileModule(fs.readFileSync('src/lib/proposal.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
+const exportsObject={};new Function('exports',code)(exportsObject);
+assert.equal(exportsObject.proposalDue('2026-10-07T08:00:00+02:00'),'2026-10-16');
+assert.equal(exportsObject.proposalDue('2026-10-09T08:00:00+02:00'),'2026-10-20');
+assert.equal(exportsObject.proposalDue('2026-10-10T08:00:00+02:00'),'2026-10-20');
+assert.equal(exportsObject.proposalDue('2026-12-31T08:00:00+02:00'),'2027-01-11');
+const deal={createdAt:'2026-10-07T06:00:00Z',stage:'lead'};
+assert.match(exportsObject.proposalStatus(deal,new Date('2026-10-07T06:00:00Z')),/7 working days left/);
+assert.match(exportsObject.proposalStatus(deal,new Date('2026-10-16T06:00:00Z')),/due today/);
+assert.match(exportsObject.proposalStatus(deal,new Date('2026-10-19T06:00:00Z')),/Overdue by 1 working day/);
+assert.match(exportsObject.proposalStatus({...deal,stage:'quote'}),/Proposal sent/);
+console.log('PASS: weekday deadlines, weekend receipt, year boundary, days remaining, due today, overdue, proposal completion.');

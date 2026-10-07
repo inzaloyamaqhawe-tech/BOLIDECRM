@@ -1,3 +1,5 @@
+import { api, hosted } from "./remote";
+import { getAllAttachments, replaceRemoteAttachments } from "./attachments";
 import type { Activity, Company, Contact, Deal, Division, DivisionKey, Stage, StageKey, Task, User } from "../types";
 import { DIVISIONS, SEED_COMPANIES, SEED_DEALS, SEED_USERS, STAGES } from "./seed-data";
 
@@ -39,6 +41,12 @@ const KEYS = {
  * value here, and only replacing it inside `save()`, keeps the reference
  * stable between real changes.
  */
+let remoteReady=false;
+let remoteRevision=0;
+let remoteTimer: ReturnType<typeof setTimeout> | undefined;
+let saving=false;
+let dirty=false;
+let blocked=false;
 const cache = new Map<string, unknown>();
 
 function load<T>(key: string, fallback: T): T {
@@ -62,6 +70,7 @@ function save<T>(key: string, value: T) {
     // storage full or unavailable — in-memory cache still works for this session
   }
   notify();
+  if(remoteReady) scheduleRemoteSave();
 }
 
 // --- reactivity -------------------------------------------------------
@@ -92,7 +101,7 @@ function seedIfEmpty() {
   if (!localStorage.getItem(KEYS.divisionOverrides)) save(KEYS.divisionOverrides, {} as Record<DivisionKey, Partial<Division>>);
   if (!localStorage.getItem(KEYS.stageOverrides)) save(KEYS.stageOverrides, {} as Record<StageKey, Partial<Stage>>);
 }
-seedIfEmpty();
+if(!hosted) seedIfEmpty();
 
 /** Adds any seed users that don't exist yet — runs every load, not just on
  * an empty store. `seedIfEmpty()` alone only populates a brand-new browser;
@@ -104,7 +113,12 @@ function migrateNewSeedUsers() {
   const missing = SEED_USERS.filter((seedUser) => !existing.some((u) => u.id === seedUser.id));
   if (missing.length > 0) save(KEYS.users, [...existing, ...missing]);
 }
-migrateNewSeedUsers();
+if(!hosted) migrateNewSeedUsers();
+const correctedUsers=load<User[]>(KEYS.users,SEED_USERS);
+if(!hosted && correctedUsers.some(u=>u.email==="langa@bolide.co.za")) save(KEYS.users,correctedUsers.map(u=>u.email==="langa@bolide.co.za"?{...u,email:"langelihle@bolide.co.za"}:u));
+const oldStages=load<Record<string,Partial<Stage>>>(KEYS.stageOverrides,{});
+for(const key of ["qualified","quote","won"]) if(oldStages[key]) delete oldStages[key].label;
+if(!hosted) save(KEYS.stageOverrides,oldStages);
 
 /** Swaps the old placeholder Energy deals for the client's real pipeline
  * from their own "Lead Tracker v1.xlsx" (Sep 2026) — same reasoning as
@@ -124,7 +138,7 @@ function migrateLeadTrackerDeals() {
     save(KEYS.deals, [...withoutPlaceholders, ...missingDeals]);
   }
 }
-migrateLeadTrackerDeals();
+if(!hosted) migrateLeadTrackerDeals();
 
 function uid(prefix: string) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -202,14 +216,20 @@ export function getDeal(id: string): Deal | undefined {
 }
 
 export function createDeal(input: Omit<Deal, "id" | "createdAt" | "updatedAt">): Deal {
+  if(input.stage === "lost" && !input.lostReason?.trim()) throw new Error("A lost reason is required.");
   const nowIso = new Date().toISOString();
-  const deal: Deal = { ...input, id: uid("d"), createdAt: nowIso, updatedAt: nowIso };
+  const deal: Deal = { ...input, id: uid("d"), receivedAt: input.receivedAt ?? nowIso, stageChangedAt: nowIso, proposalSentAt: ["quote","final_proposal","negotiation","won"].includes(input.stage) ? nowIso : undefined, createdAt: nowIso, updatedAt: nowIso };
   save(KEYS.deals, [...getDeals(), deal]);
   logActivity(deal.id, "note", `Deal created: ${deal.title}`);
   return deal;
 }
 
 export function updateDeal(id: string, patch: Partial<Deal>) {
+  const before=getDeal(id); if(!before) return;
+  const after={...before,...patch};
+  if(after.stage === "lost" && !after.lostReason?.trim()) throw new Error("A lost reason is required.");
+  if(patch.stage && patch.stage!==before.stage) patch.stageChangedAt=new Date().toISOString();
+  if(!before.proposalSentAt && patch.stage && ["quote","final_proposal","negotiation","won"].includes(patch.stage)) patch.proposalSentAt=new Date().toISOString();
   save(
     KEYS.deals,
     getDeals().map((d) => (d.id === id ? { ...d, ...patch, updatedAt: new Date().toISOString() } : d))
@@ -224,6 +244,8 @@ export function moveDealStage(id: string, stage: StageKey) {
 }
 
 export function deleteDeal(id: string) {
+  save(KEYS.activities, load<Activity[]>(KEYS.activities, []).filter(a=>a.dealId!==id));
+  save(KEYS.tasks, getTasks().map(t=>t.dealId===id?{...t,dealId:undefined}:t));
   save(
     KEYS.deals,
     getDeals().filter((d) => d.id !== id)
@@ -246,6 +268,9 @@ export function cloneDeal(id: string): Deal | undefined {
     id: uid("d"),
     title: `${source.title} (Copy)`,
     stage: "lead",
+    receivedAt: nowIso,
+    stageChangedAt: nowIso,
+    proposalSentAt: undefined,
     lostReason: undefined,
     createdAt: nowIso,
     updatedAt: nowIso,
@@ -389,4 +414,48 @@ export function updateStageMeta(key: StageKey, patch: Partial<Pick<Stage, "label
   save(KEYS.stageOverrides, { ...overrides, [key]: { ...overrides[key], ...patch } });
 }
 
+export function exportCrmSnapshot() {
+  return {
+    exportedAt: new Date().toISOString(),
+    version: 1,
+    users: getUsers(),
+    companies: getCompanies(),
+    contacts: getContacts(),
+    deals: getDeals(),
+    activities: getAllActivities(),
+    tasks: getTasks(),
+    divisionOverrides: load<Record<string, Partial<Division>>>(KEYS.divisionOverrides, {}),
+    stageOverrides: load<Record<string, Partial<Stage>>>(KEYS.stageOverrides, {}),
+  };
+}
+
 export { KEYS as STORAGE_KEYS };
+
+export async function initializeRemoteStore(poll=false) {
+ const data=await api("state");
+ if(poll && (dirty || saving || blocked || document.querySelector('[role="dialog"]') || data.revision===remoteRevision))return;
+ remoteReady=false;
+ for(const name of ["users","companies","contacts","deals","activities","tasks","divisionOverrides","stageOverrides"] as const) {
+   cache.set(KEYS[name],data.snapshot[name]);
+ }
+ replaceRemoteAttachments(data.snapshot.attachments);
+ cachedDivisions=null;cachedStages=null;remoteRevision=data.revision;remoteReady=true;notify();
+}
+export function scheduleRemoteSave() {
+ if(!hosted || !remoteReady || blocked)return;
+ dirty=true;window.dispatchEvent(new CustomEvent("crm-save-status",{detail:"Saving changes…"}));
+ clearTimeout(remoteTimer); remoteTimer=setTimeout(flushRemoteSave,250);
+}
+async function flushRemoteSave() {
+ if(saving || !dirty || blocked)return;
+ saving=true;dirty=false;
+ try {
+   const base=exportCrmSnapshot();
+   const snapshot={...base,attachments:(await getAllAttachments()).filter(a=>base.deals.some(d=>d.id===a.dealId))};
+   const data=await api("state",{revision:remoteRevision,snapshot}); remoteRevision=data.revision;
+   window.dispatchEvent(new CustomEvent("crm-save-status",{detail:dirty?"Saving changes…":"All changes saved"}));
+ } catch(e) {blocked=true;window.dispatchEvent(new CustomEvent("crm-save-status",{detail:(e as Error).message}));window.alert((e as Error).message + "\nPlease keep this tab open. Export your snapshot from Settings before reloading if you need to preserve unsaved changes.");}
+ finally {saving=false;if(dirty && !blocked)void flushRemoteSave();}
+}
+window.addEventListener("beforeunload",e=>{if(hosted && (dirty || saving || blocked)){e.preventDefault();e.returnValue="";}});
+if(hosted) setInterval(()=>{if(remoteReady && !saving && !dirty && !blocked && !document.querySelector('[role="dialog"]')) void initializeRemoteStore(true).catch(()=>{});},30000);

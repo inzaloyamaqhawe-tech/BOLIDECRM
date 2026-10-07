@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Mail, Pencil, Plus, UserPlus, X } from "lucide-react";
 import { WHOLESALE_CATALOGUE } from "../lib/seed-data";
 import { useCompanies, useCrm, useDeals, useUsers } from "../lib/use-store";
-import { createUser, getAllActivities, getDivisions, getStagesLive, updateDivisionMeta, updateStageMeta, updateUser } from "../lib/store";
+import { createUser, exportCrmSnapshot, getAllActivities, getDivisions, getStagesLive, updateDivisionMeta, updateStageMeta, updateUser } from "../lib/store";
+import { getAllAttachments } from "../lib/attachments";
 import { emailDomainAllowed } from "../lib/auth";
 import { useAuth } from "../lib/auth";
 import { ALLOWED_EMAIL_DOMAINS, type Division, type Stage } from "../types";
@@ -111,7 +112,7 @@ export function SettingsPage() {
                 <div className="font-semibold text-neutral-800">{u.name}</div>
                 <div className="truncate text-xs text-neutral-500">
                   {u.email}
-                  {!u.passwordHash && <span className="ml-2 rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-bold uppercase text-orange-600">Invited</span>}
+                  {!(u.registered ?? !!u.passwordHash) && <span className="ml-2 rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-bold uppercase text-orange-600">Invited</span>}
                 </div>
               </div>
               {isAdmin ? (
@@ -137,6 +138,18 @@ export function SettingsPage() {
         </button>
       </Card>
 
+      <Card title="CRM backup" sub="Download a snapshot of the records currently loaded in the CRM.">
+        <p className="mb-4 text-sm text-neutral-500">
+          Download a backup of your current CRM records and attachments. Keep the file private because it contains client and team information.
+        </p>
+        <button
+          onClick={downloadDatabaseSnapshot}
+          className="inline-flex w-full items-center justify-center rounded-full bg-neutral-900 px-6 py-3 text-sm font-bold text-white hover:bg-neutral-800"
+        >
+          Download database snapshot
+        </button>
+      </Card>
+
       <Card title="Activity log" sub="Every deal and company event, newest first.">
         <div className="max-h-96 space-y-2 overflow-y-auto scroll-thin">
           {activities.map((a) => (
@@ -155,6 +168,22 @@ export function SettingsPage() {
       {showInvite && <InviteModal onClose={() => setShowInvite(false)} />}
     </div>
   );
+}
+
+async function downloadDatabaseSnapshot() {
+  const snapshot = {
+    ...exportCrmSnapshot(),
+    attachments: await getAllAttachments(),
+  };
+  const blob = new Blob([JSON.stringify({ snapshot }, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `bolide-crm-snapshot-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
 
 function DivisionRow({ division, editable }: { division: Division; editable: boolean }) {

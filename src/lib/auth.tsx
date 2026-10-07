@@ -1,3 +1,5 @@
+import { api, hosted } from "./remote";
+import { initializeRemoteStore } from "./store";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { ALLOWED_EMAIL_DOMAINS } from "../types";
 import type { User } from "../types";
@@ -45,6 +47,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if(hosted) {
+      api("auth").then(async data=>{ await initializeRemoteStore(); setUser(data.user); }).catch(()=>setUser(null)).finally(()=>setLoading(false));
+      return;
+    }
     const raw = localStorage.getItem(STORAGE_KEYS.session);
     if (raw) {
       try {
@@ -68,6 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function login(email: string, password: string) {
+    if(hosted) { try {const data=await api("auth",{action:"login",email,password}); await initializeRemoteStore();setUser(data.user);return {ok:true as const};} catch(e) {return {ok:false as const,error:(e as Error).message};} }
     if (!emailDomainAllowed(email)) {
       return { ok: false as const, error: "Sign-in is limited to Bolide Group email domains." };
     }
@@ -98,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (password !== confirmPassword) {
       return { ok: false as const, error: "Passwords do not match — please re-enter both." };
     }
+    if(hosted) {try {const data=await api("auth",{action:"signup",name,email,password});await initializeRemoteStore();setUser(data.user);return {ok:true as const};}catch(e){return {ok:false as const,error:(e as Error).message};}}
     const existingInvite = findUserByEmail(email);
     const passwordHash = await hashPassword(password);
 
@@ -120,6 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   function logout() {
+    if(hosted) {api("auth",{action:"logout"}).then(()=>window.location.reload()).catch(e=>window.alert(e.message));return;}
     localStorage.removeItem(STORAGE_KEYS.session);
     setUser(null);
   }

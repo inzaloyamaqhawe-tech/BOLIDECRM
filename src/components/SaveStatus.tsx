@@ -1,0 +1,3 @@
+import {useEffect,useState} from "react";
+import {hosted} from "../lib/remote";
+export function SaveStatus(){const [status,setStatus]=useState("Connected to shared database");useEffect(()=>{const f=(e:Event)=>setStatus((e as CustomEvent).detail);window.addEventListener("crm-save-status",f);return ()=>window.removeEventListener("crm-save-status",f);},[]);return (hosted || import.meta.env.BASE_URL === "/BOLIDECRM/")?<div role="status" className="fixed bottom-2 right-3 z-[100] max-w-lg rounded-lg border bg-white px-3 py-2 text-xs shadow">{hosted ? status : "GitHub preview ? changes stay in this browser"}</div>:null;}

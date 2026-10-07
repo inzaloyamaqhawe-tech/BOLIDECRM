@@ -1,200 +1,62 @@
 # Bolide CRM
 
-Internal pipeline/deals CRM for the Bolide Group (Energy, Secure, Connect, Water, SaaS
-divisions), rebuilt from the earlier Lovable prototype with the two review rounds'
-feedback folded in. React + TypeScript + Vite, no backend required to run it.
+CRM for the Bolide Group, built with React, TypeScript and Vite, with a PHP/MySQL backend for xneelo.
 
-```
-npm install
+## Two deployments
+
+- **GitHub Pages preview:** https://inzaloyamaqhawe-tech.github.io/BOLIDECRM/ ? builds use `/BOLIDECRM/`. Sign-in, pipeline data and changes are stored in the current browser. This preview does not connect to the production database. The existing preview pipeline remains available for reviewing the interface.
+- **xneelo production:** https://bolide.co.za/crm/ ? builds use `/crm/`. Invited accounts, PHP sessions and shared MySQL records are used. HTTPS with a valid certificate is required. Certificate renewal was pending with xneelo Support on 7 October 2026.
+
+`main` contains source code. `gh-pages` contains the built static preview. Source changes alone do not update the preview; publish a new `/BOLIDECRM/` build to `gh-pages`.
+
+## Latest changes
+
+- Monthly dashboard cards show total leads received and counts for each current stage entered that month, using Johannesburg dates.
+- Stages: Lead Received, Qualify/KYC Onboarding, Preliminary Proposal, Final Proposal, Negotiation, Won (Final Proposal Signed), Lost.
+- Hover or focus on dashboard stage titles or pipeline headings to read their definitions.
+- A lost reason is compulsory for edits, drag-and-drop and bulk changes, and is validated by the PHP API and database.
+- Proposal deadlines are seven Monday?Friday days after the lead received date; the receipt day is day zero. Public holidays are currently counted as working days.
+- Proposal cards show working days remaining, due today, overdue, or proposal sent.
+- Langelihle's invited email is `langelihle@bolide.co.za`.
+- Production includes server-side password hashing, secure session cookies, CSRF protection, shared attachments and save status.
+- Revision checks reject conflicting saves. Shared records refresh every 30 seconds when no save or lead dialog is active.
+- Settings can download a backup snapshot of records and attachments.
+
+## Develop and verify
+
+```sh
+npm ci
 npm run dev
+npm run lint
+node test-deadline.cjs
 ```
 
-Sign-up is restricted to `@bolide.co.za`, `@airnergize.co.za` and `@newgx.co.za`
-addresses (matches the reference app's Settings → Access list).
+Build on PowerShell:
 
-## What changed from the reviewed version
+```powershell
+# Production frontend
+$env:BASE_PATH='/crm/'
+npm run build
 
-- **"Add New Deal" now works.** The button opens a real modal (`DealModal`)
-  that creates a deal and drops it straight into the Pipeline/Deals lists.
-- **Pipeline cards are clickable, not just draggable.** Clicking a card opens
-  the same detail modal used from the Deals table — customer, site, product
-  line, pricing, division-specific fields (cameras/solar/etc.) — so a quote
-  can be reviewed before it's dragged into Negotiation.
-- **Search is live/predictive.** `GlobalSearch` filters deals, companies and
-  contacts on every keystroke instead of waiting for a full term.
-- **Owner filter is a searchable dropdown** (`OwnerFilterDropdown`), default
-  "Everyone", instead of one button per teammate — stays usable as the team
-  grows past five people.
-- **Confirm password on sign-up**, with a live match/mismatch indicator,
-  so a typo doesn't silently lock someone out of the account they just made.
-- **Bolide branding**: the real Bolide Tanzania wordmark (shared asset with
-  the Shopfront) is used in the sidebar, top bar and auth screens, and the
-  brand gradient/colour tokens match the Shopfront's `--gradient-brand`
-  exactly (see `src/index.css`).
-- **Settings is now real reference data**, not placeholders: the five
-  divisions and their product lines, the Herotel Business wholesale
-  catalogue (cost prices Bolide pays), pipeline stage probabilities, and the
-  actual team list all come from `src/lib/seed-data.ts`.
+# GitHub Pages preview in a separate output folder
+$env:BASE_PATH='/BOLIDECRM/'
+npm run build -- --outDir .pages-build
+```
 
-## Fifth round — real Energy pipeline from the client's own Lead Tracker
+On bash, prefix each build with `BASE_PATH=/crm/` or `BASE_PATH=/BOLIDECRM/`.
 
-- **The placeholder Energy deals are gone.** `SEED_DEALS` used to have four
-  synthetic Energy entries (ALT Piet Retief/Ganyesa/Ekuphumleni, BP Kew) with
-  made-up solar/BESS numbers. They're replaced with all 30 real leads from
-  the client's own `Lead Tracker v1.xlsx` (Sep 2026) — same company names,
-  assigned engineers (now `ownerId`), Bank Model Status, Capex-PPA/Rental,
-  and PPA/Rental IRR the client already tracks. Nine new prospect companies
-  were added for sites that don't map onto an existing company (PIC and
-  several standalone properties).
-- **Stage is inferred, not given** — the spreadsheet has no CRM "stage"
-  column, so it's derived from Approved/Proposal Sent: Declined or a
-  "Closed…" note → Lost, Approved → Negotiation, proposal sent on a date →
-  Quote, "Pending Send" → Qualified, otherwise Lead. This is a best-effort
-  mapping, not something the client confirmed — flag it to them if a deal's
-  stage looks wrong.
-- **A migration (`migrateLeadTrackerDeals` in `store.ts`) removes the old
-  placeholder deals and adds the real ones for anyone who already opened the
-  CRM** — same reasoning as the Herman/Welcome user migration: editing
-  `SEED_DEALS` only affects a brand-new browser, and QA/the client already
-  have their own saved `localStorage` copy of the old placeholder data.
+The PHP/database integration check in `test_hosted.py` requires a local, private `api/config.php`, PyMySQL, and a PHP executable. It temporarily inserts a verification account and records, then removes them. It is a manual database check, not a public preview test; adjust its local PHP path before using it.
 
-## Fourth round — scalable lists (search + pagination everywhere)
+## Production setup
 
-- **Tasks' "linked deal" picker is now a searchable dropdown**
-  (`DealPickerDropdown`), not a native `<select>` — a plain option list of
-  every deal stops being usable once there are hundreds/thousands of them
-  (the client's own Lead Tracker is already close to that), and a native
-  select can render itself *above* the trigger depending on scroll position.
-  This one always opens downward and filters as you type.
-- **Contacts now has live search** (name, email, role, company) — it had
-  none before, unlike Deals which already searched deal/site/company.
-- **Deals and Contacts both paginate**, default 25 rows, adjustable to
-  10/50/100 (`src/components/Pagination.tsx`) — rendering every row
-  unpaginated was fine at seed-data scale but won't be once real pipeline
-  data accumulates.
+See [UPLOAD-INSTRUCTIONS.md](UPLOAD-INSTRUCTIONS.md) for individual file uploads, root redirect exceptions, and HTTPS requirements. The existing production database was populated with 42 leads, 16 companies and 7 invited users. Do not reinitialize that database.
 
-## Third round — delete function, Product Line dropdown, financing fields
+For a new installation, import `database/schema.sql` into an empty MySQL/MariaDB database, then copy `api/config.example.php` to `api/config.php` and set credentials privately. PHP 8.2+ with PDO MySQL and Apache rewrite support is required.
 
-- **Delete is no longer admin-gated.** Client feedback (email, Sep 2026) was
-  that they couldn't delete from Pipeline — the earlier admin-only
-  restriction was our own scope call, not something they'd asked for. Any
-  logged-in user can now delete a deal, from the modal, a one-click icon on
-  a Pipeline card, or a row/bulk action on the Deals table.
-- **Product Line is a fixed dropdown**: Water, Security, Solar, Fibre — no
-  longer free text against a division's suggested list. An existing deal
-  whose value doesn't match one of the four (e.g. seed data's "Hybrid Solar
-  + BESS") shows as a "(legacy)" option rather than disappearing.
-- **Primary contact is now a plain typed name** (`Deal.primaryContactName`),
-  not a dropdown requiring a full Contact record (with an email) to exist
-  first — client just wants to type who they're dealing with.
-- **New Financing fields on Energy deals**, matching the client's own Lead
-  Tracker spreadsheet columns: Bank Model Status (Modelled/Not Modelled),
-  Contract Signature Date, Operations Start Date, Capex – PPA, Capex –
-  Rental, PPA IRR, Rental IRR. Shown alongside the existing Energy-specific
-  fields when a deal's division is Energy.
-- **Herman Ras and Welcome Nyathi added as owners** (Engineering team,
-  matching their existing spreadsheet's "Assigned Engineer" column). Because
-  `SEED_USERS` only seeds a brand-new/empty store, `store.ts` now also runs
-  a small one-time migration on every load that back-fills any seed user
-  missing from an *existing* saved user list — otherwise a team member added
-  here later would never show up for someone already using the CRM.
+After building with `/crm/`, `python package_crm.py` prepares the individual upload folder if a private configuration file is present. It never creates a ZIP. Upload the folder's contents into the website's `crm` folder, including hidden files, without adding an extra directory level.
 
-## Second round — deal workflow, admin/rep roles, and polish
+Do not commit `api/config.php`, environment files, upload folders, ZIP archives, database exports or local migration scripts. GitHub Pages must never receive the PHP folder or production database configuration.
 
-- **Notes & activity feed on a deal** — a deal modal now has a live notes
-  thread (`logActivity`, previously built but never wired to any UI) plus
-  every stage change, edit, and duplication logs itself automatically. A
-  project-wide version of the same feed lives under Settings → Activity log.
-- **Lost-reason capture** — moving a deal to Lost (from the modal *or* by
-  dragging it on the Pipeline board) now requires a short reason before it's
-  accepted, instead of the deal just quietly disappearing from view.
-- **Duplicate deal** — clones a deal (fresh id, reset to Lead) for a
-  near-identical site under the same or a different client.
-- **File attachments** — quotes/contracts attach directly to a deal, stored
-  in IndexedDB (`src/lib/attachments.ts`) rather than `localStorage`, since a
-  scanned PDF would blow through localStorage's ~5-10MB quota fast.
-- **Bulk actions on the Deals table** — select rows, bulk-change stage or
-  owner, export just the selection to CSV.
-- **Company detail page** (`/companies/:id`) — a company's full deal list,
-  contacts, and company-level activity, instead of cards-only with no
-  drill-down.
-- **Duplicate-company protection** — typing a company name close to (but not
-  exactly matching) an existing one now surfaces a "Did you mean…?" nudge
-  before it creates a near-duplicate record; a "Merge duplicates" tool on the
-  Companies page folds an accidental duplicate's deals/contacts back into one.
-- **A deal's primary contact** is now a real field (`Deal.primaryContactId`),
-  not just "someone at that company."
-- **Divisions, product lines, and pipeline stages are editable** from
-  Settings (admins only) — a small persisted override layer on top of the
-  seed data, so the existing division/stage *keys* (wired into colours,
-  Kanban columns, dashboard buckets) stay stable while their labels,
-  descriptions, product lines, and win probabilities can change.
-- **Admin/rep roles** — a first pass at permissions. Deleting a deal and
-  editing Settings reference data are admin-only; this is enforced in the UI
-  only (there's no backend yet to enforce it server-side — see Known
-  limitations).
-- **Reports**: date-range filter (all-time/month/quarter/year) and an
-  "Export PDF" button (`window.print()` with print-specific CSS — no new
-  dependency for something the browser already does).
-- **Tasks & follow-ups** (`/tasks`) — reminders optionally linked to a deal,
-  with overdue ones flagged distinctly. Dashboard surfaces overdue follow-ups
-  and upcoming ones, and close-dates that have quietly passed are flagged
-  the same way under "Closing soon."
-- **Undo on delete** — deleting a deal no longer uses a plain `confirm()`
-  dialog; it's removed immediately with a toast offering "Undo" for a few
-  seconds (`src/lib/toast.tsx`), restoring the exact same record if clicked.
-- **Mobile-responsive layout** — the sidebar becomes a slide-over drawer
-  below the `lg` breakpoint instead of a fixed 256px column with nowhere to
-  go on a phone.
+## Limitations
 
-## Architecture — written for the Shopfront integration
-
-The previous review couldn't see the source, which made it hard to plan how
-quote requests from the Shopfront would eventually reach the CRM. That's the
-main thing this rebuild optimises for:
-
-- **`src/types.ts`** is the single source of truth for every shape (`Deal`,
-  `Company`, `Contact`, `User`, `Activity`, the Herotel `WholesalePackage`
-  catalogue). These are written to look like a real backend schema, not
-  view-model props — a `Deal` has the same fields whether it came from a
-  salesperson typing it in or, later, from a Shopfront quote request.
-- **`src/lib/store.ts`** is a small repository layer: `getDeals()`,
-  `createDeal()`, `updateDeal()`, `moveDealStage()`, etc. Every page reads
-  and writes through these functions — nothing touches `localStorage`
-  directly outside this one file. Data currently lives in
-  `localStorage` under `bolide-crm:v1:*` keys, seeded from
-  `src/lib/seed-data.ts` on first run.
-- **Why this matters for integration**: when the Shopfront is ready to hand
-  off quote requests, `store.ts` is the *only* file that needs to change —
-  swap each function's body for a real API/Supabase call against the same
-  `Deal`/`Company`/`Contact` shapes, and every page keeps working unmodified.
-  A Shopfront quote request maps directly onto `createDeal()` +
-  `createCompany()`/`createContact()` as already defined: customer info →
-  `Company`/`Contact`, requested products/quantities → `Deal.productLine` +
-  `notes` (or a `lineItems[]` array added to `Deal` if per-line pricing is
-  needed), stage starts at `"lead"` or `"quote"`.
-- **`src/lib/auth.tsx`** is similarly isolated — sign-up/login/session both
-  go through this one module. It currently hashes passwords client-side
-  (SHA-256) and stores the session in `localStorage`, which is fine for an
-  internal tool behind existing network/device trust but is **not** meant to
-  survive being put on the open internet as-is — swapping in real auth
-  (Supabase Auth, Azure AD, etc.) touches only this file.
-
-## Known limitations (same spirit as the previous review's "Known limitations")
-
-- No real backend yet — this is an intentional first step; see
-  "Architecture" above for exactly where a backend plugs in.
-- MRR trend on Reports is a synthetic ramp ending at today's real total MRR
-  (there's no historical time-series to chart yet without a backend).
-- Contacts starts empty, same as the reviewed version — a working "Add
-  contact" flow now exists so it doesn't have to stay that way.
-- "Invite teammate" creates a placeholder account (shown as "Invited" under
-  Settings → Access) that the invited person claims by signing up with that
-  same email — there's no real email delivery without a backend to send from.
-- Admin/rep permissions are UI-only right now — anyone comfortable editing
-  their own browser's `localStorage` could bypass them. Fine for an internal
-  tool among a trusted small team; not a substitute for real server-side
-  auth once this is opened up further.
-- Attachments live in each browser's own IndexedDB, so a file attached on
-  one device isn't visible from another until there's a real backend to
-  store it centrally — same underlying limitation as the rest of the data.
+GitHub Pages authentication is only a browser-local preview; its accounts are separate from production. Invitations create account records but do not send email. Reports' MRR trend remains a synthetic chart, not a historical time series. Public holidays are not yet excluded from proposal deadlines. Production is ready for secure access only after the hosting certificate is valid.

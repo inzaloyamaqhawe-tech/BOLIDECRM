@@ -1,3 +1,4 @@
+import { StageTitle } from "../StageTitle";
 import { DragDropContext, Droppable, type DropResult } from "@hello-pangea/dnd";
 import type { Deal, StageKey } from "../../types";
 import { getDeal, getStagesLive, logActivity, moveDealStage, updateDeal } from "../../lib/store";
@@ -10,6 +11,7 @@ const STAGE_DOT: Record<StageKey, string> = {
   lead: "bg-neutral-400",
   qualified: "bg-sky-500",
   quote: "bg-violet-500",
+  final_proposal: "bg-indigo-500",
   negotiation: "bg-orange-500",
   won: "bg-emerald-500",
   lost: "bg-red-500",
@@ -54,7 +56,7 @@ export function KanbanBoard({ deals, onOpenDeal }: { deals: Deal[]; onOpenDeal: 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm font-bold text-neutral-800">
                     <span className={`h-2 w-2 rounded-full ${STAGE_DOT[stage.key]}`} />
-                    {stage.label}
+                    <StageTitle stage={stage} />
                   </div>
                   <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-bold text-neutral-500">{stageDeals.length}</span>
                 </div>

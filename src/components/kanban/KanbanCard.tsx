@@ -1,3 +1,4 @@
+import { proposalStatus } from "../../lib/proposal";
 import { Draggable } from "@hello-pangea/dnd";
 import { MapPin, Trash2 } from "lucide-react";
 import type { Deal } from "../../types";
@@ -87,6 +88,7 @@ export function KanbanCard({ deal, index, onOpen }: { deal: Deal; index: number;
             </div>
           )}
 
+          <div className="mt-2 rounded-lg bg-neutral-50 p-2 text-xs font-semibold text-neutral-600">{proposalStatus(deal)}</div>
           {deal.closeDate && <div className="mt-2 text-xs text-neutral-400">{deal.closeDate}</div>}
         </div>
       )}

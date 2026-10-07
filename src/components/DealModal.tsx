@@ -1,3 +1,4 @@
+import { proposalStatus } from "../lib/proposal";
 import { useEffect, useRef, useState } from "react";
 import { X, Copy, Paperclip, Download, Trash2, Send, CalendarClock } from "lucide-react";
 import type { BankModelStatus, Activity, Attachment, Deal, DivisionKey, Segment, StageKey } from "../types";
@@ -84,6 +85,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
   const [ppaIrr, setPpaIrr] = useState(deal?.financingDetails?.ppaIrr?.toString() ?? "");
   const [rentalIrr, setRentalIrr] = useState(deal?.financingDetails?.rentalIrr?.toString() ?? "");
 
+  const [receivedAt, setReceivedAt] = useState((deal?.receivedAt ?? deal?.createdAt ?? new Date().toISOString()).slice(0,10));
   const [error, setError] = useState("");
 
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -123,6 +125,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
       );
 
   function handleSave() {
+    if (!receivedAt) { setError("Enter the lead received date."); return; }
     if (!title.trim()) {
       setError("Give the deal a title.");
       return;
@@ -144,6 +147,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
     const finalCompanyId = existing ? existing.id : createCompany({ name: trimmedName, industry: "—", status: "Prospect", divisions: [division] }).id;
 
     const payload = {
+      receivedAt: receivedAt + "T08:00:00+02:00",
       title: title.trim(),
       companyId: finalCompanyId,
       primaryContactName: primaryContactName.trim() || undefined,
@@ -259,12 +263,12 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-12" onClick={onClose}>
+    <div role="dialog" aria-modal="true" aria-label="Lead details" className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-12" onClick={onClose}>
       <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="mb-4 flex items-start justify-between">
           <div className="flex flex-wrap items-center gap-2">
             <DivisionBadge division={division} />
-            {!isNew && <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-semibold text-neutral-600">{stage}</span>}
+            {!isNew && <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-semibold text-neutral-600">{stages.find(s=>s.key===stage)?.label}</span>}
           </div>
           <button onClick={onClose} className="rounded-full p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700">
             <X className="h-5 w-5" />
@@ -279,7 +283,8 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
         )}
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Title" span={2}>
+          <div className="mb-3"><label className="text-xs font-semibold">Lead received date<input type="date" required value={receivedAt} onChange={e=>setReceivedAt(e.target.value)} className="input mt-1" /></label><p className="mt-1 text-xs text-neutral-500">{receivedAt ? proposalStatus({ ...(deal ?? {}), stage, createdAt: receivedAt + "T08:00:00+02:00", receivedAt: receivedAt + "T08:00:00+02:00" } as Deal) : "Enter the lead received date."}</p></div>
+              <Field label="Title" span={2}>
             <input value={title} onChange={(e) => setTitle(e.target.value)} className="input" placeholder="e.g. AJ — Kingsburgh" />
           </Field>
 
@@ -372,6 +377,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
           {stage === "lost" && (
             <Field label="Reason lost" span={2}>
               <input
+                required
                 value={lostReason}
                 onChange={(e) => setLostReason(e.target.value)}
                 className="input"

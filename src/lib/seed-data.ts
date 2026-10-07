@@ -44,25 +44,26 @@ export const DIVISIONS: Division[] = [
 ];
 
 export const STAGES: Stage[] = [
-  { key: "lead", label: "Lead", probability: 10 },
-  { key: "qualified", label: "Qualified", probability: 30 },
-  { key: "quote", label: "Quote", probability: 50 },
-  { key: "negotiation", label: "Negotiation", probability: 75 },
-  { key: "won", label: "Won", probability: 100 },
-  { key: "lost", label: "Lost", probability: 0 },
+  { key: "lead", label: "Lead Received", description: "A new enquiry received and assigned. A proposal is due within seven working days.", probability: 10 },
+  { key: "qualified", label: "Qualify/KYC Onboarding", description: "Confirm the client requirements, suitability and KYC onboarding information.", probability: 30 },
+  { key: "quote", label: "Preliminary Proposal", description: "Initial scope and indicative pricing prepared and sent to the client.", probability: 50 },
+  { key: "final_proposal", label: "Final Proposal", probability: 65, description: "Complete scope, commercial terms and final pricing sent for approval and signature." },
+  { key: "negotiation", label: "Negotiation", description: "Discuss proposal terms, pricing and outstanding requirements with the client.", probability: 75 },
+  { key: "won", label: "Won (Final Proposal Signed)", description: "The client has signed the final proposal and accepted the deal.", probability: 100 },
+  { key: "lost", label: "Lost", description: "The opportunity did not proceed. A reason is required so the team can learn from the outcome.", probability: 0 },
 ];
 
-export const SEED_USERS: User[] = [
+export const SEED_USERS: User[] = import.meta.env.BASE_URL === "/crm/" ? [] : [
   { id: "u-khudusela", name: "Khudusela Pitje", email: "khudu.pitje@newgx.co.za", passwordHash: "", role: "admin" },
   { id: "u-ravani", name: "Ravani Reddi", email: "ravani@newgx.co.za", passwordHash: "", role: "rep" },
   { id: "u-suhail", name: "Suhail Asvat", email: "suhail@airnergize.co.za", passwordHash: "", role: "rep" },
-  { id: "u-langelihle", name: "Langelihle Ngidi", email: "langa@bolide.co.za", passwordHash: "", role: "admin" },
+  { id: "u-langelihle", name: "Langelihle Ngidi", email: "langelihle@bolide.co.za", passwordHash: "", role: "admin" },
   { id: "u-gianna", name: "Gianna de Figueiredo", email: "gianna@bolide.co.za", passwordHash: "", role: "rep" },
   { id: "u-herman", name: "Herman Ras", email: "herman@bolide.co.za", passwordHash: "", role: "rep" },
   { id: "u-welcome", name: "Welcome Nyathi", email: "welcome@bolide.co.za", passwordHash: "", role: "rep" },
 ];
 
-export const SEED_COMPANIES: Company[] = [
+export const SEED_COMPANIES: Company[] = import.meta.env.BASE_URL === "/crm/" ? [] : [
   { id: "c-aj", name: "AJ Properties", industry: "Property & Security", status: "Prospect", divisions: ["secure"], createdAt: "2026-02-01" },
   { id: "c-alt", name: "ALT Capital Partners", industry: "Property & Security", status: "Prospect", divisions: ["secure", "energy", "water"], createdAt: "2026-02-01" },
   { id: "c-bp", name: "BP", industry: "Fuel retail", status: "Prospect", divisions: ["connect"], createdAt: "2026-02-01" },
@@ -84,7 +85,7 @@ export const SEED_COMPANIES: Company[] = [
 
 const now = new Date().toISOString();
 
-export const SEED_DEALS: Deal[] = [
+export const SEED_DEALS: Deal[] = import.meta.env.BASE_URL === "/crm/" ? [] : [
   // Lead — Bolide Connect (sites TBC)
   { id: "d-1", title: "Sasol — Connectivity (sites TBC)", companyId: "c-sasol", division: "connect", productLine: "Herotel Business", stage: "lead", onceOff: 0, mrr: 0, ownerId: "u-langelihle", createdAt: now, updatedAt: now },
   { id: "d-2", title: "BP — Connectivity (sites TBC)", companyId: "c-bp", division: "connect", productLine: "Herotel Business", stage: "lead", onceOff: 0, mrr: 0, ownerId: "u-langelihle", createdAt: now, updatedAt: now },

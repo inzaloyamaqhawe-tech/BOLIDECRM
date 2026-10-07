@@ -1,3 +1,7 @@
+import { hosted } from "./remote";
+import { scheduleRemoteSave } from "./store";
+let remoteAttachments: Attachment[]=[];
+export function replaceRemoteAttachments(rows: Attachment[]) { remoteAttachments=rows; }
 import type { Attachment } from "../types";
 
 /**
@@ -46,6 +50,7 @@ function fileToDataUrl(file: File): Promise<string> {
 }
 
 export async function getAttachments(dealId: string): Promise<Attachment[]> {
+  if(hosted) return remoteAttachments.filter(a=>a.dealId===dealId);
   try {
     const db = await openDb();
     return await new Promise((resolve, reject) => {
@@ -60,7 +65,23 @@ export async function getAttachments(dealId: string): Promise<Attachment[]> {
   }
 }
 
+export async function getAllAttachments(): Promise<Attachment[]> {
+  if(hosted) return remoteAttachments;
+  try {
+    const db = await openDb();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readonly");
+      const req = tx.objectStore(STORE_NAME).getAll();
+      req.onsuccess = () => resolve((req.result as Attachment[]).sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+      req.onerror = () => reject(req.error);
+    });
+  } catch {
+    return [];
+  }
+}
+
 export async function addAttachment(dealId: string, file: File): Promise<Attachment> {
+  if(file.size>10*1024*1024) throw new Error("Please upload a file smaller than 10 MB.");
   const dataUrl = await fileToDataUrl(file);
   const attachment: Attachment = {
     id: uid(),
@@ -71,6 +92,7 @@ export async function addAttachment(dealId: string, file: File): Promise<Attachm
     dataUrl,
     createdAt: new Date().toISOString(),
   };
+  if(hosted) {remoteAttachments=[...remoteAttachments,attachment];scheduleRemoteSave();return attachment;}
   const db = await openDb();
   await new Promise<void>((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, "readwrite");
@@ -82,6 +104,7 @@ export async function addAttachment(dealId: string, file: File): Promise<Attachm
 }
 
 export async function deleteAttachment(id: string): Promise<void> {
+  if(hosted) {remoteAttachments=remoteAttachments.filter(a=>a.id!==id);scheduleRemoteSave();return;}
   const db = await openDb();
   await new Promise<void>((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, "readwrite");

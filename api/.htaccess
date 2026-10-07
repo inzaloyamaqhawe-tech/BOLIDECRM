@@ -1,0 +1,4 @@
+Options -Indexes
+<FilesMatch "^(config(\.example)?|db|session|import-functions)\.php$">
+Require all denied
+</FilesMatch>

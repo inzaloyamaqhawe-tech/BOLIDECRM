@@ -1,3 +1,4 @@
+import { SaveStatus } from "./components/SaveStatus";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./lib/auth";
 import { ToastProvider } from "./lib/toast";
@@ -19,6 +20,7 @@ export default function App() {
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <ToastProvider>
         <AuthProvider>
+          <SaveStatus />
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
