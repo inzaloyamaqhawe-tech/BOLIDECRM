@@ -1,4 +1,5 @@
 import { api, hosted } from "./remote";
+import { matchDealContact } from "./contact-match";
 import { getAllAttachments, replaceRemoteAttachments } from "./attachments";
 import type { Activity, Company, Contact, Deal, Division, DivisionKey, Stage, StageKey, Task, User } from "../types";
 import { DIVISIONS, SEED_COMPANIES, SEED_DEALS, SEED_USERS, STAGES } from "./seed-data";
@@ -202,6 +203,17 @@ export function getContactsByCompany(companyId: string): Contact[] {
 export function createContact(input: Omit<Contact, "id" | "createdAt">): Contact {
   const contact: Contact = { ...input, id: uid("ct"), createdAt: new Date().toISOString() };
   save(KEYS.contacts, [...getContacts(), contact]);
+  return contact;
+}
+
+export function saveDealContact(input: {companyId: string; name: string; phone?: string; email: string}, linkedId?: string): Contact {
+  const clean={...input,name:input.name.trim(),email:input.email.trim().toLowerCase(),phone:input.phone?.trim() || undefined};
+  const existing=matchDealContact(getContacts(),clean,linkedId);
+  if(!existing) return createContact(clean);
+  const contact={...existing,...clean};
+  save(KEYS.contacts,getContacts().map(c=>c.id===existing.id?contact:c));
+  // Keep the display name consistent on other deals linked to this person.
+  save(KEYS.deals,getDeals().map(d=>d.primaryContactId===contact.id?{...d,primaryContactName:contact.name}:d));
   return contact;
 }
 

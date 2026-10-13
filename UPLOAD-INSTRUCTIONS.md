@@ -61,3 +61,8 @@ Ensure the redirect destination includes a slash before its captured path, for e
 ## Sign-in requires HTTPS
 
 Upload the updated `deploy-crm/.htaccess` to `crm/.htaccess`. It redirects HTTP CRM requests to HTTPS, which is required for secure session cookies. Use `https://bolide.co.za/crm/` for sign-in. Keep the existing account and password. No frontend rebuild or other upload is needed for this fix.
+
+
+## Contact details update ? 13 October 2026
+
+The deal form now saves contact names, cell/phone numbers and optional email addresses directly to Contacts and links them to the deal. No SQL migration or database reset is needed. Upload the latest `deploy-crm/index.html`, `deploy-crm/faviconbolide.png` and all files from `deploy-crm/assets` to the matching website folders. Keep the existing private API configuration and HTTPS/redirect settings. The GitHub preview continues to save in the browser; xneelo shares contacts through MySQL after the frontend files are uploaded and HTTPS is working.

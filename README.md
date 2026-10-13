@@ -11,6 +11,8 @@ CRM for the Bolide Group, built with React, TypeScript and Vite, with a PHP/MySQ
 
 ## Latest changes
 
+- The deal form captures contact name, cell/phone and optional email. Saving creates or updates the company contact and links it to the deal. Existing contacts can be selected by name; contacts from other companies are kept separate.
+
 - Monthly dashboard cards show total leads received and counts for each current stage entered that month, using Johannesburg dates.
 - Stages: Lead Received, Qualify/KYC Onboarding, Preliminary Proposal, Final Proposal, Negotiation, Won (Final Proposal Signed), Lost.
 - Hover or focus on dashboard stage titles or pipeline headings to read their definitions.
@@ -29,6 +31,7 @@ npm ci
 npm run dev
 npm run lint
 node test-deadline.cjs
+node test-contacts.cjs
 ```
 
 Build on PowerShell:

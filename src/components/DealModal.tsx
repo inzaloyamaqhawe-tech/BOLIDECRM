@@ -13,10 +13,11 @@ import {
   getStagesLive,
   logActivity,
   restoreDeal,
+  saveDealContact,
   subscribe,
   updateDeal,
 } from "../lib/store";
-import { useCompanies, useUsers } from "../lib/use-store";
+import { useCompanies, useContacts, useUsers } from "../lib/use-store";
 import { formatZAR, formatDate, findSimilarName } from "../lib/format";
 import { addAttachment, deleteAttachment, formatFileSize, getAttachments } from "../lib/attachments";
 import { DivisionBadge } from "./DivisionBadge";
@@ -51,13 +52,17 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
   const { show: showToast } = useToast();
   const companies = useCompanies();
   const users = useUsers();
+  const contacts = useContacts();
+  const linkedContact=contacts.find(c=>c.id===deal?.primaryContactId) ?? contacts.find(c=>c.companyId===deal?.companyId && c.name.toLowerCase()===deal?.primaryContactName?.toLowerCase());
   const isNew = !deal;
   const divisions = getDivisions();
   const stages = getStagesLive();
 
   const [title, setTitle] = useState(deal?.title ?? "");
   const [companyName, setCompanyName] = useState(() => companies.find((c) => c.id === deal?.companyId)?.name ?? "");
-  const [primaryContactName, setPrimaryContactName] = useState(deal?.primaryContactName ?? "");
+  const [primaryContactName, setPrimaryContactName] = useState(linkedContact?.name ?? deal?.primaryContactName ?? "");
+  const [contactPhone, setContactPhone] = useState(linkedContact?.phone ?? "");
+  const [contactEmail, setContactEmail] = useState(linkedContact?.email ?? "");
   const [division, setDivision] = useState<DivisionKey>(deal?.division ?? defaultDivision ?? "secure");
   const [segment, setSegment] = useState<Segment | "">(deal?.segment ?? "");
   const [site, setSite] = useState(deal?.site ?? "");
@@ -125,6 +130,8 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
       );
 
   function handleSave() {
+    if((contactPhone.trim() || contactEmail.trim()) && !primaryContactName.trim()) {setError("Enter the contact person's name.");return;}
+    if(contactEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail.trim())) {setError("Enter a valid contact email address.");return;}
     if (!receivedAt) { setError("Enter the lead received date."); return; }
     if (!title.trim()) {
       setError("Give the deal a title.");
@@ -145,12 +152,14 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
     // separate step first.
     const existing = companies.find((c) => c.name.toLowerCase() === trimmedName.toLowerCase());
     const finalCompanyId = existing ? existing.id : createCompany({ name: trimmedName, industry: "—", status: "Prospect", divisions: [division] }).id;
+    const contact=primaryContactName.trim() ? saveDealContact({companyId:finalCompanyId,name:primaryContactName,phone:contactPhone,email:contactEmail},linkedContact?.id) : undefined;
 
     const payload = {
       receivedAt: receivedAt + "T08:00:00+02:00",
       title: title.trim(),
       companyId: finalCompanyId,
       primaryContactName: primaryContactName.trim() || undefined,
+      primaryContactId: contact?.id,
       site: site.trim() || undefined,
       division,
       segment: segment || undefined,
@@ -319,10 +328,25 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
           <Field label="Primary contact" span={2}>
             <input
               value={primaryContactName}
-              onChange={(e) => setPrimaryContactName(e.target.value)}
+              onChange={(e) => {
+                const name=e.target.value;setPrimaryContactName(name);
+                const company=companies.find(c=>c.name.toLowerCase()===companyName.trim().toLowerCase());
+                const person=contacts.find(c=>c.companyId===company?.id && c.name.toLowerCase()===name.trim().toLowerCase());
+                setContactPhone(person?.phone ?? "");setContactEmail(person?.email ?? "");
+              }}
+              list="deal-contact-people"
               className="input"
               placeholder="e.g. Jane Doe"
             />
+            <datalist id="deal-contact-people">{contacts.filter(c=>companies.find(company=>company.id===c.companyId)?.name.toLowerCase()===companyName.trim().toLowerCase()).map(c=><option key={c.id} value={c.name}/>)}</datalist>
+            <p className="mt-1 text-xs text-neutral-500">Saved automatically to Contacts for this company.</p>
+          </Field>
+
+          <Field label="Contact cell / phone number">
+            <input type="tel" autoComplete="tel" value={contactPhone} onChange={e=>setContactPhone(e.target.value)} className="input" placeholder="e.g. +27 82 123 4567" />
+          </Field>
+          <Field label="Contact email (optional)">
+            <input type="email" autoComplete="email" value={contactEmail} onChange={e=>setContactEmail(e.target.value)} className="input" placeholder="e.g. linda@mercedes.co.za" />
           </Field>
 
           <Field label="Site">
