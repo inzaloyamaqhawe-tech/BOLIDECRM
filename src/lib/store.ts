@@ -1,8 +1,8 @@
 import { api, hosted } from "./remote";
 import { matchDealContact } from "./contact-match";
-import { getAllAttachments, replaceRemoteAttachments } from "./attachments";
+import { getAllAttachments, replaceRemoteAttachments, resetPreviewAttachments } from "./attachments";
 import type { Activity, Company, Contact, Deal, Division, DivisionKey, Stage, StageKey, Task, User } from "../types";
-import { DIVISIONS, SEED_COMPANIES, SEED_DEALS, SEED_USERS, STAGES } from "./seed-data";
+import { DIVISIONS, SEED_COMPANIES, SEED_DEALS, SEED_USERS, SEED_CONTACTS, PREVIEW_DATASET_VERSION, STAGES } from "./seed-data";
 
 /**
  * Local data store for the CRM.
@@ -94,7 +94,7 @@ export function subscribe(listener: Listener) {
 
 function seedIfEmpty() {
   if (!localStorage.getItem(KEYS.companies)) save(KEYS.companies, SEED_COMPANIES);
-  if (!localStorage.getItem(KEYS.contacts)) save(KEYS.contacts, [] as Contact[]);
+  if (!localStorage.getItem(KEYS.contacts)) save(KEYS.contacts, SEED_CONTACTS);
   if (!localStorage.getItem(KEYS.deals)) save(KEYS.deals, SEED_DEALS);
   if (!localStorage.getItem(KEYS.users)) save(KEYS.users, SEED_USERS);
   if (!localStorage.getItem(KEYS.activities)) save(KEYS.activities, [] as Activity[]);
@@ -121,25 +121,13 @@ const oldStages=load<Record<string,Partial<Stage>>>(KEYS.stageOverrides,{});
 for(const key of ["qualified","quote","won"]) if(oldStages[key]) delete oldStages[key].label;
 if(!hosted) save(KEYS.stageOverrides,oldStages);
 
-/** Swaps the old placeholder Energy deals for the client's real pipeline
- * from their own "Lead Tracker v1.xlsx" (Sep 2026) — same reasoning as
- * `migrateNewSeedUsers()`: anyone who already opened the CRM has their own
- * saved `deals`/`companies` and would otherwise keep the old zero-value
- * placeholder leads (d-11..d-14) forever, never seeing the real numbers. */
-const OLD_PLACEHOLDER_ENERGY_DEAL_IDS = ["d-11", "d-12", "d-13", "d-14"];
-function migrateLeadTrackerDeals() {
-  const existingCompanies = load<Company[]>(KEYS.companies, SEED_COMPANIES);
-  const missingCompanies = SEED_COMPANIES.filter((c) => !existingCompanies.some((ec) => ec.id === c.id));
-  if (missingCompanies.length > 0) save(KEYS.companies, [...existingCompanies, ...missingCompanies]);
-
-  const existingDeals = load<Deal[]>(KEYS.deals, SEED_DEALS);
-  const withoutPlaceholders = existingDeals.filter((d) => !OLD_PLACEHOLDER_ENERGY_DEAL_IDS.includes(d.id));
-  const missingDeals = SEED_DEALS.filter((d) => d.id.startsWith("d-e") && !withoutPlaceholders.some((ed) => ed.id === d.id));
-  if (withoutPlaceholders.length !== existingDeals.length || missingDeals.length > 0) {
-    save(KEYS.deals, [...withoutPlaceholders, ...missingDeals]);
-  }
+// Replace the preview starting dataset once, retaining accounts and sessions.
+if(!hosted && localStorage.getItem("bolide-crm:preview-dataset") !== PREVIEW_DATASET_VERSION) {
+  save(KEYS.companies,SEED_COMPANIES);save(KEYS.contacts,SEED_CONTACTS);save(KEYS.deals,SEED_DEALS);
+  save(KEYS.activities,[]);save(KEYS.tasks,[]);
+  localStorage.setItem("bolide-crm:preview-dataset",PREVIEW_DATASET_VERSION);
+  void resetPreviewAttachments().catch(()=>{});
 }
-if(!hosted) migrateLeadTrackerDeals();
 
 function uid(prefix: string) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -193,7 +181,7 @@ export function mergeCompanies(keepId: string, mergeId: string) {
 // --- contacts -------------------------------------------------------------
 
 export function getContacts(): Contact[] {
-  return load(KEYS.contacts, [] as Contact[]);
+  return load(KEYS.contacts, SEED_CONTACTS);
 }
 
 export function getContactsByCompany(companyId: string): Contact[] {
@@ -238,6 +226,7 @@ export function createDeal(input: Omit<Deal, "id" | "createdAt" | "updatedAt">):
 
 export function updateDeal(id: string, patch: Partial<Deal>) {
   const before=getDeal(id); if(!before) return;
+  if(patch.receivedAt && before.leadTracker) patch.leadTracker={...before.leadTracker,enquiryReceived:patch.receivedAt.slice(0,10)};
   const after={...before,...patch};
   if(after.stage === "lost" && !after.lostReason?.trim()) throw new Error("A lost reason is required.");
   if(patch.stage && patch.stage!==before.stage) patch.stageChangedAt=new Date().toISOString();

@@ -90,7 +90,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
   const [ppaIrr, setPpaIrr] = useState(deal?.financingDetails?.ppaIrr?.toString() ?? "");
   const [rentalIrr, setRentalIrr] = useState(deal?.financingDetails?.rentalIrr?.toString() ?? "");
 
-  const [receivedAt, setReceivedAt] = useState((deal?.receivedAt ?? deal?.createdAt ?? new Date().toISOString()).slice(0,10));
+  const [receivedAt, setReceivedAt] = useState(deal?.leadTracker ? (deal.leadTracker.enquiryReceived ?? "") : (deal?.receivedAt ?? deal?.createdAt ?? new Date().toISOString()).slice(0,10));
   const [error, setError] = useState("");
 
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -132,7 +132,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
   function handleSave() {
     if((contactPhone.trim() || contactEmail.trim()) && !primaryContactName.trim()) {setError("Enter the contact person's name.");return;}
     if(contactEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail.trim())) {setError("Enter a valid contact email address.");return;}
-    if (!receivedAt) { setError("Enter the lead received date."); return; }
+    if (!receivedAt && !deal?.leadTracker) { setError("Enter the lead received date."); return; }
     if (!title.trim()) {
       setError("Give the deal a title.");
       return;
@@ -155,7 +155,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
     const contact=primaryContactName.trim() ? saveDealContact({companyId:finalCompanyId,name:primaryContactName,phone:contactPhone,email:contactEmail},linkedContact?.id) : undefined;
 
     const payload = {
-      receivedAt: receivedAt + "T08:00:00+02:00",
+      receivedAt: receivedAt ? receivedAt + "T08:00:00+02:00" : undefined,
       title: title.trim(),
       companyId: finalCompanyId,
       primaryContactName: primaryContactName.trim() || undefined,
@@ -292,7 +292,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
         )}
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="mb-3"><label className="text-xs font-semibold">Lead received date<input type="date" required value={receivedAt} onChange={e=>setReceivedAt(e.target.value)} className="input mt-1" /></label><p className="mt-1 text-xs text-neutral-500">{receivedAt ? proposalStatus({ ...(deal ?? {}), stage, createdAt: receivedAt + "T08:00:00+02:00", receivedAt: receivedAt + "T08:00:00+02:00" } as Deal) : "Enter the lead received date."}</p></div>
+          <div className="mb-3"><label className="text-xs font-semibold">Lead received date<input type="date" required value={receivedAt} onChange={e=>setReceivedAt(e.target.value)} className="input mt-1" /></label><p className="mt-1 text-xs text-neutral-500">{receivedAt ? proposalStatus({ ...(deal ?? {}), stage, leadTracker: deal?.leadTracker ? {...deal.leadTracker,enquiryReceived:receivedAt} : undefined, createdAt: receivedAt + "T08:00:00+02:00", receivedAt: receivedAt + "T08:00:00+02:00" } as Deal) : "Enter the lead received date."}</p></div>
               <Field label="Title" span={2}>
             <input value={title} onChange={(e) => setTitle(e.target.value)} className="input" placeholder="e.g. AJ — Kingsburgh" />
           </Field>

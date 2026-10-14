@@ -4,12 +4,15 @@ CRM for the Bolide Group, built with React, TypeScript and Vite, with a PHP/MySQ
 
 ## Two deployments
 
-- **GitHub Pages preview:** https://inzaloyamaqhawe-tech.github.io/BOLIDECRM/ ? builds use `/BOLIDECRM/`. Sign-in, pipeline data and changes are stored in the current browser. This preview does not connect to the production database. The existing preview pipeline remains available for reviewing the interface.
+- **GitHub Pages preview:** https://inzaloyamaqhawe-tech.github.io/BOLIDECRM/ ? builds use `/BOLIDECRM/`. Sign-in, pipeline data and changes are stored in the current browser. This preview does not connect to the production database. The preview now starts from the updated Lead Tracker workbook; its dataset is reset once when this version first loads, while accounts and sessions are retained.
 - **xneelo production:** https://bolide.co.za/crm/ ? builds use `/crm/`. Invited accounts, PHP sessions and shared MySQL records are used. HTTPS with a valid certificate is required. Certificate renewal was pending with xneelo Support on 7 October 2026.
 
 `main` contains source code. `gh-pages` contains the built static preview. Source changes alone do not update the preview; publish a new `/BOLIDECRM/` build to `gh-pages`.
 
 ## Latest changes
+
+- The 14 October tracker import replaces the prior pipeline with 36 leads from 37 workbook rows, consolidating duplicate Sasol Raceway entries. Stages: 21 Qualify/KYC, 14 Preliminary Proposal, 1 Lost. Approval means modelling approval and does not imply Negotiation or Won. Full source rows are preserved in each lead's metadata and notes.
+- Deals scroll within the table; table headings and search/filter controls remain visible.
 
 - The deal form captures contact name, cell/phone and optional email. Saving creates or updates the company contact and links it to the deal. Existing contacts can be selected by name; contacts from other companies are kept separate.
 
@@ -52,7 +55,7 @@ The PHP/database integration check in `test_hosted.py` requires a local, private
 
 ## Production setup
 
-See [UPLOAD-INSTRUCTIONS.md](UPLOAD-INSTRUCTIONS.md) for individual file uploads, root redirect exceptions, and HTTPS requirements. The existing production database was populated with 42 leads, 16 companies and 7 invited users. Do not reinitialize that database.
+See [UPLOAD-INSTRUCTIONS.md](UPLOAD-INSTRUCTIONS.md) for individual file uploads, root redirect exceptions, and HTTPS requirements. The existing production database was populated with 36 leads, 36 companies, 1 named contact and 7 existing users. Do not reinitialize that database.
 
 For a new installation, import `database/schema.sql` into an empty MySQL/MariaDB database, then copy `api/config.example.php` to `api/config.php` and set credentials privately. PHP 8.2+ with PDO MySQL and Apache rewrite support is required.
 

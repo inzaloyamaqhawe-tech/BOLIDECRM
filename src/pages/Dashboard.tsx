@@ -35,8 +35,8 @@ export function DashboardPage() {
 
   const now = new Date();
   const monthKey = (iso: string) => new Intl.DateTimeFormat("en-ZA", { timeZone: "Africa/Johannesburg", year: "numeric", month: "2-digit" }).format(new Date(iso));
-  const receivedThisMonth = deals.filter(d => monthKey(d.receivedAt ?? d.createdAt) === monthKey(now.toISOString()));
-  const monthlyStages = stages.map(stage => ({ stage, count: deals.filter(d => d.stage === stage.key && monthKey(d.stageChangedAt ?? d.createdAt) === monthKey(now.toISOString())).length }));
+  const receivedThisMonth = deals.filter(d => (!d.leadTracker || !!d.receivedAt) && monthKey(d.receivedAt ?? d.createdAt) === monthKey(now.toISOString()));
+  const monthlyStages = stages.map(stage => ({ stage, count: deals.filter(d => d.stage === stage.key && (!d.leadTracker || !!d.stageChangedAt) && monthKey(d.stageChangedAt ?? d.createdAt) === monthKey(now.toISOString())).length }));
   const wonThisMonth = deals.filter((d) => d.stage === "won" && new Date(d.updatedAt).getMonth() === now.getMonth() && new Date(d.updatedAt).getFullYear() === now.getFullYear());
   const wonThisMonthValue = wonThisMonth.reduce((s, d) => s + d.onceOff, 0);
 

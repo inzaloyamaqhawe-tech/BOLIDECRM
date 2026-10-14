@@ -46,7 +46,7 @@ try:
  assert req('auth',{'action':'logout'})[0]==200
  assert req('state')[0]==401
  assert req('auth',{'action':'login','email':email,'password':password})[0]==200
- q.execute('SELECT COUNT(*) FROM deals');assert q.fetchone()[0]==42
+ q.execute('SELECT COUNT(*) FROM deals');assert q.fetchone()[0]==36
  print('PASS: PHP/database connection, invitation signup, login/logout, session protection, shared save roundtrip, lead/attachment create-read-delete, conflict detection, compulsory lost reason, role enforcement, password hash exclusion, pipeline preserved.')
 finally:
  server.terminate();server.wait();log.close();q.execute('DELETE FROM attachments WHERE id=%s',(testid,));q.execute('DELETE FROM deals WHERE id=%s',(testid,));q.execute('DELETE FROM users WHERE id=%s',(testid,));c.close()

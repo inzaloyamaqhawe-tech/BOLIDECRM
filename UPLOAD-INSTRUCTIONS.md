@@ -1,6 +1,6 @@
 # Bolide CRM upload
 
-The xneelo database is already created and populated: 10 tables, 42 leads, 16 companies and 7 invited users. Do not re-import the schema or initialization files.
+The xneelo database is already created and populated: 10 tables, 36 leads, 36 companies, 1 named contact and 7 existing users. Do not re-import the schema or initialization files.
 
 1. Open your website's public web directory in the xneelo File Manager or FTP client.
 2. Create the `crm` folder alongside the main website's index file.
@@ -66,3 +66,16 @@ Upload the updated `deploy-crm/.htaccess` to `crm/.htaccess`. It redirects HTTP 
 ## Contact details update ? 13 October 2026
 
 The deal form now saves contact names, cell/phone numbers and optional email addresses directly to Contacts and links them to the deal. No SQL migration or database reset is needed. Upload the latest `deploy-crm/index.html`, `deploy-crm/faviconbolide.png` and all files from `deploy-crm/assets` to the matching website folders. Keep the existing private API configuration and HTTPS/redirect settings. The GitHub preview continues to save in the browser; xneelo shares contacts through MySQL after the frontend files are uploaded and HTTPS is working.
+
+
+## Tracker replacement and scrolling update ? 14 October 2026
+
+The previous 42 database leads have been replaced directly by 36 workbook leads. Existing user accounts are preserved. A private backup was saved locally before replacement. The database already has the new `lead_tracker_json` metadata column; do not clear or re-import it again.
+
+Upload the latest individual files from `deploy-crm`: `index.html` to `crm/index.html`, `faviconbolide.png` to `crm/faviconbolide.png`, every file inside `assets` to `crm/assets`, and `api/import-functions.php` to `crm/api/import-functions.php`. Preserve `api/config.php`, `crm/.htaccess` and the main website redirect configuration. No ZIP is needed.
+
+GitHub preview accounts and sessions remain intact, while the old preview leads, companies, contacts, activities, tasks and attachments are replaced once at first load of the new dataset. Later edits are preserved. Refresh any older open tab to load the update.
+
+Status mapping: a proposal date means Preliminary Proposal; Pending Send or In progress means Qualify/KYC Onboarding; the explicitly Closed/No client commitment entry is Lost. Approved/Declined in the approval column refers to modelling and is retained as source metadata without implying a signed proposal. Dates in the contract-signature column are not treated as confirmed signatures.
+
+19 leads have no enquiry received date, so their deadlines remain unavailable until an actual date is entered. CAPEX stays in Financing; the workbook does not provide sales contract values or MRR. The security leads are kept under Secure and the remaining solar/PPA leads under Energy.

@@ -146,7 +146,7 @@ export function DealsPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex h-full min-h-0 flex-col gap-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-3xl font-black text-neutral-900">Deals</h1>
@@ -252,7 +252,7 @@ export function DealsPage() {
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-2xl border border-neutral-200 bg-white">
+      <div className="crm-data-table min-h-0 flex-1 overflow-auto rounded-2xl border border-neutral-200 bg-white">
         <table className="w-full min-w-[950px] text-sm">
           <thead>
             <tr className="border-b border-neutral-100 text-left text-xs font-bold uppercase tracking-widest text-neutral-400">

@@ -7,6 +7,7 @@ export function proposalDue(iso: string) {
  return day.toISOString().slice(0,10);
 }
 export function proposalStatus(deal: Deal, now=new Date()) {
+ if(deal.leadTracker && !deal.leadTracker.enquiryReceived) return deal.stage === "lost" ? "Closed as lost" : "Received date not recorded ? deadline unavailable";
  const due=proposalDue(deal.receivedAt ?? deal.createdAt);
  if(deal.proposalSentAt || ["quote","final_proposal","negotiation","won"].includes(deal.stage)) return `Proposal sent · due ${due}`;
  if(deal.stage==="lost") return "Closed as lost";

@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS deals (
   energy_details_json JSON NULL,
   water_details_json JSON NULL,
   financing_details_json JSON NULL,
+  lead_tracker_json JSON NULL,
   created_at DATETIME NOT NULL,
   updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),

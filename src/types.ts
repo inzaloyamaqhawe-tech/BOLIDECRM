@@ -107,6 +107,7 @@ export interface Deal {
   /** Only meaningful once stage === "lost" — captured at the moment it's lost
    * so a reason isn't just implied by the deal quietly disappearing. */
   lostReason?: string;
+  leadTracker?: { source: string; sourceRows: number[]; enquiryReceived?: string; [key: string]: unknown };
   receivedAt?: string;
   proposalSentAt?: string;
   stageChangedAt?: string;

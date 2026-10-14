@@ -26,7 +26,7 @@ export function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
   }, [showAccountMenu]);
 
   return (
-    <header className="border-b border-neutral-200 bg-white">
+    <header className="shrink-0 border-b border-neutral-200 bg-white">
       <div className="flex flex-wrap items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6">
         <button onClick={onOpenNav} className="text-neutral-500 lg:hidden">
           <Menu className="h-5 w-5" />

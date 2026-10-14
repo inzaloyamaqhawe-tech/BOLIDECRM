@@ -1,0 +1,2238 @@
+{
+  "datasetVersion": "lead-tracker-2026-10-14-452e1da9a44d",
+  "companies": [
+    {
+      "id": "c-tracker-3",
+      "name": "Founder Hill Crescent",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-07-30T08:00:00+02:00"
+    },
+    {
+      "id": "c-tracker-4",
+      "name": "Sasol Chiawelo",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-07-26T08:00:00+02:00"
+    },
+    {
+      "id": "c-tracker-5",
+      "name": "Sasol La Belle",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-07-16T08:00:00+02:00"
+    },
+    {
+      "id": "c-tracker-6",
+      "name": "Sasol King Shaka",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-07-09T08:00:00+02:00"
+    },
+    {
+      "id": "c-tracker-7",
+      "name": "Villa Carla Complex",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-07-09T08:00:00+02:00"
+    },
+    {
+      "id": "c-tracker-8",
+      "name": "Sasol Raceway",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-06-26T08:00:00+02:00"
+    },
+    {
+      "id": "c-tracker-9",
+      "name": "232 Sir Lowrie",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-06-18T08:00:00+02:00"
+    },
+    {
+      "id": "c-tracker-10",
+      "name": "Orient Islamic School",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-06-06T08:00:00+02:00"
+    },
+    {
+      "id": "c-tracker-11",
+      "name": "Dante Alighieri Society",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-05-30T08:00:00+02:00"
+    },
+    {
+      "id": "c-tracker-12",
+      "name": "Supahot",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-05-04T08:00:00+02:00"
+    },
+    {
+      "id": "c-tracker-13",
+      "name": "Soethe Inval",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-04-24T08:00:00+02:00"
+    },
+    {
+      "id": "c-tracker-14",
+      "name": "Sasol Sebenzile",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-04-21T08:00:00+02:00"
+    },
+    {
+      "id": "c-tracker-15",
+      "name": "BP Kew",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-04-21T08:00:00+02:00"
+    },
+    {
+      "id": "c-tracker-16",
+      "name": "170 Grosvenor",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-04-09T08:00:00+02:00"
+    },
+    {
+      "id": "c-tracker-17",
+      "name": "Astron Klipspruit",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-04-21T08:00:00+02:00"
+    },
+    {
+      "id": "c-tracker-19",
+      "name": "Central City",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-20",
+      "name": "BCX",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-21",
+      "name": "Woodmead SARS",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-22",
+      "name": "Palm Grove",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-23",
+      "name": "Garankuwa",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-24",
+      "name": "Melvern",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-25",
+      "name": "Kasteel Park",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-26",
+      "name": "Amsterdam",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-27",
+      "name": "Piet Retief",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-28",
+      "name": "Ekhuphumleni",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-29",
+      "name": "Ngqamakwe",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-30",
+      "name": "Arcon Park",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-31",
+      "name": "Welkom",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-32",
+      "name": "Harrismith",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-33",
+      "name": "Inanda",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-34",
+      "name": "Pendleberry Grove Body Corporate",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-05T08:00:00+02:00"
+    },
+    {
+      "id": "c-tracker-35",
+      "name": "Inanda (Ikhwani Junction)",
+      "industry": "Security prospect",
+      "status": "Prospect",
+      "divisions": [
+        "secure"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-36",
+      "name": "Erica Square",
+      "industry": "Security prospect",
+      "status": "Prospect",
+      "divisions": [
+        "secure"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-37",
+      "name": "JDT Farm (Seenveld Boerdery)",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-38",
+      "name": "Phetogo Poultry Farm",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-14T08:00:00Z"
+    },
+    {
+      "id": "c-tracker-39",
+      "name": "Soshanguve",
+      "industry": "Energy prospect",
+      "status": "Prospect",
+      "divisions": [
+        "energy"
+      ],
+      "createdAt": "2026-10-12T08:00:00+02:00"
+    }
+  ],
+  "contacts": [
+    {
+      "id": "ct-tracker-34",
+      "companyId": "c-tracker-34",
+      "name": "Claudette Erasmus",
+      "email": "",
+      "role": "Numeri (source tracker)",
+      "createdAt": "2026-10-14T08:00:00Z"
+    }
+  ],
+  "deals": [
+    {
+      "id": "d-tracker-3",
+      "title": "Founder Hill Crescent — Solar/PPA",
+      "companyId": "c-tracker-3",
+      "site": "Founder Hill Crescent",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 3.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nSource row 3:\nLead originator: Matt Koller\nPartner: Fungi\nCompany and contact: Founder Hill Crescent\nLead maturity: Medium\nEnquiry received: 2026-07-30\nIntro email sent: 2026-07-31\nAssigned engineer: Welcome\nProposal sent: Pending Send\nBank model status: Not Modelled",
+      "financingDetails": {
+        "bankModelStatus": "Not Modelled"
+      },
+      "createdAt": "2026-07-30T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          3
+        ],
+        "rawRows": [
+          {
+            "row": 3,
+            "cells": {
+              "A": "Matt Koller ",
+              "B": "Fungi ",
+              "C": "Founder Hill Crescent ",
+              "D": "Medium ",
+              "E": "46233",
+              "F": "46234",
+              "J": "Welcome ",
+              "K": "Pending Send ",
+              "M": "Not Modelled"
+            }
+          }
+        ],
+        "maturity": "Medium",
+        "partner": "Fungi",
+        "originator": "Matt Koller",
+        "modellingApproval": "",
+        "enquiryReceived": "2026-07-30"
+      },
+      "receivedAt": "2026-07-30T08:00:00+02:00",
+      "stageChangedAt": "2026-07-31T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-4",
+      "title": "Sasol Chiawelo — Solar/PPA",
+      "companyId": "c-tracker-4",
+      "site": "Sasol Chiawelo",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "quote",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 4.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nSource row 4:\nLead originator: Welcome Nyathi\nPartner: Sasol\nCompany and contact: Sasol Chiawelo\nLead maturity: Medium\nEnquiry received: 2026-07-26\nIntro email sent: 2026-07-26\nAssigned engineer: Welcome\nProposal sent: 2026-07-27\nBank model status: Not Modelled",
+      "financingDetails": {
+        "bankModelStatus": "Not Modelled"
+      },
+      "createdAt": "2026-07-26T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          4
+        ],
+        "rawRows": [
+          {
+            "row": 4,
+            "cells": {
+              "A": "Welcome Nyathi",
+              "B": "Sasol",
+              "C": "Sasol Chiawelo",
+              "D": "Medium ",
+              "E": "46229",
+              "F": "46229",
+              "J": "Welcome ",
+              "K": "46230",
+              "M": "Not Modelled"
+            }
+          }
+        ],
+        "maturity": "Medium",
+        "partner": "Sasol",
+        "originator": "Welcome Nyathi",
+        "modellingApproval": "",
+        "enquiryReceived": "2026-07-26"
+      },
+      "receivedAt": "2026-07-26T08:00:00+02:00",
+      "proposalSentAt": "2026-07-27T08:00:00+02:00",
+      "stageChangedAt": "2026-07-27T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-5",
+      "title": "Sasol La Belle — Solar/PPA",
+      "companyId": "c-tracker-5",
+      "site": "Sasol La Belle",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 5.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nSource row 5:\nLead originator: Khudu Pitje\nPartner: Sasol\nCompany and contact: Sasol La Belle\nLead maturity: Medium\nEnquiry received: 2026-07-16\nIntro email sent: 2026-07-16\nAssigned engineer: Welcome\nProposal sent: Pending Send\nBank model status: Not Modelled",
+      "financingDetails": {
+        "bankModelStatus": "Not Modelled"
+      },
+      "createdAt": "2026-07-16T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          5
+        ],
+        "rawRows": [
+          {
+            "row": 5,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "Sasol",
+              "C": "Sasol La Belle\n",
+              "D": "Medium ",
+              "E": "46219",
+              "F": "46219",
+              "J": "Welcome",
+              "K": "Pending Send",
+              "M": "Not Modelled"
+            }
+          }
+        ],
+        "maturity": "Medium",
+        "partner": "Sasol",
+        "originator": "Khudu Pitje",
+        "modellingApproval": "",
+        "enquiryReceived": "2026-07-16"
+      },
+      "receivedAt": "2026-07-16T08:00:00+02:00",
+      "stageChangedAt": "2026-07-16T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-6",
+      "title": "Sasol King Shaka — Solar/PPA",
+      "companyId": "c-tracker-6",
+      "site": "Sasol King Shaka",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "quote",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 6.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nSource row 6:\nLead originator: Khudu Pitje\nPartner: Sasol\nCompany and contact: Sasol King Shaka\nLead maturity: Medium\nEnquiry received: 2026-07-09\nIntro email sent: 2026-07-09\nAssigned engineer: Welcome\nProposal sent: 2026-09-15\nBank model status: Not Modelled",
+      "financingDetails": {
+        "bankModelStatus": "Not Modelled"
+      },
+      "createdAt": "2026-07-09T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          6
+        ],
+        "rawRows": [
+          {
+            "row": 6,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "Sasol",
+              "C": "Sasol King Shaka\n",
+              "D": "Medium ",
+              "E": "46212",
+              "F": "46212",
+              "J": "Welcome",
+              "K": "46280",
+              "M": "Not Modelled"
+            }
+          }
+        ],
+        "maturity": "Medium",
+        "partner": "Sasol",
+        "originator": "Khudu Pitje",
+        "modellingApproval": "",
+        "enquiryReceived": "2026-07-09"
+      },
+      "receivedAt": "2026-07-09T08:00:00+02:00",
+      "proposalSentAt": "2026-09-15T08:00:00+02:00",
+      "stageChangedAt": "2026-09-15T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-7",
+      "title": "Villa Carla Complex — Solar/PPA",
+      "companyId": "c-tracker-7",
+      "site": "Villa Carla Complex",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "lost",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-herman",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 7.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nSource row 7:\nLead originator: Welcome Nyathi\nPartner: Fungi\nCompany and contact: Villa Carla Complex\nLead maturity: Low\nEnquiry received: 2026-07-09\nIntro email sent: 2026-07-09\nAssigned engineer: Herman\nProposal sent: Closed No client commitment (Herman)\nBank model status: Not Modelled",
+      "financingDetails": {
+        "bankModelStatus": "Not Modelled"
+      },
+      "createdAt": "2026-07-09T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          7
+        ],
+        "rawRows": [
+          {
+            "row": 7,
+            "cells": {
+              "A": "Welcome Nyathi",
+              "B": "Fungi ",
+              "C": "Villa Carla Complex ",
+              "D": "Low ",
+              "E": "46212",
+              "F": "46212",
+              "J": "Herman ",
+              "K": "Closed\nNo client commitment \n(Herman)",
+              "M": "Not Modelled"
+            }
+          }
+        ],
+        "maturity": "Low",
+        "partner": "Fungi",
+        "originator": "Welcome Nyathi",
+        "modellingApproval": "",
+        "enquiryReceived": "2026-07-09"
+      },
+      "receivedAt": "2026-07-09T08:00:00+02:00",
+      "lostReason": "Closed No client commitment (Herman)"
+    },
+    {
+      "id": "d-tracker-8",
+      "title": "Sasol Raceway — Solar/PPA",
+      "companyId": "c-tracker-8",
+      "site": "Sasol Raceway",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 8, 18.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nDuplicate Sasol Raceway entries consolidated; both original rows are retained below.\nSource row 8:\nLead originator: Khudu Pitje\nPartner: Sasol\nCompany and contact: Sasol Raceway\nLead maturity: Medium\nEnquiry received: 2026-06-26\nIntro email sent: 2026-06-23\nAssigned engineer: Welcome\nProposal sent: Pending Send\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-10-31\nOperations start date: 2027-01-31\nCAPEX PPA incl contingency: 1472891\nCAPEX Rental incl contingency: 707438\nPPA IRR: 0.2\nRental IRR: 0.2001\nSource row 18:\nLead originator: Khudu Pitje\nPartner: Sasol\nCompany and contact: Sasol Raceway\nLead maturity: High\nAssigned engineer: Welcome\nProposal sent: Pending Send\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-10-31\nOperations start date: 2027-01-31\nCAPEX PPA incl contingency: 1472891\nCAPEX Rental incl contingency: 707438\nPPA IRR: 0.2\nRental IRR: 20.01%",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-10-31",
+        "operationsStartDate": "2027-01-31",
+        "capexPpa": 1472891.0,
+        "capexRental": 707438.0,
+        "ppaIrr": 20.0,
+        "rentalIrr": 20.01
+      },
+      "createdAt": "2026-06-26T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          8,
+          18
+        ],
+        "rawRows": [
+          {
+            "row": 8,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "Sasol",
+              "C": "Sasol Raceway\n",
+              "D": "Medium ",
+              "E": "46199",
+              "F": "46196",
+              "J": "Welcome",
+              "K": "Pending Send",
+              "M": "Modelled",
+              "N": "46326",
+              "O": "46418",
+              "P": "1472891",
+              "Q": "707438",
+              "R": "0.2",
+              "S": "0.2001"
+            }
+          },
+          {
+            "row": 18,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "Sasol",
+              "C": " Sasol Raceway",
+              "D": "High",
+              "J": "Welcome",
+              "K": "Pending Send",
+              "M": "Modelled",
+              "N": "46326",
+              "O": "46418",
+              "P": "1472891",
+              "Q": "707438",
+              "R": "0.2",
+              "S": "20.01%"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "Sasol",
+        "originator": "Khudu Pitje",
+        "modellingApproval": "",
+        "enquiryReceived": "2026-06-26"
+      },
+      "receivedAt": "2026-06-26T08:00:00+02:00",
+      "stageChangedAt": "2026-06-23T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-9",
+      "title": "232 Sir Lowrie — Solar/PPA",
+      "companyId": "c-tracker-9",
+      "site": "232 Sir Lowrie",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "quote",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 9.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nSource row 9:\nLead originator: Matt Koller\nPartner: Fungi\nCompany and contact: 232 Sir Lowrie\nLead maturity: Medium\nEnquiry received: 2026-06-18\nIntro email sent: 2026-06-18\nAssigned engineer: Welcome\nProposal sent: 2026-07-21\nBank model status: Not Modelled",
+      "financingDetails": {
+        "bankModelStatus": "Not Modelled"
+      },
+      "createdAt": "2026-06-18T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          9
+        ],
+        "rawRows": [
+          {
+            "row": 9,
+            "cells": {
+              "A": "Matt Koller ",
+              "B": "Fungi ",
+              "C": "232 Sir Lowrie",
+              "D": "Medium ",
+              "E": "46191",
+              "F": "46191",
+              "J": "Welcome",
+              "K": "46224",
+              "M": "Not Modelled"
+            }
+          }
+        ],
+        "maturity": "Medium",
+        "partner": "Fungi",
+        "originator": "Matt Koller",
+        "modellingApproval": "",
+        "enquiryReceived": "2026-06-18"
+      },
+      "receivedAt": "2026-06-18T08:00:00+02:00",
+      "proposalSentAt": "2026-07-21T08:00:00+02:00",
+      "stageChangedAt": "2026-07-21T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-10",
+      "title": "Orient Islamic School — Solar/PPA",
+      "companyId": "c-tracker-10",
+      "site": "Orient Islamic School",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "quote",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-herman",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 10.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nSource row 10:\nLead originator: Suhail Asvat\nPartner: Business Development\nCompany and contact: Orient Islamic School\nLead maturity: Medium\nEnquiry received: 2026-06-06\nIntro email sent: 2026-06-06\nFollow-up 1: 2026-08-07\nFollow-up 2: 2026-08-10\nAssigned engineer: Herman\nProposal sent: 2026-07-13\nBank model status: Modelled\nOperations start date: 2026-09-30\nCAPEX PPA incl contingency: 2345429\nCAPEX Rental incl contingency: 1311978\nPPA IRR: 20.02%\nRental IRR: 20.19%",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "operationsStartDate": "2026-09-30",
+        "capexPpa": 2345429.0,
+        "capexRental": 1311978.0,
+        "ppaIrr": 20.02,
+        "rentalIrr": 20.19
+      },
+      "createdAt": "2026-06-06T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          10
+        ],
+        "rawRows": [
+          {
+            "row": 10,
+            "cells": {
+              "A": "Suhail Asvat",
+              "B": "Business Development ",
+              "C": "Orient Islamic School ",
+              "D": "Medium ",
+              "E": "46179",
+              "F": "46179",
+              "G": "46241",
+              "H": "46244",
+              "J": "Herman",
+              "K": "46216",
+              "M": "Modelled",
+              "O": "46295",
+              "P": "2345429",
+              "Q": "1311978",
+              "R": "20.02%",
+              "S": "20.19%"
+            }
+          }
+        ],
+        "maturity": "Medium",
+        "partner": "Business Development",
+        "originator": "Suhail Asvat",
+        "modellingApproval": "",
+        "enquiryReceived": "2026-06-06"
+      },
+      "receivedAt": "2026-06-06T08:00:00+02:00",
+      "proposalSentAt": "2026-07-13T08:00:00+02:00",
+      "stageChangedAt": "2026-07-13T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-11",
+      "title": "Dante Alighieri Society — Solar/PPA",
+      "companyId": "c-tracker-11",
+      "site": "Dante Alighieri Society",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "quote",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-herman",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 11.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nSource row 11:\nLead originator: Kgomotso Moloantoa\nPartner: Business Development\nCompany and contact: Dante Alighieri Society\nLead maturity: Medium\nEnquiry received: 2026-05-30\nIntro email sent: 2026-06-05\nFollow-up 1: 2026-06-10\nFollow-up 2: 2026-06-17\nAssigned engineer: Herman\nProposal sent: 2026-07-15\nApproved for modelling: Declined\nBank model status: Not Modelled",
+      "financingDetails": {
+        "bankModelStatus": "Not Modelled"
+      },
+      "createdAt": "2026-05-30T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          11
+        ],
+        "rawRows": [
+          {
+            "row": 11,
+            "cells": {
+              "A": "Kgomotso Moloantoa",
+              "B": "Business Development ",
+              "C": "Dante Alighieri Society\n ",
+              "D": "Medium",
+              "E": "46172",
+              "F": "46178",
+              "G": "46183",
+              "H": "46190",
+              "J": "Herman",
+              "K": "46218",
+              "L": "Declined",
+              "M": "Not Modelled"
+            }
+          }
+        ],
+        "maturity": "Medium",
+        "partner": "Business Development",
+        "originator": "Kgomotso Moloantoa",
+        "modellingApproval": "Declined",
+        "enquiryReceived": "2026-05-30"
+      },
+      "receivedAt": "2026-05-30T08:00:00+02:00",
+      "proposalSentAt": "2026-07-15T08:00:00+02:00",
+      "stageChangedAt": "2026-07-15T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-12",
+      "title": "Supahot — Solar/PPA",
+      "companyId": "c-tracker-12",
+      "site": "Supahot",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "quote",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-herman",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 12.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nSource row 12:\nLead originator: Suhail Asvat\nPartner: Business Development\nCompany and contact: Supahot\nLead maturity: Medium\nEnquiry received: 2026-05-04\nIntro email sent: 2026-05-04\nFollow-up 1: 2026-07-21\nFollow-up 2: 2026-08-10\nAssigned engineer: Herman\nProposal sent: 2026-07-13\nBank model status: Not Modelled\nOperations start date: 2026-06-30\nCAPEX PPA incl contingency: 17010759\nCAPEX Rental incl contingency: 0\nPPA IRR: 0.19\nRental IRR: N/A",
+      "financingDetails": {
+        "bankModelStatus": "Not Modelled",
+        "operationsStartDate": "2026-06-30",
+        "capexPpa": 17010759.0,
+        "capexRental": 0.0,
+        "ppaIrr": 19.0
+      },
+      "createdAt": "2026-05-04T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          12
+        ],
+        "rawRows": [
+          {
+            "row": 12,
+            "cells": {
+              "A": "Suhail Asvat",
+              "B": "Business Development ",
+              "C": "Supahot",
+              "D": "Medium ",
+              "E": "46146",
+              "F": "46146",
+              "G": "46224",
+              "H": "46244",
+              "J": "Herman ",
+              "K": "46216",
+              "M": "Not Modelled",
+              "O": "46203",
+              "P": "17010759",
+              "Q": "0",
+              "R": "0.19",
+              "S": "N/A"
+            }
+          }
+        ],
+        "maturity": "Medium",
+        "partner": "Business Development",
+        "originator": "Suhail Asvat",
+        "modellingApproval": "",
+        "enquiryReceived": "2026-05-04"
+      },
+      "receivedAt": "2026-05-04T08:00:00+02:00",
+      "proposalSentAt": "2026-07-13T08:00:00+02:00",
+      "stageChangedAt": "2026-07-13T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-13",
+      "title": "Soethe Inval — Solar/PPA",
+      "companyId": "c-tracker-13",
+      "site": "Soethe Inval",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "quote",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-herman",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 13.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nSource row 13:\nLead originator: Khudu Pitje\nPartner: Business Development\nCompany and contact: Soethe Inval\nLead maturity: Medium\nEnquiry received: 2026-04-24\nIntro email sent: 2026-04-24\nFollow-up 1: 2026-08-06\nAssigned engineer: Herman\nProposal sent: 2026-09-08\nBank model status: Not Modelled",
+      "financingDetails": {
+        "bankModelStatus": "Not Modelled"
+      },
+      "createdAt": "2026-04-24T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          13
+        ],
+        "rawRows": [
+          {
+            "row": 13,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "Business Development ",
+              "C": "Soethe Inval ",
+              "D": "Medium ",
+              "E": "46136",
+              "F": "46136",
+              "G": "46240",
+              "J": "Herman",
+              "K": "46273",
+              "M": "Not Modelled"
+            }
+          }
+        ],
+        "maturity": "Medium",
+        "partner": "Business Development",
+        "originator": "Khudu Pitje",
+        "modellingApproval": "",
+        "enquiryReceived": "2026-04-24"
+      },
+      "receivedAt": "2026-04-24T08:00:00+02:00",
+      "proposalSentAt": "2026-09-08T08:00:00+02:00",
+      "stageChangedAt": "2026-09-08T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-14",
+      "title": "Sasol Sebenzile — Solar/PPA",
+      "companyId": "c-tracker-14",
+      "site": "Sasol Sebenzile",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "quote",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 14.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nSource row 14:\nLead originator: Khudu Pitje\nPartner: Sasol\nCompany and contact: Sasol Sebenzile\nLead maturity: High\nEnquiry received: 2026-04-21\nIntro email sent: 2026-04-21\nFollow-up 1: 2026-06-25\nFollow-up 2: 2026-08-06\nFollow-up 3: 2026-09-04\nAssigned engineer: Welcome\nProposal sent: 2026-07-13\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-09-30\nOperations start date: 2026-11-30\nCAPEX PPA incl contingency: 1090878\nCAPEX Rental incl contingency: 571152\nPPA IRR: 0.1904\nRental IRR: 19.33%",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-09-30",
+        "operationsStartDate": "2026-11-30",
+        "capexPpa": 1090878.0,
+        "capexRental": 571152.0,
+        "ppaIrr": 19.040000000000003,
+        "rentalIrr": 19.33
+      },
+      "createdAt": "2026-04-21T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          14
+        ],
+        "rawRows": [
+          {
+            "row": 14,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "Sasol",
+              "C": "Sasol Sebenzile\n",
+              "D": "High",
+              "E": "46133",
+              "F": "46133",
+              "G": "46198",
+              "H": "46240",
+              "I": "46269",
+              "J": "Welcome ",
+              "K": "46216",
+              "M": "Modelled",
+              "N": "46295",
+              "O": "46356",
+              "P": "1090878",
+              "Q": "571152",
+              "R": "0.1904",
+              "S": "19.33%"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "Sasol",
+        "originator": "Khudu Pitje",
+        "modellingApproval": "",
+        "enquiryReceived": "2026-04-21"
+      },
+      "receivedAt": "2026-04-21T08:00:00+02:00",
+      "proposalSentAt": "2026-07-13T08:00:00+02:00",
+      "stageChangedAt": "2026-07-13T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-15",
+      "title": "BP Kew — Solar/PPA",
+      "companyId": "c-tracker-15",
+      "site": "BP Kew",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "quote",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 15.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nSource row 15:\nLead originator: Khudu Pitje\nPartner: Sasol\nCompany and contact: BP Kew\nLead maturity: High\nEnquiry received: 2026-04-21\nIntro email sent: 2026-04-21\nFollow-up 1: 2026-06-25\nFollow-up 2: 2026-08-06\nAssigned engineer: Welcome\nProposal sent: 2026-07-13\nApproved for modelling: 2026-07-24\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-09-30\nOperations start date: 2026-11-30\nCAPEX PPA incl contingency: 1022434\nCAPEX Rental incl contingency: 519092\nPPA IRR: 0.2119\nRental IRR: 20.92%",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-09-30",
+        "operationsStartDate": "2026-11-30",
+        "capexPpa": 1022434.0,
+        "capexRental": 519092.0,
+        "ppaIrr": 21.19,
+        "rentalIrr": 20.92
+      },
+      "createdAt": "2026-04-21T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          15
+        ],
+        "rawRows": [
+          {
+            "row": 15,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "Sasol",
+              "C": "BP Kew \n",
+              "D": "High",
+              "E": "46133",
+              "F": "46133",
+              "G": "46198",
+              "H": "46240",
+              "J": "Welcome",
+              "K": "46216",
+              "L": "46227",
+              "M": "Modelled",
+              "N": "46295",
+              "O": "46356",
+              "P": "1022434",
+              "Q": "519092",
+              "R": "0.2119",
+              "S": "20.92%"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "Sasol",
+        "originator": "Khudu Pitje",
+        "modellingApproval": "46227",
+        "enquiryReceived": "2026-04-21"
+      },
+      "receivedAt": "2026-04-21T08:00:00+02:00",
+      "proposalSentAt": "2026-07-13T08:00:00+02:00",
+      "stageChangedAt": "2026-07-13T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-16",
+      "title": "170 Grosvenor — Solar/PPA",
+      "companyId": "c-tracker-16",
+      "site": "170 Grosvenor",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "quote",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 16.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nSource row 16:\nLead originator: Welcome Nyathi\nPartner: Business Development\nCompany and contact: 170 Grosvenor\nLead maturity: Medium\nEnquiry received: 2026-04-09\nIntro email sent: 2026-04-15\nFollow-up 1: 2026-04-20\nAssigned engineer: Welcome\nProposal sent: 2026-07-20\nBank model status: Not Modelled",
+      "financingDetails": {
+        "bankModelStatus": "Not Modelled"
+      },
+      "createdAt": "2026-04-09T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          16
+        ],
+        "rawRows": [
+          {
+            "row": 16,
+            "cells": {
+              "A": "Welcome Nyathi",
+              "B": "Business Development ",
+              "C": "170 Grosvenor",
+              "D": "Medium ",
+              "E": "46121",
+              "F": "46127",
+              "G": "46132",
+              "J": "Welcome",
+              "K": "46223",
+              "M": "Not Modelled"
+            }
+          }
+        ],
+        "maturity": "Medium",
+        "partner": "Business Development",
+        "originator": "Welcome Nyathi",
+        "modellingApproval": "",
+        "enquiryReceived": "2026-04-09"
+      },
+      "receivedAt": "2026-04-09T08:00:00+02:00",
+      "proposalSentAt": "2026-07-20T08:00:00+02:00",
+      "stageChangedAt": "2026-07-20T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-17",
+      "title": "Astron Klipspruit — Solar/PPA",
+      "companyId": "c-tracker-17",
+      "site": "Astron Klipspruit",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 17.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nSource row 17:\nLead originator: Khudu Pitje\nPartner: Sasol\nCompany and contact: Astron Klipspruit\nLead maturity: High\nEnquiry received: 2026-04-21\nIntro email sent: 2026-04-21\nFollow-up 1: 2026-06-25\nFollow-up 2: 2026-08-06\nAssigned engineer: Welcome\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-09-30\nOperations start date: 2026-11-30\nCAPEX PPA incl contingency: 791621\nCAPEX Rental incl contingency: 0\nPPA IRR: 0\nRental IRR: N/A",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-09-30",
+        "operationsStartDate": "2026-11-30",
+        "capexPpa": 791621.0,
+        "capexRental": 0.0,
+        "ppaIrr": 0.0
+      },
+      "createdAt": "2026-04-21T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          17
+        ],
+        "rawRows": [
+          {
+            "row": 17,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "Sasol",
+              "C": "Astron Klipspruit ",
+              "D": "High",
+              "E": "46133",
+              "F": "46133",
+              "G": "46198",
+              "H": "46240",
+              "J": "Welcome",
+              "M": "Modelled",
+              "N": "46295",
+              "O": "46356",
+              "P": "791621",
+              "Q": "0",
+              "R": "0",
+              "S": "N/A"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "Sasol",
+        "originator": "Khudu Pitje",
+        "modellingApproval": "",
+        "enquiryReceived": "2026-04-21"
+      },
+      "receivedAt": "2026-04-21T08:00:00+02:00",
+      "stageChangedAt": "2026-04-21T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-19",
+      "title": "Central City — Solar/PPA",
+      "companyId": "c-tracker-19",
+      "site": "Central City",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-herman",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 19.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 19:\nLead originator: Khudu Pitje\nPartner: PIC\nCompany and contact: Central City\nLead maturity: High\nAssigned engineer: Herman\nProposal sent: Pending Send\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-11-30\nOperations start date: 2027-02-28\nCAPEX PPA incl contingency: 25000\nCAPEX Rental incl contingency: 0\nPPA IRR: 0.2466\nRental IRR: 0",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-11-30",
+        "operationsStartDate": "2027-02-28",
+        "capexPpa": 25000.0,
+        "capexRental": 0.0,
+        "ppaIrr": 24.66,
+        "rentalIrr": 0.0
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          19
+        ],
+        "rawRows": [
+          {
+            "row": 19,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "PIC ",
+              "C": "Central City  ",
+              "D": "High",
+              "J": "Herman ",
+              "K": "Pending Send",
+              "M": "Modelled",
+              "N": "46356",
+              "O": "46446",
+              "P": "25000",
+              "Q": "0",
+              "R": "0.2466",
+              "S": "0"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "PIC",
+        "originator": "Khudu Pitje",
+        "modellingApproval": ""
+      }
+    },
+    {
+      "id": "d-tracker-20",
+      "title": "BCX — Solar/PPA",
+      "companyId": "c-tracker-20",
+      "site": "BCX",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-herman",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 20.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 20:\nLead originator: Khudu Pitje\nPartner: PIC\nCompany and contact: BCX\nLead maturity: High\nAssigned engineer: Herman\nProposal sent: Pending Send\nBank model status: Not Modelled",
+      "financingDetails": {
+        "bankModelStatus": "Not Modelled"
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          20
+        ],
+        "rawRows": [
+          {
+            "row": 20,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "PIC ",
+              "C": "BCX ",
+              "D": "High",
+              "J": "Herman ",
+              "K": "Pending Send",
+              "M": "Not Modelled"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "PIC",
+        "originator": "Khudu Pitje",
+        "modellingApproval": ""
+      }
+    },
+    {
+      "id": "d-tracker-21",
+      "title": "Woodmead SARS — Solar/PPA",
+      "companyId": "c-tracker-21",
+      "site": "Woodmead SARS",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-herman",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 21.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 21:\nLead originator: Khudu Pitje\nPartner: PIC\nCompany and contact: Woodmead SARS\nLead maturity: High\nAssigned engineer: Herman\nProposal sent: Pending Send\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-11-30\nOperations start date: 2027-02-28\nCAPEX PPA incl contingency: 25000\nCAPEX Rental incl contingency: 0\nPPA IRR: 0.2033\nRental IRR: 26.08%",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-11-30",
+        "operationsStartDate": "2027-02-28",
+        "capexPpa": 25000.0,
+        "capexRental": 0.0,
+        "ppaIrr": 20.330000000000002,
+        "rentalIrr": 26.08
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          21
+        ],
+        "rawRows": [
+          {
+            "row": 21,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "PIC ",
+              "C": " Woodmead SARS ",
+              "D": "High",
+              "J": "Herman ",
+              "K": "Pending Send",
+              "M": "Modelled",
+              "N": "46356",
+              "O": "46446",
+              "P": "25000",
+              "Q": "0",
+              "R": "0.2033",
+              "S": "26.08%"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "PIC",
+        "originator": "Khudu Pitje",
+        "modellingApproval": ""
+      }
+    },
+    {
+      "id": "d-tracker-22",
+      "title": "Palm Grove — Solar/PPA",
+      "companyId": "c-tracker-22",
+      "site": "Palm Grove",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-herman",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 22.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 22:\nLead originator: Khudu Pitje\nPartner: PIC\nCompany and contact: Palm Grove\nLead maturity: High\nAssigned engineer: Herman\nProposal sent: Pending Send\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-11-30\nOperations start date: 2027-03-31\nCAPEX PPA incl contingency: 25000\nCAPEX Rental incl contingency: 0\nPPA IRR: 0.2121\nRental IRR: 23.44%",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-11-30",
+        "operationsStartDate": "2027-03-31",
+        "capexPpa": 25000.0,
+        "capexRental": 0.0,
+        "ppaIrr": 21.21,
+        "rentalIrr": 23.44
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          22
+        ],
+        "rawRows": [
+          {
+            "row": 22,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "PIC ",
+              "C": " Palm Grove",
+              "D": "High",
+              "J": "Herman ",
+              "K": "Pending Send",
+              "M": "Modelled",
+              "N": "46356",
+              "O": "46477",
+              "P": "25000",
+              "Q": "0",
+              "R": "0.2121",
+              "S": "23.44%"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "PIC",
+        "originator": "Khudu Pitje",
+        "modellingApproval": ""
+      }
+    },
+    {
+      "id": "d-tracker-23",
+      "title": "Garankuwa — Solar/PPA",
+      "companyId": "c-tracker-23",
+      "site": "Garankuwa",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-herman",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 23.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 23:\nLead originator: Khudu Pitje\nPartner: PIC\nCompany and contact: Garankuwa\nLead maturity: High\nAssigned engineer: Herman\nProposal sent: Pending Send\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-11-30\nOperations start date: 2027-02-28\nCAPEX PPA incl contingency: 10212718\nCAPEX Rental incl contingency: 0\nPPA IRR: 0.2425\nRental IRR: 23.91%",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-11-30",
+        "operationsStartDate": "2027-02-28",
+        "capexPpa": 10212718.0,
+        "capexRental": 0.0,
+        "ppaIrr": 24.25,
+        "rentalIrr": 23.91
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          23
+        ],
+        "rawRows": [
+          {
+            "row": 23,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "PIC ",
+              "C": "Garankuwa",
+              "D": "High",
+              "J": "Herman ",
+              "K": "Pending Send",
+              "M": "Modelled",
+              "N": "46356",
+              "O": "46446",
+              "P": "10212718",
+              "Q": "0",
+              "R": "0.2425",
+              "S": "23.91%"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "PIC",
+        "originator": "Khudu Pitje",
+        "modellingApproval": ""
+      }
+    },
+    {
+      "id": "d-tracker-24",
+      "title": "Melvern — Solar/PPA",
+      "companyId": "c-tracker-24",
+      "site": "Melvern",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-herman",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 24.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 24:\nLead originator: Khudu Pitje\nPartner: PIC\nCompany and contact: Melvern\nLead maturity: High\nAssigned engineer: Herman\nProposal sent: Pending Send\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-11-30\nOperations start date: 2027-03-31\nCAPEX PPA incl contingency: 25000\nCAPEX Rental incl contingency: 0\nPPA IRR: 0.1985\nRental IRR: 26.08%",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-11-30",
+        "operationsStartDate": "2027-03-31",
+        "capexPpa": 25000.0,
+        "capexRental": 0.0,
+        "ppaIrr": 19.85,
+        "rentalIrr": 26.08
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          24
+        ],
+        "rawRows": [
+          {
+            "row": 24,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "PIC ",
+              "C": "Melvern",
+              "D": "High",
+              "J": "Herman ",
+              "K": "Pending Send",
+              "M": "Modelled",
+              "N": "46356",
+              "O": "46477",
+              "P": "25000",
+              "Q": "0",
+              "R": "0.1985",
+              "S": "26.08%"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "PIC",
+        "originator": "Khudu Pitje",
+        "modellingApproval": ""
+      }
+    },
+    {
+      "id": "d-tracker-25",
+      "title": "Kasteel Park — Solar/PPA",
+      "companyId": "c-tracker-25",
+      "site": "Kasteel Park",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-herman",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 25.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 25:\nLead originator: Khudu Pitje\nPartner: PIC\nCompany and contact: Kasteel Park\nLead maturity: High\nAssigned engineer: Herman\nProposal sent: Pending Send\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-11-30\nOperations start date: 2027-03-31\nCAPEX PPA incl contingency: 4166195\nCAPEX Rental incl contingency: 0\nPPA IRR: 0.2381\nRental IRR: 23.44%",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-11-30",
+        "operationsStartDate": "2027-03-31",
+        "capexPpa": 4166195.0,
+        "capexRental": 0.0,
+        "ppaIrr": 23.810000000000002,
+        "rentalIrr": 23.44
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          25
+        ],
+        "rawRows": [
+          {
+            "row": 25,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "PIC ",
+              "C": "Kasteel Park",
+              "D": "High",
+              "J": "Herman ",
+              "K": "Pending Send",
+              "M": "Modelled",
+              "N": "46356",
+              "O": "46477",
+              "P": "4166195",
+              "Q": "0",
+              "R": "0.2381",
+              "S": "23.44%"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "PIC",
+        "originator": "Khudu Pitje",
+        "modellingApproval": ""
+      }
+    },
+    {
+      "id": "d-tracker-26",
+      "title": "Amsterdam — Solar/PPA",
+      "companyId": "c-tracker-26",
+      "site": "Amsterdam",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "quote",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 26.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 26:\nLead originator: Khudu Pitje\nPartner: ALT\nCompany and contact: Amsterdam\nLead maturity: High\nFollow-up 1: 2026-08-31\nFollow-up 2: 2026-09-01\nAssigned engineer: Welcome\nProposal sent: 2026-08-30\nApproved for modelling: Approved\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-06-30\nOperations start date: 2026-08-31\nCAPEX PPA incl contingency: 25000\nCAPEX Rental incl contingency: 0\nPPA IRR: 0.2443\nRental IRR: 25.05%",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-06-30",
+        "operationsStartDate": "2026-08-31",
+        "capexPpa": 25000.0,
+        "capexRental": 0.0,
+        "ppaIrr": 24.43,
+        "rentalIrr": 25.05
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          26
+        ],
+        "rawRows": [
+          {
+            "row": 26,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "ALT",
+              "C": "Amsterdam ",
+              "D": "High",
+              "G": "46265",
+              "H": "46266",
+              "J": "Welcome",
+              "K": "46264",
+              "L": "Approved",
+              "M": "Modelled",
+              "N": "46203",
+              "O": "46265",
+              "P": "25000",
+              "Q": "0",
+              "R": "0.2443",
+              "S": "25.05%"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "ALT",
+        "originator": "Khudu Pitje",
+        "modellingApproval": "Approved"
+      },
+      "proposalSentAt": "2026-08-30T08:00:00+02:00",
+      "stageChangedAt": "2026-08-30T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-27",
+      "title": "Piet Retief — Solar/PPA",
+      "companyId": "c-tracker-27",
+      "site": "Piet Retief",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "quote",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 27.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 27:\nLead originator: Khudu Pitje\nPartner: ALT\nCompany and contact: Piet Retief\nLead maturity: High\nFollow-up 1: 2026-08-31\nFollow-up 2: 2026-09-01\nAssigned engineer: Welcome\nProposal sent: 2026-08-30\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-11-01\nOperations start date: 2026-12-01\nCAPEX PPA incl contingency: 8452987\nCAPEX Rental incl contingency: 3726764\nPPA IRR: 0.2202\nRental IRR: 30.14%",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-11-01",
+        "operationsStartDate": "2026-12-01",
+        "capexPpa": 8452987.0,
+        "capexRental": 3726764.0,
+        "ppaIrr": 22.02,
+        "rentalIrr": 30.14
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          27
+        ],
+        "rawRows": [
+          {
+            "row": 27,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "ALT",
+              "C": "Piet Retief ",
+              "D": "High",
+              "G": "46265",
+              "H": "46266",
+              "J": "Welcome",
+              "K": "46264",
+              "M": "Modelled",
+              "N": "46327",
+              "O": "46357",
+              "P": "8452987",
+              "Q": "3726764",
+              "R": "0.2202",
+              "S": "30.14%"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "ALT",
+        "originator": "Khudu Pitje",
+        "modellingApproval": ""
+      },
+      "proposalSentAt": "2026-08-30T08:00:00+02:00",
+      "stageChangedAt": "2026-08-30T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-28",
+      "title": "Ekhuphumleni — Solar/PPA",
+      "companyId": "c-tracker-28",
+      "site": "Ekhuphumleni",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "quote",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 28.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 28:\nLead originator: Khudu Pitje\nPartner: ALT\nCompany and contact: Ekhuphumleni\nLead maturity: High\nFollow-up 1: 2026-08-17\nFollow-up 2: 2026-08-31\nFollow-up 3: 2026-09-01\nAssigned engineer: Welcome\nProposal sent: 2026-06-30\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-06-30\nOperations start date: 2026-07-31\nCAPEX PPA incl contingency: 1601250\nCAPEX Rental incl contingency: 2625000\nPPA IRR: 0.2198\nRental IRR: 0.22",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-06-30",
+        "operationsStartDate": "2026-07-31",
+        "capexPpa": 1601250.0,
+        "capexRental": 2625000.0,
+        "ppaIrr": 21.98,
+        "rentalIrr": 22.0
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          28
+        ],
+        "rawRows": [
+          {
+            "row": 28,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "ALT",
+              "C": "Ekhuphumleni ",
+              "D": "High",
+              "G": "46251",
+              "H": "46265",
+              "I": "46266",
+              "J": "Welcome ",
+              "K": "46203",
+              "M": "Modelled",
+              "N": "46203",
+              "O": "46234",
+              "P": "1601250",
+              "Q": "2625000",
+              "R": "0.2198",
+              "S": "0.22"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "ALT",
+        "originator": "Khudu Pitje",
+        "modellingApproval": ""
+      },
+      "proposalSentAt": "2026-06-30T08:00:00+02:00",
+      "stageChangedAt": "2026-06-30T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-29",
+      "title": "Ngqamakwe — Solar/PPA",
+      "companyId": "c-tracker-29",
+      "site": "Ngqamakwe",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-herman",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 29.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 29:\nLead originator: Khudu Pitje\nPartner: ALT\nCompany and contact: Ngqamakwe\nLead maturity: High\nAssigned engineer: Herman\nProposal sent: Pending Send\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-11-30\nOperations start date: 2026-12-31\nCAPEX PPA incl contingency: 6016129\nCAPEX Rental incl contingency: 4007934\nPPA IRR: 0.2232\nRental IRR: 21.62%",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-11-30",
+        "operationsStartDate": "2026-12-31",
+        "capexPpa": 6016129.0,
+        "capexRental": 4007934.0,
+        "ppaIrr": 22.32,
+        "rentalIrr": 21.62
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          29
+        ],
+        "rawRows": [
+          {
+            "row": 29,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "ALT",
+              "C": "Ngqamakwe ",
+              "D": "High",
+              "J": "Herman",
+              "K": "Pending Send",
+              "M": "Modelled",
+              "N": "46356",
+              "O": "46387",
+              "P": "6016129",
+              "Q": "4007934",
+              "R": "0.2232",
+              "S": "21.62%"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "ALT",
+        "originator": "Khudu Pitje",
+        "modellingApproval": ""
+      }
+    },
+    {
+      "id": "d-tracker-30",
+      "title": "Arcon Park — Solar/PPA",
+      "companyId": "c-tracker-30",
+      "site": "Arcon Park",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 30.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 30:\nLead originator: Khudu Pitje\nPartner: ALT\nCompany and contact: Arcon Park\nLead maturity: High\nAssigned engineer: Welcome\nProposal sent: Pending Send\nBank model status: Not Modelled",
+      "financingDetails": {
+        "bankModelStatus": "Not Modelled"
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          30
+        ],
+        "rawRows": [
+          {
+            "row": 30,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "ALT",
+              "C": "Arcon Park ",
+              "D": "High",
+              "J": "Welcome ",
+              "K": "Pending Send",
+              "M": "Not Modelled"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "ALT",
+        "originator": "Khudu Pitje",
+        "modellingApproval": ""
+      }
+    },
+    {
+      "id": "d-tracker-31",
+      "title": "Welkom — Solar/PPA",
+      "companyId": "c-tracker-31",
+      "site": "Welkom",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 31.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 31:\nLead originator: Khudu Pitje\nPartner: ALT\nCompany and contact: Welkom\nLead maturity: High\nAssigned engineer: Welcome\nProposal sent: Pending Send\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-03-31\nOperations start date: 2026-05-31\nCAPEX PPA incl contingency: 4874462\nCAPEX Rental incl contingency: 1194666\nRental IRR: 18.11%",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-03-31",
+        "operationsStartDate": "2026-05-31",
+        "capexPpa": 4874462.0,
+        "capexRental": 1194666.0,
+        "rentalIrr": 18.11
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          31
+        ],
+        "rawRows": [
+          {
+            "row": 31,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "ALT",
+              "C": "Welkom ",
+              "D": "High",
+              "J": "Welcome ",
+              "K": "Pending Send",
+              "M": "Modelled",
+              "N": "46112",
+              "O": "46173",
+              "P": "4874462",
+              "Q": "1194666",
+              "S": "18.11%"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "ALT",
+        "originator": "Khudu Pitje",
+        "modellingApproval": ""
+      }
+    },
+    {
+      "id": "d-tracker-32",
+      "title": "Harrismith — Solar/PPA",
+      "companyId": "c-tracker-32",
+      "site": "Harrismith",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 32.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 32:\nLead originator: Khudu Pitje\nPartner: ALT\nCompany and contact: Harrismith\nLead maturity: High\nAssigned engineer: Welcome\nProposal sent: Pending Send\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-11-01\nOperations start date: 2026-12-01\nCAPEX PPA incl contingency: 0\nCAPEX Rental incl contingency: 0\nPPA IRR: 0.23\nRental IRR: n/a",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-11-01",
+        "operationsStartDate": "2026-12-01",
+        "capexPpa": 0.0,
+        "capexRental": 0.0,
+        "ppaIrr": 23.0
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          32
+        ],
+        "rawRows": [
+          {
+            "row": 32,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "ALT",
+              "C": "Harrismith ",
+              "D": "High",
+              "J": "Welcome ",
+              "K": "Pending Send",
+              "M": "Modelled",
+              "N": "46327",
+              "O": "46357",
+              "P": "0",
+              "Q": "0",
+              "R": "0.23",
+              "S": "n/a"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "ALT",
+        "originator": "Khudu Pitje",
+        "modellingApproval": ""
+      }
+    },
+    {
+      "id": "d-tracker-33",
+      "title": "Inanda — Solar/PPA",
+      "companyId": "c-tracker-33",
+      "site": "Inanda",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-welcome",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 33.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 33:\nLead originator: Khudu Pitje\nPartner: ALT\nCompany and contact: Inanda\nLead maturity: High\nAssigned engineer: Welcome\nProposal sent: Pending Send\nBank model status: Modelled\nContract signature date (unconfirmed): 2026-09-30\nOperations start date: 2026-12-31\nCAPEX PPA incl contingency: 3255210\nCAPEX Rental incl contingency: 0\nPPA IRR: 0.2012\nRental IRR: n/a",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "contractSignatureDate": "2026-09-30",
+        "operationsStartDate": "2026-12-31",
+        "capexPpa": 3255210.0,
+        "capexRental": 0.0,
+        "ppaIrr": 20.119999999999997
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          33
+        ],
+        "rawRows": [
+          {
+            "row": 33,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "ALT",
+              "C": "Inanda ",
+              "D": "High",
+              "J": "Welcome ",
+              "K": "Pending Send",
+              "M": "Modelled",
+              "N": "46295",
+              "O": "46387",
+              "P": "3255210",
+              "Q": "0",
+              "R": "0.2012",
+              "S": "n/a"
+            }
+          }
+        ],
+        "maturity": "High",
+        "partner": "ALT",
+        "originator": "Khudu Pitje",
+        "modellingApproval": ""
+      }
+    },
+    {
+      "id": "d-tracker-34",
+      "title": "Pendleberry Grove Body Corporate — Solar/PPA",
+      "companyId": "c-tracker-34",
+      "site": "Pendleberry Grove Body Corporate",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-herman",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 34.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nSource row 34:\nLead originator: Khudu Pitje\nPartner: Fungi\nCompany and contact: Pendleberry Grove Body Corporate (Claudette Erasmus, Numeri)\nEnquiry received: 2026-10-05\nIntro email sent: 2026-10-05\nAssigned engineer: Herman\nProposal sent: Pending Send (model being reworked)\nBank model status: Modelled\nPPA IRR: 0.23",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "ppaIrr": 23.0
+      },
+      "createdAt": "2026-10-05T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          34
+        ],
+        "rawRows": [
+          {
+            "row": 34,
+            "cells": {
+              "A": "Khudu Pitje ",
+              "B": "Fungi ",
+              "C": "Pendleberry Grove Body Corporate\n(Claudette Erasmus, Numeri)",
+              "E": "46300",
+              "F": "46300",
+              "J": "Herman ",
+              "K": "Pending Send\n(model being reworked)",
+              "M": "Modelled",
+              "R": "0.23"
+            }
+          }
+        ],
+        "maturity": "",
+        "partner": "Fungi",
+        "originator": "Khudu Pitje",
+        "modellingApproval": "",
+        "enquiryReceived": "2026-10-05"
+      },
+      "receivedAt": "2026-10-05T08:00:00+02:00",
+      "stageChangedAt": "2026-10-05T08:00:00+02:00",
+      "primaryContactId": "ct-tracker-34",
+      "primaryContactName": "Claudette Erasmus"
+    },
+    {
+      "id": "d-tracker-35",
+      "title": "Inanda (Ikhwani Junction) — Vumacam AI security",
+      "companyId": "c-tracker-35",
+      "site": "Inanda (Ikhwani Junction)",
+      "division": "secure",
+      "productLine": "Security",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-suhail",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 35.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 35:\nLead originator: Suhail Asvat\nPartner: AJ Properties\nCompany and contact: Inanda (Ikhwani Junction) Vumacam AI security\nProposal sent: Pending Send (IC review 09-Oct)\nBank model status: Modelled\nCAPEX Rental incl contingency: 274054\nRental IRR: 0.239",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "capexRental": 274054.0,
+        "rentalIrr": 23.9
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          35
+        ],
+        "rawRows": [
+          {
+            "row": 35,
+            "cells": {
+              "A": "Suhail Asvat",
+              "B": "AJ Properties",
+              "C": "Inanda (Ikhwani Junction)\nVumacam AI security",
+              "K": "Pending Send\n(IC review 09-Oct)",
+              "M": "Modelled",
+              "Q": "274054",
+              "S": "0.239"
+            }
+          }
+        ],
+        "maturity": "",
+        "partner": "AJ Properties",
+        "originator": "Suhail Asvat",
+        "modellingApproval": ""
+      }
+    },
+    {
+      "id": "d-tracker-36",
+      "title": "Erica Square — Vumacam AI security",
+      "companyId": "c-tracker-36",
+      "site": "Erica Square",
+      "division": "secure",
+      "productLine": "Security",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-suhail",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 36.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 36:\nLead originator: Suhail Asvat\nPartner: ALT\nCompany and contact: Erica Square Vumacam AI security\nProposal sent: Pending Send (awaiting Bester contribution)\nBank model status: Modelled\nCAPEX Rental incl contingency: 660176\nRental IRR: 0.18",
+      "financingDetails": {
+        "bankModelStatus": "Modelled",
+        "capexRental": 660176.0,
+        "rentalIrr": 18.0
+      },
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          36
+        ],
+        "rawRows": [
+          {
+            "row": 36,
+            "cells": {
+              "A": "Suhail Asvat",
+              "B": "ALT",
+              "C": "Erica Square\nVumacam AI security",
+              "K": "Pending Send\n(awaiting Bester contribution)",
+              "M": "Modelled",
+              "Q": "660176",
+              "S": "0.18"
+            }
+          }
+        ],
+        "maturity": "",
+        "partner": "ALT",
+        "originator": "Suhail Asvat",
+        "modellingApproval": ""
+      }
+    },
+    {
+      "id": "d-tracker-37",
+      "title": "JDT Farm (Seenveld Boerdery) — Solar/PPA",
+      "companyId": "c-tracker-37",
+      "site": "JDT Farm (Seenveld Boerdery)",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "quote",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-langelihle",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 37.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 37:\nCompany and contact: JDT Farm (Seenveld Boerdery) Settlers, Limpopo\nProposal sent: 2026-10-06",
+      "financingDetails": {},
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          37
+        ],
+        "rawRows": [
+          {
+            "row": 37,
+            "cells": {
+              "C": "JDT Farm (Seenveld Boerdery)\nSettlers, Limpopo",
+              "K": "46301"
+            }
+          }
+        ],
+        "maturity": "",
+        "partner": "",
+        "originator": "",
+        "modellingApproval": ""
+      },
+      "proposalSentAt": "2026-10-06T08:00:00+02:00",
+      "stageChangedAt": "2026-10-06T08:00:00+02:00"
+    },
+    {
+      "id": "d-tracker-38",
+      "title": "Phetogo Poultry Farm — Solar/PPA",
+      "companyId": "c-tracker-38",
+      "site": "Phetogo Poultry Farm",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-langelihle",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 38.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nEnquiry received date not recorded; proposal deadline is unavailable until entered.\nSource row 38:\nCompany and contact: Phetogo Poultry Farm Sokhulumi, Gauteng\nProposal sent: Pending Send (draft 25-Sep, subject to IC)",
+      "financingDetails": {},
+      "createdAt": "2026-10-14T08:00:00Z",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          38
+        ],
+        "rawRows": [
+          {
+            "row": 38,
+            "cells": {
+              "C": "Phetogo Poultry Farm\nSokhulumi, Gauteng",
+              "K": "Pending Send\n(draft 25-Sep, subject to IC)"
+            }
+          }
+        ],
+        "maturity": "",
+        "partner": "",
+        "originator": "",
+        "modellingApproval": ""
+      }
+    },
+    {
+      "id": "d-tracker-39",
+      "title": "Soshanguve — Solar/PPA",
+      "companyId": "c-tracker-39",
+      "site": "Soshanguve",
+      "division": "energy",
+      "productLine": "Solar",
+      "stage": "qualified",
+      "onceOff": 0,
+      "mrr": 0,
+      "ownerId": "u-langelihle",
+      "notes": "Imported from Lead_Tracker_v1.xlsx, source rows 39.\nApproval refers to modelling approval, not a signed proposal.\nContract signature dates are unconfirmed; no Won status inferred.\nSales contract value and MRR were not provided; CAPEX is retained separately in Financing.\nSource row 39:\nCompany and contact: Soshanguve (site name TBC)\nEnquiry received: 2026-10-12\nProposal sent: In progress",
+      "financingDetails": {},
+      "createdAt": "2026-10-12T08:00:00+02:00",
+      "updatedAt": "2026-10-14T08:00:00Z",
+      "leadTracker": {
+        "source": "Lead_Tracker_v1.xlsx",
+        "sourceRows": [
+          39
+        ],
+        "rawRows": [
+          {
+            "row": 39,
+            "cells": {
+              "C": "Soshanguve\n(site name TBC)",
+              "E": "46307",
+              "K": "In progress"
+            }
+          }
+        ],
+        "maturity": "",
+        "partner": "",
+        "originator": "",
+        "modellingApproval": "",
+        "enquiryReceived": "2026-10-12"
+      },
+      "receivedAt": "2026-10-12T08:00:00+02:00",
+      "stageChangedAt": "2026-10-12T08:00:00+02:00"
+    }
+  ]
+}

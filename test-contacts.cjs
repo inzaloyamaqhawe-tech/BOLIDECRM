@@ -1,17 +1,28 @@
 const ts=require('typescript'),fs=require('fs'),path=require('path'),assert=require('assert');
 const data=new Map();global.localStorage={getItem:k=>data.get(k)??null,setItem:(k,v)=>data.set(k,v)};global.window={addEventListener(){}};
+data.set("bolide-crm:v1:deals",JSON.stringify([{id:"old-placeholder"}]));
+data.set("bolide-crm:v1:users",JSON.stringify([{id:"u-test-account",name:"Preserved account",email:"test@bolide.co.za",passwordHash:"existing-hash",role:"rep"}]));
+data.set("bolide-crm:v1:session",JSON.stringify({userId:"u-test-account"}));
 const modules={};
 function load(file){
  file=path.resolve(file);
  if(file.endsWith('/remote.ts') || file.endsWith('\\remote.ts'))return {hosted:false};
- if(file.endsWith('/attachments.ts') || file.endsWith('\\attachments.ts'))return {};
+ if(file.endsWith('/attachments.ts') || file.endsWith('\\attachments.ts'))return {resetPreviewAttachments:async()=>{}};
  if(modules[file])return modules[file];
  const exports={};modules[file]=exports;
  const source=fs.readFileSync(file,'utf8').replaceAll('import.meta.env.BASE_URL','"/"');
  const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
- new Function('exports','require',code)(exports,name=>load(path.resolve(path.dirname(file),name+'.ts')));return exports;
+ new Function('exports','require',code)(exports,name=>name.endsWith('.json')?JSON.parse(fs.readFileSync(path.resolve(path.dirname(file),name),'utf8')):load(path.resolve(path.dirname(file),name+'.ts')));return exports;
 }
 const store=load('src/lib/store.ts');
+assert.equal(store.getDeals().length,36);assert.equal(store.getDeal("old-placeholder"),undefined);
+assert.equal(store.getUsers().find(u=>u.id==="u-test-account").passwordHash,"existing-hash");
+assert.equal(JSON.parse(localStorage.getItem("bolide-crm:v1:session")).userId,"u-test-account");
+const tracker=JSON.parse(fs.readFileSync('src/data/lead-tracker.json','utf8'));
+assert.equal(tracker.deals.flatMap(d=>d.leadTracker.sourceRows).length,37);
+assert.equal(tracker.deals.filter(d=>d.leadTracker.sourceRows.includes(8) && d.leadTracker.sourceRows.includes(18)).length,1);
+assert.equal(tracker.deals.find(d=>d.id==="d-tracker-11").stage,"quote");
+assert.equal(tracker.deals.filter(d=>d.stage==="won").length,0);
 const linda=store.saveDealContact({companyId:'c-aj',name:'Linda',phone:'+27 82 123 4567',email:''});
 const deal=store.createDeal({title:'Contact verification',companyId:'c-aj',primaryContactId:linda.id,primaryContactName:linda.name,division:'secure',stage:'lead',onceOff:0,mrr:0,ownerId:'u-langelihle'});
 assert.equal(store.getContacts().find(c=>c.id===store.getDeal(deal.id).primaryContactId).phone,'+27 82 123 4567');
@@ -21,4 +32,7 @@ assert.equal(store.getContacts().find(c=>c.id===linda.id).email,'linda@example.c
 assert.notEqual(store.saveDealContact({companyId:'c-alt',name:'Linda',phone:'0829999999',email:'linda@example.com'}).id,linda.id);
 assert.notEqual(store.saveDealContact({companyId:'c-aj',name:'Bob',phone:'0835555555',email:''},linda.id).id,linda.id);
 assert.equal(store.getContacts().find(c=>c.id===linda.id).name,'Linda');
+delete modules[path.resolve('src/lib/store.ts')];
+assert.equal(load('src/lib/store.ts').getDeal(deal.id).id,deal.id);
+console.log('PASS: tracker replaces stale leads once, accounts/session preserved, duplicate consolidated, modelling approval mapping, subsequent edits preserved.');
 console.log('PASS: saved deal links to Contacts, phone-only contact, duplicate reuse, contact edits, email normalization, company isolation, replacement person preserves original.');

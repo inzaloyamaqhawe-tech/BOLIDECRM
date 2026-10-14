@@ -18,3 +18,7 @@ connect_crm.py
 finish_crm.py
 database/initialize.py
 database/initial-data.json
+
+.private-backups/
+.import-work/
+replace_tracker_database.py

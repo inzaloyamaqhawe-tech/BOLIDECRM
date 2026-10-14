@@ -11,3 +11,5 @@ assert.match(exportsObject.proposalStatus(deal,new Date('2026-10-16T06:00:00Z'))
 assert.match(exportsObject.proposalStatus(deal,new Date('2026-10-19T06:00:00Z')),/Overdue by 1 working day/);
 assert.match(exportsObject.proposalStatus({...deal,stage:'quote'}),/Proposal sent/);
 console.log('PASS: weekday deadlines, weekend receipt, year boundary, days remaining, due today, overdue, proposal completion.');
+
+assert.match(exportsObject.proposalStatus({...deal,leadTracker:{source:"tracker",sourceRows:[3]}}),/deadline unavailable/);

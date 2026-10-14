@@ -119,3 +119,9 @@ export function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
+
+export async function resetPreviewAttachments() {
+  if(hosted)return;
+  const db=await openDb();
+  await new Promise<void>((resolve,reject)=>{const tx=db.transaction(STORE_NAME,"readwrite");tx.objectStore(STORE_NAME).clear();tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});
+}

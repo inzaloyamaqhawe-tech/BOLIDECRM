@@ -87,3 +87,6 @@ body {
 .scroll-thin::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* Scroll the rows while retaining table labels and search controls. */
+.crm-data-table thead th { position: sticky; top: 0; z-index: 10; background: white; box-shadow: 0 1px 0 #e5e5e5; }
