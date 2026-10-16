@@ -353,7 +353,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
             <input type="tel" autoComplete="tel" value={contactPhone} onChange={e=>setContactPhone(e.target.value)} className="input" placeholder="e.g. +27 82 123 4567" />
           </Field>
           <Field label="Contact email (optional)">
-            <input type="email" autoComplete="email" value={contactEmail} onChange={e=>setContactEmail(e.target.value)} className="input" placeholder="e.g. linda@mercedes.co.za" />
+            <input type="email" autoComplete="email" value={contactEmail} onChange={e=>setContactEmail(e.target.value)} className="input" placeholder="user@bolideexample.co.za" />
           </Field>
 
           <Field label="Site">

@@ -6,7 +6,7 @@ api/state.php
 api/notifications.php
 api/notification-functions.php
 assets/index-BfE8Up0a.css
-assets/index-Dk9sE_aF.js
+assets/index-BbRWodpo.js
 assets/vendor-charts-BHuxWsbc.js
 assets/vendor-dnd-C-c8qG_2.js
 assets/vendor-icons-Cc-lgg2c.js
