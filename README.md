@@ -11,7 +11,11 @@ CRM for the Bolide Group, built with React, TypeScript and Vite, with a PHP/MySQ
 
 ## Latest changes
 
-- 16 October: assigned tasks, personal desktop reminders, recurring follow-ups, mandatory next actions, holiday-aware deadlines/escalation, document-backed KYC, signed-proposal confirmation, combined filters and personal saved views, and attributed field history under Reports.
+- Corrected deal actions: automatically derived from stage, never assigned to the logged-in developer; task assignments are explicit and independent.
+- Personal header inbox beside New deal: unread badge, persistent read/unread state, missed reminders and recipient isolation, backed by MySQL.
+- Live search for every deal picker (tasks and report history), matching title, company and site with a bounded result list; checked with 5,000 deals.
+
+- 16 October: assigned tasks, personal desktop reminders, recurring follow-ups, stage-based next actions independent of assigned tasks, holiday-aware deadlines/escalation, document-backed KYC, signed-proposal confirmation, combined filters and personal saved views, and attributed field history under Reports.
 - Xneelo's database was backed up and migrated without replacing existing leads or accounts. See [the current upload instructions](UPDATE-2026-10-16.md).
 - Desktop notifications need valid HTTPS, browser permission and an open/minimised CRM tab. Closed-browser push is not configured.
 

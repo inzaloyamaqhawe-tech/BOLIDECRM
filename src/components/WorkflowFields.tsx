@@ -2,24 +2,17 @@ import { useState } from "react";
 import type { Attachment, DealWorkflow, KycItem, StageKey } from "../types";
 import { useUsers } from "../lib/use-store";
 import { useAuth } from "../lib/auth";
-import { defaultKyc, kycIssues } from "../lib/workflow";
+import { defaultKyc, kycIssues, stageNextAction } from "../lib/workflow";
 import { localDay } from "../lib/proposal";
 
 export function WorkflowFields({value,onChange,stage,attachments,isNew}:{value:DealWorkflow;onChange:(v:DealWorkflow)=>void;stage:StageKey;attachments:Attachment[];isNew:boolean}) {
  const users=useUsers(),{user}=useAuth();const [open,setOpen]=useState(false),[newLabel,setNewLabel]=useState("");
  const patch=(p:Partial<DealWorkflow>)=>onChange({...value,...p});
- const items=value.kyc??defaultKyc(),next=value.nextAction??{title:"",assigneeId:user?.id??"",dueDate:""};
+ const items=value.kyc??defaultKyc();
  function itemPatch(id:string,p:Partial<KycItem>){patch({kyc:items.map(i=>i.id===id?{...i,...p}:i)});}
  const issues=kycIssues(items,attachments);
  return <div className="sm:col-span-2 space-y-4 rounded-xl border border-sky-100 bg-sky-50/40 p-4">
-  {!["won","lost"].includes(stage)&&<>
-   <h3 className="font-bold">Required next action</h3>
-   <input aria-label="Next action" className="input" placeholder="Next step for this deal" value={next.title} onChange={e=>patch({nextAction:{...next,title:e.target.value}})}/>
-   <div className="grid gap-3 sm:grid-cols-2">
-    <label className="text-xs font-semibold">Responsible person<select className="input mt-1" value={next.assigneeId} onChange={e=>patch({nextAction:{...next,assigneeId:e.target.value}})}><option value="">Choose person</option>{users.map(u=><option key={u.id} value={u.id}>{u.name}</option>)}</select></label>
-    <label className="text-xs font-semibold">Next action due<input className="input mt-1" type="date" value={next.dueDate} onChange={e=>patch({nextAction:{...next,dueDate:e.target.value}})}/></label>
-   </div>
-  </>}
+  <div><h3 className="font-bold">{["won","lost"].includes(stage)?"Deal status":"Next deal action"}</h3><p className="mt-1 text-sm font-semibold">{stageNextAction(stage)}</p><p className="mt-1 text-xs text-neutral-500">Determined by the pipeline stage. Follow-up tasks are assigned separately and do not control this action.</p></div>
   <details><summary className="cursor-pointer font-semibold">Proposal deadline and escalation</summary>
    <p className="my-2 text-xs text-neutral-500">Default: seven South African working days after receipt, excluding public holidays. An override or received-date correction needs a reason. Escalation alerts the selected person when overdue.</p>
    <div className="grid gap-3 sm:grid-cols-2">

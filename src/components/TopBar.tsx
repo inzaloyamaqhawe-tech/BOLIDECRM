@@ -1,3 +1,4 @@
+import { ReminderCenter } from "./ReminderCenter";
 import { useEffect, useRef, useState } from "react";
 import { Plus, LogOut, Menu } from "lucide-react";
 import { DIVISIONS } from "../lib/seed-data";
@@ -33,6 +34,7 @@ export function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
         </button>
         <GlobalSearch />
         <div className="flex-1" />
+        <ReminderCenter key={user?.id} />
         <button
           type="button"
           onClick={() => setShowNewDeal(true)}

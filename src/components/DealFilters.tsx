@@ -14,7 +14,7 @@ export function DealFilters({value,onChange}:{value:Filters;onChange:(f:Filters)
   {select("Division","division",["energy","secure","connect","water","saas"].map(v=>({value:v,label:v})))}
   {select("Stage","stage",stages.map(s=>({value:s.key,label:s.label})))}
   {select("Segment","segment",["Commercial","Industrial","Forecourt","MDU"].map(v=>({value:v,label:v})))}
-  {select("Attention","attention",[{value:"proposal-overdue",label:"Overdue proposals"},{value:"no-action",label:"Missing next action"},{value:"action-overdue",label:"Next action overdue"},{value:"stale",label:"Inactive 14+ days"},{value:"awaiting-model",label:"Energy not yet modelled"}])}
+  {select("Attention","attention",[{value:"proposal-overdue",label:"Overdue proposals"},{value:"stale",label:"Inactive 14+ days"},{value:"awaiting-model",label:"Energy not yet modelled"}])}
   <label className="text-xs font-semibold">Close from<input className="input mt-1" type="date" value={value.closeFrom} onChange={e=>patch("closeFrom",e.target.value)}/></label>
   <label className="text-xs font-semibold">Close to<input className="input mt-1" type="date" value={value.closeTo} onChange={e=>patch("closeTo",e.target.value)}/></label>
   <label className="text-xs font-semibold">Sort<select className="input mt-1" value={value.sort} onChange={e=>patch("sort",e.target.value)}>{[{value:"updated-desc",label:"Recently updated"},{value:"received-desc",label:"Newest received"},{value:"title",label:"Title A–Z"},{value:"close-asc",label:"Earliest close"},{value:"value-desc",label:"Highest value"}].map(o=><option key={o.value} value={o.value}>{o.label}</option>)}</select></label>

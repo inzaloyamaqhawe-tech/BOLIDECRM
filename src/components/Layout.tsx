@@ -1,4 +1,3 @@
-import { ReminderCenter } from "./ReminderCenter";
 import { useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../lib/auth";
@@ -17,7 +16,6 @@ export function Layout() {
       <Sidebar open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
       <div className="flex flex-1 flex-col overflow-hidden">
         <TopBar onOpenNav={() => setMobileNavOpen(true)} />
-        <ReminderCenter />
         <main className="flex-1 overflow-y-auto scroll-thin px-4 py-6 sm:px-6">
           <Outlet />
         </main>

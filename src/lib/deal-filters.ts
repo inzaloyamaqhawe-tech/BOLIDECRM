@@ -10,9 +10,7 @@ export function filterDeals(deals:Deal[],f:DealFilters,companyName:(id:string)=>
   if(f.closeFrom&&(!d.closeDate||d.closeDate<f.closeFrom)||f.closeTo&&(!d.closeDate||d.closeDate>f.closeTo))return false;
   if(f.query&&![d.title,d.site,companyName(d.companyId),d.primaryContactName].some(s=>s?.toLowerCase().includes(f.query.toLowerCase().trim())))return false;
   if(f.attention==="proposal-overdue"&&(!proposalOutstanding(d)||!effectiveProposalDue(d)||effectiveProposalDue(d)!>=today))return false;
-  if(f.attention==="no-action"&&!dealFlags(d,now).includes("No next action"))return false;
   if(f.attention==="stale"&&!dealFlags(d,now).includes("Inactive 14+ days"))return false;
-  if(f.attention==="action-overdue"&&!dealFlags(d,now).includes("Next action overdue"))return false;
   if(f.attention==="awaiting-model"&&(d.division!=="energy"||d.financingDetails?.bankModelStatus==="Modelled"||["won","lost"].includes(d.stage)))return false;
   return true;
  });

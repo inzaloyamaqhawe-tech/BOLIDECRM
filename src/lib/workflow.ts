@@ -1,5 +1,12 @@
 import type { Attachment, Deal, KycItem, Task } from "../types";
 import { localDay } from "./proposal";
+export function stageNextAction(stage: Deal["stage"]): string {
+ return {lead:"Qualify/KYC Onboarding",qualified:"Preliminary Proposal",quote:"Final Proposal",final_proposal:"Negotiation",negotiation:"Final Proposal Signed",won:"Won (Final Proposal Signed)",lost:"Lost"}[stage];
+}
+export function stageWorkflow(stage: Deal["stage"],workflow: Deal["workflow"] = {}) {
+ const {nextAction:legacy,...rest}=workflow;
+ return {...rest,...(!["won","lost"].includes(stage)?{nextAction:{title:stageNextAction(stage)}}:{})};
+}
 export const activeDeal=(deal: Deal)=>!["won","lost"].includes(deal.stage);
 export const defaultKyc=(): KycItem[]=>[
  {id:"registration",label:"Company registration document",required:true,status:"missing"},
@@ -12,7 +19,6 @@ export function kycIssues(items: KycItem[]|undefined,attachments?: Attachment[],
 }
 export function workflowErrors(after: Deal,before?: Deal,attachments?: Attachment[]){
  const errors:string[]=[],today=localDay(new Date().toISOString());
- if(activeDeal(after)){const next=after.workflow?.nextAction;if(!next?.title.trim()||!next.assigneeId||!/^\d{4}-\d{2}-\d{2}$/.test(next.dueDate))errors.push("An active deal needs a next action, responsible person and due date.");}
  if(after.stage==="lost"&&!after.lostReason?.trim())errors.push("A lost reason is required.");
  if(after.stage==="won"){
   if(!after.workflow?.signedOn||after.workflow.signedOn>today)errors.push("Record a valid signature date (today or earlier) before marking Won.");
@@ -24,8 +30,7 @@ export function workflowErrors(after: Deal,before?: Deal,attachments?: Attachmen
  return errors;
 }
 export function dealFlags(deal: Deal,now=new Date()){
- if(!activeDeal(deal))return [];const flags:string[]=[],next=deal.workflow?.nextAction,today=localDay(now.toISOString());
- if(!next?.title||!next.assigneeId||!next.dueDate)flags.push("No next action");else if(next.dueDate<today)flags.push("Next action overdue");
+ if(!activeDeal(deal))return [];const flags:string[]=[];
  if(now.getTime()-new Date(deal.updatedAt).getTime()>14*86400000)flags.push("Inactive 14+ days");return flags;
 }
 export function nextOccurrence(task: Task): Partial<Task>|undefined {

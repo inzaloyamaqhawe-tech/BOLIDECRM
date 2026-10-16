@@ -1,6 +1,6 @@
 import { DealFilters } from "../components/DealFilters";
 import { emptyFilters, filterDeals } from "../lib/deal-filters";
-import { dealFlags } from "../lib/workflow";
+import { stageNextAction, dealFlags } from "../lib/workflow";
 import { getAttachments } from "../lib/attachments";
 import { workflowErrors } from "../lib/workflow";
 import { useMemo, useState } from "react";
@@ -298,7 +298,7 @@ export function DealsPage() {
                 <td className="px-4 py-3">
                   <div className="font-semibold text-neutral-900">{d.title}</div>
                   {dealFlags(d).map(flag=><div key={flag} className="text-xs font-semibold text-amber-700">{flag}</div>)}
-                  {d.workflow?.nextAction&&<div className="text-xs text-neutral-500">Next: {d.workflow.nextAction.title} · {ownerName(d.workflow.nextAction.assigneeId)} · {d.workflow.nextAction.dueDate}</div>}
+                  <div className="text-xs text-neutral-500">{["won","lost"].includes(d.stage)?"Status":"Next"}: {stageNextAction(d.stage)}</div>
                   <div className="text-xs text-neutral-500">
                     {companyName(d.companyId)}
                     {d.productLine ? ` · ${d.productLine}` : ""}

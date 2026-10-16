@@ -1,4 +1,4 @@
-import { nextOccurrence, workflowErrors } from "./workflow";
+import { nextOccurrence, stageWorkflow, workflowErrors } from "./workflow";
 import { api, hosted } from "./remote";
 import { matchDealContact } from "./contact-match";
 import { getAllAttachments, replaceRemoteAttachments, resetPreviewAttachments } from "./attachments";
@@ -222,6 +222,7 @@ export function createDeal(input: Omit<Deal, "id" | "createdAt" | "updatedAt">):
   if(input.stage === "lost" && !input.lostReason?.trim()) throw new Error("A lost reason is required.");
   const nowIso = new Date().toISOString();
   const deal: Deal = { ...input, id: uid("d"), receivedAt: input.receivedAt ?? nowIso, stageChangedAt: nowIso, proposalSentAt: ["quote","final_proposal","negotiation","won"].includes(input.stage) ? nowIso : undefined, createdAt: nowIso, updatedAt: nowIso };
+  deal.workflow=stageWorkflow(deal.stage,deal.workflow);
   const errors=workflowErrors(deal);if(errors.length)throw new Error(errors.join("\n"));
   save(KEYS.deals, [...getDeals(), deal]);
   logActivity(deal.id, "note", `Deal created: ${deal.title}`);
@@ -232,6 +233,7 @@ export function createDeal(input: Omit<Deal, "id" | "createdAt" | "updatedAt">):
 export function updateDeal(id: string, patch: Partial<Deal>) {
   const before=getDeal(id); if(!before) return;
   if(patch.receivedAt && before.leadTracker) patch.leadTracker={...before.leadTracker,enquiryReceived:patch.receivedAt.slice(0,10)};
+  patch.workflow=stageWorkflow(patch.stage??before.stage,patch.workflow??before.workflow);
   const after={...before,...patch};
   if(after.stage === "lost" && !after.lostReason?.trim()) throw new Error("A lost reason is required.");
   const errors=workflowErrors(after,before);if(errors.length)throw new Error(errors.join("\n"));
@@ -288,7 +290,7 @@ export function cloneDeal(id: string): Deal | undefined {
     id: uid("d"),
     title: `${source.title} (Copy)`,
     stage: "lead",
-    workflow:{nextAction:source.workflow?.nextAction??{title:"Review duplicated lead",assigneeId:source.ownerId,dueDate:nowIso.slice(0,10)}},
+    workflow:stageWorkflow("lead"),
     receivedAt: nowIso,
     stageChangedAt: nowIso,
     proposalSentAt: undefined,
@@ -368,7 +370,9 @@ export function getTasks(): Task[] {
 }
 
 export function createTask(input: Omit<Task, "id" | "createdAt" | "done">): Task {
-  const task: Task = { ...input, assigneeId:input.assigneeId ?? (actorId!=="system"?actorId:undefined), priority:input.priority ?? "normal", id: uid("t"), done: false, createdAt: new Date().toISOString() };
+  if(!input.title.trim()||!input.assigneeId)throw new Error("Enter a task title and explicitly choose its assignee.");
+  if(input.recurrence&&input.recurrence!=="none"&&!input.dueDate)throw new Error("Recurring tasks need a due date.");
+  const task: Task = { ...input, assigneeId:input.assigneeId, priority:input.priority ?? "normal", id: uid("t"), done: false, createdAt: new Date().toISOString() };
   save(KEYS.tasks, [...getTasks(), task]);
   if (task.dealId) logActivity(task.dealId, "task", `Follow-up added: ${task.title}`);
   return task;

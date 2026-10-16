@@ -38,7 +38,13 @@ console.log('PASS: tracker replaces stale leads once, accounts/session preserved
 console.log('PASS: saved deal links to Contacts, phone-only contact, duplicate reuse, contact edits, email normalization, company isolation, replacement person preserves original.');
 
 store.setActor('u-langelihle');
-assert.throws(()=>store.createDeal({title:'Missing action',companyId:'c-aj',division:'secure',stage:'lead',onceOff:0,mrr:0,ownerId:'u-langelihle'}),/next action/);
+const independent=store.createDeal({title:'Stage action',companyId:'c-aj',division:'secure',stage:'qualified',onceOff:0,mrr:0,ownerId:'u-other'});
+assert.deepEqual(independent.workflow.nextAction,{title:'Preliminary Proposal'});
+assert.throws(()=>store.createTask({title:'Unassigned follow-up'}),/explicitly/);
+const followup=store.createTask({title:'Call client first',assigneeId:'u-langelihle',dealId:independent.id});
+store.setTaskDone(followup.id,true);
+assert.equal(store.getDeal(independent.id).stage,'qualified');
+assert.deepEqual(store.getDeal(independent.id).workflow.nextAction,{title:'Preliminary Proposal'});
 store.updateDeal(deal.id,{ownerId:'u-other',onceOff:123});
 const audit=store.getActivities(deal.id).find(a=>a.changes?.some(c=>c.field==='ownerId'));
 assert.equal(audit.userId,'u-langelihle');assert.equal(audit.changes.find(c=>c.field==='ownerId').before,'u-langelihle');assert.equal(audit.changes.find(c=>c.field==='ownerId').after,'u-other');
@@ -58,4 +64,4 @@ assert(workflow.workflowErrors(signed,base,[{id:'kyc',dealId:base.id}]).some(e=>
 assert(workflow.kycIssues(kyc.map(i=>({...i,expiresOn:'2020-01-01'}))).length===3);
 assert(filters.filterDeals([base],{...filters.emptyFilters,owner:'other'}).length===0);
 assert(filters.filterDeals([base],{...filters.emptyFilters,owner:base.ownerId}).length===1);
-console.log('PASS: required actions, attributed field audit, KYC/signature gates, deadline reasons, recurring task dates and duplicate prevention, combined owner filters.');
+console.log('PASS: stage-driven actions independent of tasks, explicit task assignees, attributed field audit, KYC/signature gates, deadline reasons, recurring task dates and duplicate prevention, combined owner filters.');

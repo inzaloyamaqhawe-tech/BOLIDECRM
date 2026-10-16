@@ -36,13 +36,33 @@ try:
  assert req('auth',{'action':'signup','email':uid+'@bolide.co.za','name':'Temporary workflow verification','password':password})[0]==200
  initial=state();save(initial)
  data=state();template=copy.deepcopy(data['snapshot']['deals'][0]);template.update(id=marker,title='Temporary workflow check',stage='lead',ownerId=uid,receivedAt='2026-10-16T06:00:00Z',createdAt='2026-10-16T06:00:00Z',updatedAt='2026-10-16T06:00:00Z');template.pop('leadTracker',None);template.pop('proposalSentAt',None);template.pop('lostReason',None);template.pop('workflow',None)
- data['snapshot']['deals'].append(template);save(data,400)
+ data['snapshot']['deals'].append(template);save(data)
+ assert next(d for d in state()['snapshot']['deals'] if d['id']==marker)['workflow']['nextAction']=={'title':'Qualify/KYC Onboarding'}
+ data=state();template=next(d for d in data['snapshot']['deals'] if d['id']==marker)
  workflow={'nextAction':{'title':'Verify documents','assigneeId':uid,'dueDate':'2026-10-30'},'escalationUserId':uid2}
  template['workflow']=workflow;save(data)
+ assert next(d for d in state()['snapshot']['deals'] if d['id']==marker)['workflow']['nextAction']=={'title':'Qualify/KYC Onboarding'}
  data=state();data['snapshot']['tasks'].append({'id':marker,'title':'Private task reminder','assigneeId':uid,'priority':'high','reminderAt':'2026-10-16T07:00:00Z','recurrence':'monthly','dueDate':'2026-10-31','dealId':marker,'done':False,'createdAt':'2026-10-16T06:00:00Z'})
  me=next(u for u in data['snapshot']['users'] if u['id']==uid);me['savedViews']=[{'id':marker,'name':'My overdue proposals','filters':{'owner':uid,'attention':'proposal-overdue'}}];save(data)
  data=state();task=next(t for t in data['snapshot']['tasks'] if t['id']==marker);assert task['assigneeId']==uid and task['reminderAt']=='2026-10-16T07:00:00Z' and task['recurrence']=='monthly'
  assert next(u for u in data['snapshot']['users'] if u['id']==uid)['savedViews'][0]['name']=='My overdue proposals'
+ status,inbox=req('notifications');assert status==200,(status,inbox)
+ notification=next(n for n in inbox['notifications'] if n['title']=='Private task reminder');nid=notification['id'];assert notification['readAt'] is None and notification['active']
+ assert req('notifications',{'action':'read','id':nid})[0]==200
+ assert next(n for n in req('notifications')[1]['notifications'] if n['id']==nid)['readAt'] is not None
+ save(state())
+ assert next(n for n in req('notifications')[1]['notifications'] if n['id']==nid)['readAt'] is not None
+ assert req('auth',{'action':'signup','email':uid2+'@bolide.co.za','name':'Other temporary person','password':password})[0]==200
+ status,other=req('notifications');assert status==200 and not any(n['id']==nid for n in other['notifications'])
+ assert req('notifications',{'action':'unread','id':nid})[0]==200
+ q.execute('SELECT read_at FROM notifications WHERE recipient_id=%s AND id=%s',(uid,nid));assert q.fetchone()[0] is not None
+ assert req('auth',{'action':'login','email':uid+'@bolide.co.za','password':password})[0]==200
+ assert req('notifications',{'action':'unread','id':nid})[0]==200
+ assert next(n for n in req('notifications')[1]['notifications'] if n['id']==nid)['readAt'] is None
+ assert req('notifications',{'action':'read-all'})[0]==200
+ assert all(n['readAt'] for n in req('notifications')[1]['notifications'])
+ print('PASS: personal inbox generation, persistent read/unread and mark-all, snapshot-save independence, cross-account read and write isolation.')
+
  change_deal({'stage':'quote'},400)
  change_deal({'stage':'won'},400)
  changed=copy.deepcopy(workflow);changed['proposalDueOverride']='2026-11-12';change_deal({'workflow':changed},400)

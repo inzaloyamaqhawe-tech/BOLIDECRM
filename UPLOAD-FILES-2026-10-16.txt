@@ -1,15 +1,17 @@
-Xneelo update files (upload individually; keep paths relative to crm/):
+Latest Xneelo update: upload these files individually from deploy-crm into crm/, preserving subfolders.
 
 api/workflow.php
 api/import-functions.php
 api/state.php
-assets/index-BknTYZ87.js
-assets/index-C-G6XTPI.css
+api/notifications.php
+api/notification-functions.php
+assets/index-BfE8Up0a.css
+assets/index-Dk9sE_aF.js
 assets/vendor-charts-BHuxWsbc.js
 assets/vendor-dnd-C-c8qG_2.js
-assets/vendor-icons-BQ66S41C.js
+assets/vendor-icons-Cc-lgg2c.js
 assets/vendor-react-PGvNAZat.js
 reminders-sw.js
 index.html
 
-Database already migrated. Keep api/config.php unchanged. Upload index.html last.
+Database and inbox table already updated. Keep api/config.php unchanged. Upload index.html last. No ZIP or SQL import.

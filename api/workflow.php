@@ -22,10 +22,6 @@ function workflow_validate(array $deal, ?array $before, array $attachments, arra
     $userIds=array_column($users,'id');
     $files=array_filter($attachments,fn($a)=>($a['dealId']??'')===$deal['id']);
     $fileIds=array_column($files,'id');
-    if(!in_array($stage,['won','lost'],true)) {
-        $next=$w['nextAction']??[];
-        if(!trim($next['title']??'') || !in_array($next['assigneeId']??'',$userIds,true) || !workflow_date($next['dueDate']??null)) throw new InvalidArgumentException('Active deals require a next action, valid responsible person and due date.');
-    }
     if($stage==='won' && (!workflow_date($w['signedOn']??null) || $w['signedOn']>$today || !in_array($w['signedAttachmentId']??'',$fileIds,true))) throw new InvalidArgumentException('Won requires a signature date (today or earlier) and the signed final proposal attachment.');
     if(in_array($stage,['quote','final_proposal','negotiation','won'],true) && (!$before || ($before['stage']??'')!==$stage)) {
         $items=$w['kyc']??[];
@@ -58,6 +54,9 @@ function workflow_prepare(array &$snapshot,array $old,array $actor): void {
     foreach($old['activities'] as $a)if(!empty($a['changes'])&&in_array($a['dealId']??'',$dealIds,true))$activities[$a['id']]=$a;
     foreach($snapshot['deals'] as &$deal) {
         $before=$oldDeals[$deal['id']]??null;
+        $actions=['lead'=>'Qualify/KYC Onboarding','qualified'=>'Preliminary Proposal','quote'=>'Final Proposal','final_proposal'=>'Negotiation','negotiation'=>'Final Proposal Signed'];
+        unset($deal['workflow']['nextAction']);
+        if(isset($actions[$deal['stage']]))$deal['workflow']['nextAction']=['title'=>$actions[$deal['stage']]];
         $fileIds=array_column(array_filter($snapshot['attachments'],fn($f)=>($f['dealId']??'')===$deal['id']),'id');
         foreach(array_merge([$deal['workflow']['signedAttachmentId']??null],array_column($deal['workflow']['kyc']??[],'attachmentId')) as $fileId) if($fileId&&!in_array($fileId,$fileIds,true))throw new InvalidArgumentException('A selected signature / KYC document cannot be deleted. Update the deal selections first.');
         if(isset($deal['workflow']['kyc']))foreach($deal['workflow']['kyc'] as &$item) {

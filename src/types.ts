@@ -175,7 +175,7 @@ export interface KycItem {
 }
 
 export interface DealWorkflow {
-  nextAction?: { title: string; assigneeId: string; dueDate: string };
+  nextAction?: { title: string };
   kyc?: KycItem[];
   proposalDueOverride?: string;
   deadlineReason?: string;

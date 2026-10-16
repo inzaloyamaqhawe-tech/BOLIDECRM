@@ -1,4 +1,4 @@
-import { dealFlags } from "../../lib/workflow";
+import { stageNextAction, dealFlags } from "../../lib/workflow";
 import { proposalStatus } from "../../lib/proposal";
 import { Draggable } from "@hello-pangea/dnd";
 import { MapPin, Trash2 } from "lucide-react";
@@ -91,7 +91,7 @@ export function KanbanCard({ deal, index, onOpen }: { deal: Deal; index: number;
 
           <div className="mt-2 rounded-lg bg-neutral-50 p-2 text-xs font-semibold text-neutral-600">{proposalStatus(deal)}</div>
           {dealFlags(deal).map(flag=><div key={flag} className="mt-1 text-xs font-bold text-amber-700">{flag}</div>)}
-          {deal.workflow?.nextAction&&<div className="mt-1 text-xs text-neutral-500">Next: {deal.workflow.nextAction.title} · {deal.workflow.nextAction.dueDate}</div>}
+          <div className="mt-1 text-xs text-neutral-500">{["won","lost"].includes(deal.stage)?"Status":"Next"}: {stageNextAction(deal.stage)}</div>
           {deal.closeDate && <div className="mt-2 text-xs text-neutral-400">{deal.closeDate}</div>}
         </div>
       )}

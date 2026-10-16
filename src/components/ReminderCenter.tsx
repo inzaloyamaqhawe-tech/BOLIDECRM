@@ -1,23 +1,34 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { MessageSquare, CheckCheck, X } from "lucide-react";
+import { hosted, api } from "../lib/remote";
+import { previewInbox, reminderCandidates, type ReminderMessage } from "../lib/notifications";
 import { Link } from "react-router-dom";
 import { useAuth } from "../lib/auth";
-import { getTasks } from "../lib/store";
+import { getDeals, getTasks } from "../lib/store";
 import { useCrm, useDeals } from "../lib/use-store";
-import { effectiveProposalDue, localDay, proposalOutstanding } from "../lib/proposal";
 
 export function ReminderCenter(){
  const {user}=useAuth(),tasks=useCrm(getTasks),deals=useDeals();
- const [tick,setTick]=useState(Date.now()),[dismissed,setDismissed]=useState<string[]>([]),[permission,setPermission]=useState(typeof Notification==="undefined"?"unsupported":Notification.permission),[error,setError]=useState("");
+ const [tick,setTick]=useState(Date.now()),[messages,setMessages]=useState<ReminderMessage[]>([]),[open,setOpen]=useState(false),[unreadOnly,setUnreadOnly]=useState(false),[limit,setLimit]=useState(50),[busy,setBusy]=useState(false),[permission,setPermission]=useState(typeof Notification==="undefined"?"unsupported":Notification.permission),[error,setError]=useState("");
  useEffect(()=>{const timer=setInterval(()=>setTick(Date.now()),15000);return()=>clearInterval(timer);},[]);
  useEffect(()=>{
   const owner=user?.id;
   return()=>{if(owner&&"serviceWorker" in navigator)void navigator.serviceWorker.getRegistration?.(import.meta.env.BASE_URL).then(async registration=>{for(const notification of await registration?.getNotifications()??[])if(notification.tag.startsWith(owner+":"))notification.close();}).catch(()=>{});};
  },[user?.id]);
- const today=localDay(new Date(tick).toISOString());
- const reminders=user?[
-  ...tasks.filter(t=>!t.done&&t.assigneeId===user.id&&t.reminderAt&&new Date(t.reminderAt).getTime()<=tick).map(t=>({id:"task:"+t.id+":"+t.reminderAt,title:t.title,body:"Your "+(t.priority??"normal")+" priority task"+(t.dueDate?" · due "+t.dueDate:""),url:"tasks"})),
-  ...deals.filter(d=>proposalOutstanding(d)&&(d.ownerId===user.id||d.workflow?.escalationUserId===user.id)&&!!effectiveProposalDue(d)&&effectiveProposalDue(d)!<today).map(d=>({id:"proposal:"+d.id+":"+effectiveProposalDue(d)+":"+today,title:"Overdue proposal: "+d.title,body:(d.ownerId===user.id?"Your proposal is overdue":"Proposal escalated to you")+" · due "+effectiveProposalDue(d),url:"deals?open="+encodeURIComponent(d.id)})),
- ]:[];
+ const ref=useRef<HTMLDivElement>(null);
+ const candidates=user?reminderCandidates(user.id,tasks,deals,new Date(tick)):[];
+ const candidateKey=JSON.stringify(candidates);
+ useEffect(()=>{if(!open)return;const close=(e:MouseEvent)=>{if(ref.current&&!ref.current.contains(e.target as Node))setOpen(false);};const escape=(e:KeyboardEvent)=>{if(e.key==="Escape")setOpen(false);};document.addEventListener("mousedown",close);document.addEventListener("keydown",escape);return()=>{document.removeEventListener("mousedown",close);document.removeEventListener("keydown",escape);};},[open]);
+ const currentUser=useRef(user?.id);currentUser.current=user?.id;
+ const requestVersion=useRef(0),busyRef=useRef(false);
+ useEffect(()=>{
+  const owner=user?.id;if(!owner)return;let cancelled=false;
+  const refresh=async()=>{if(busyRef.current)return;const version=++requestVersion.current;try{const rows=hosted?(await api("notifications")).notifications:previewInbox(owner,reminderCandidates(owner,getTasks(),getDeals()));if(!cancelled&&currentUser.current===owner&&version===requestVersion.current){setMessages(rows);setError("");}}catch(e){if(!cancelled)setError((e as Error).message);}};
+  void refresh();const timer=setInterval(refresh,15000),wake=()=>void refresh();window.addEventListener("focus",wake);window.addEventListener("storage",wake);
+  return()=>{cancelled=true;clearInterval(timer);window.removeEventListener("focus",wake);window.removeEventListener("storage",wake);};
+ },[user?.id,candidateKey]);
+ async function mark(action:"read"|"unread"|"read-all",id?:string){if(!user||busyRef.current)return;const owner=user.id,version=++requestVersion.current;busyRef.current=true;setBusy(true);try{const rows=hosted?(await api("notifications",{action,id})).notifications:previewInbox(owner,candidates,{action,id});if(currentUser.current===owner&&version===requestVersion.current)setMessages(rows);}catch(e){setError((e as Error).message);}finally{busyRef.current=false;setBusy(false);}}
+ const reminders=messages.filter(n=>n.active&&!n.readAt);
  useEffect(()=>{
   if(!user||permission!=="granted")return;
   let cancelled=false;
@@ -39,9 +50,24 @@ export function ReminderCenter(){
  },[user?.id,permission,JSON.stringify(reminders)]);
  async function enable(){if(!window.isSecureContext){setError("Desktop notifications require valid HTTPS.");return;}try{setPermission(await Notification.requestPermission());}catch{setError("Allow notifications in your browser's site settings.");}}
  if(!user)return null;
- const visible=reminders.filter(r=>!dismissed.includes(r.id));
- return <div className="no-print border-b bg-white px-4 py-2 text-xs">
-  <div className="flex flex-wrap items-center gap-3"><Link to="/tasks" className="font-bold">My reminders ({visible.length})</Link>{permission!=="granted"&&permission!=="unsupported"&&<button onClick={enable} className="font-bold text-pink-600">{permission==="denied"?"Notifications blocked — check browser settings":"Enable Windows notifications"}</button>}<span className="text-neutral-500">Reminders are personal. Keep the CRM open or minimised for alerts.</span>{error&&<span className="text-amber-700">{error}</span>}</div>
-  {!!visible.length&&<div role="status" className="mt-2 flex max-h-32 flex-wrap gap-2 overflow-y-auto">{visible.map(r=><div key={r.id} className="rounded-lg bg-amber-50 p-2"><Link className="font-semibold" to={"/"+r.url}>{r.title}</Link><span className="ml-2">{r.body}</span><button aria-label="Dismiss reminder" className="ml-3 font-bold" onClick={()=>setDismissed([...dismissed,r.id])}>×</button></div>)}</div>}
+ const unread=messages.filter(n=>!n.readAt).length,visible=messages.filter(n=>!unreadOnly||!n.readAt);
+ return <div ref={ref} className="relative no-print">
+  <button type="button" aria-label={"Reminder inbox, "+unread+" unread"} aria-expanded={open} onClick={()=>setOpen(!open)} className="relative flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 text-neutral-600 hover:bg-pink-50 hover:text-pink-600">
+   <MessageSquare className="h-5 w-5"/>{unread>0&&<span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-pink-600 px-1 text-center text-[10px] font-bold leading-5 text-white">{unread>99?"99+":unread}</span>}{error&&<span className="absolute -bottom-1 right-0 rounded-full bg-amber-500 px-1 text-[10px] text-white">!</span>}
+  </button>
+  {open&&<div role="dialog" aria-label="My reminder inbox" className="fixed left-3 right-3 top-20 z-40 max-h-[75vh] overflow-y-auto rounded-2xl border border-neutral-200 bg-white shadow-2xl sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-3 sm:w-[400px]">
+   <div className="sticky top-0 z-10 space-y-3 border-b bg-white p-4">
+    <div className="flex items-center justify-between"><h2 className="font-bold">My reminders <span className="text-pink-600">({unread} unread)</span></h2><button aria-label="Close reminder inbox" onClick={()=>setOpen(false)}><X className="h-4 w-4"/></button></div>
+    <div className="flex items-center gap-3 text-xs"><button className={!unreadOnly?"font-bold text-pink-600":"text-neutral-500"} onClick={()=>setUnreadOnly(false)}>All</button><button className={unreadOnly?"font-bold text-pink-600":"text-neutral-500"} onClick={()=>setUnreadOnly(true)}>Unread</button><button disabled={busy||!unread} className="ml-auto inline-flex items-center gap-1 font-semibold disabled:opacity-40" onClick={()=>void mark("read-all")}><CheckCheck className="h-3 w-3"/>Mark all as read</button></div>
+    {permission!=="granted"&&permission!=="unsupported"&&<button onClick={enable} className="text-xs font-bold text-pink-600">{permission==="denied"?"Notifications blocked — check browser settings":"Enable Windows notifications"}</button>}
+    <p className="text-[11px] text-neutral-400">Only your reminders appear here. Read status is separate from task completion. Desktop alerts need an open or minimised CRM tab.</p>{error&&<p role="alert" className="text-xs text-amber-700">{error}</p>}
+   </div>
+   {visible.slice(0,limit).map(n=><div key={n.id} className={"border-b p-4 "+(!n.readAt?"bg-pink-50/60":"bg-white")}>
+    <div className="flex items-start gap-2">{!n.readAt&&<span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-pink-600"/>}<Link to={"/"+n.url} onClick={()=>{void mark("read",n.id);setOpen(false);}} className="text-sm font-bold text-neutral-800 hover:text-pink-600">{n.title}</Link></div><p className="mt-1 text-xs text-neutral-600">{n.body}</p><div className="mt-2 flex items-center justify-between gap-2 text-[11px]"><span className="text-neutral-400">{new Date(n.createdAt).toLocaleString("en-ZA",{timeZone:"Africa/Johannesburg"})}</span><button disabled={busy} className="font-semibold text-pink-600" onClick={()=>void mark(n.readAt?"unread":"read",n.id)}>{n.readAt?"Mark as unread":"Mark as read"}</button></div>
+   </div>)}
+   {!visible.length&&<p className="p-8 text-center text-sm text-neutral-500">{unreadOnly?"No unread reminders.":"You have no reminders yet."}</p>}
+   {visible.length>limit&&<button className="w-full p-3 text-sm font-bold" onClick={()=>setLimit(limit+50)}>Show more</button>}
+  </div>}
  </div>;
+
 }
