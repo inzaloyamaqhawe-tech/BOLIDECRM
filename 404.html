@@ -2,27 +2,49 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/BOLIDECRM/faviconbolide.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bolide CRM</title>
+    <meta name="robots" content="noindex" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <!--
-      GitHub Pages has no real server-side router — a hard refresh or a
-      shared link to a client-side route like /BOLIDECRM/pipeline has no
-      matching file, so GitHub serves this 404 page instead of a blank error.
-      This redirects back to index.html with the intended path encoded in
-      the query string; a matching script in index.html decodes it and
-      restores the real URL via history.replaceState before React Router
-      ever sees it. (Standard technique: rafgraph/spa-github-pages)
+      Pairs with public/404.html: decodes the real path GitHub Pages
+      couldn't serve directly (a deep link or refresh on a client-side
+      route) back into the URL bar before React Router mounts and reads it.
     -->
     <script>
-      var segmentCount = 1; // matches the repo name segment: /BOLIDECRM/
-      var l = window.location;
-      l.replace(
-        l.protocol + "//" + l.hostname + (l.port ? ":" + l.port : "") +
-        l.pathname.split("/").slice(0, 1 + segmentCount).join("/") +
-        "/?p=/" + l.pathname.slice(1).split("/").slice(segmentCount).join("/").replace(/&/g, "~and~") +
-        (l.search ? "&q=" + l.search.slice(1).replace(/&/g, "~and~") : "") +
-        l.hash
-      );
+      (function (l) {
+        if (l.search[1] === "p" && l.search[2] === "=") {
+          var decoded = l.search
+            .slice(1)
+            .split("&")
+            .map(function (s) {
+              return s.replace(/~and~/g, "&");
+            });
+          window.history.replaceState(
+            null,
+            "",
+            l.pathname.slice(0, -1) +
+              decoded[0].slice(2) +
+              (decoded[1] ? "?" + decoded[1].slice(2) : "") +
+              l.hash
+          );
+        }
+      })(window.location);
     </script>
+    <script type="module" crossorigin src="/BOLIDECRM/assets/index-ZQjfz1oX.js"></script>
+    <link rel="modulepreload" crossorigin href="/BOLIDECRM/assets/vendor-react-PGvNAZat.js">
+    <link rel="modulepreload" crossorigin href="/BOLIDECRM/assets/vendor-icons-BQ66S41C.js">
+    <link rel="modulepreload" crossorigin href="/BOLIDECRM/assets/vendor-charts-BHuxWsbc.js">
+    <link rel="modulepreload" crossorigin href="/BOLIDECRM/assets/vendor-dnd-C-c8qG_2.js">
+    <link rel="stylesheet" crossorigin href="/BOLIDECRM/assets/index-C-G6XTPI.css">
   </head>
-  <body></body>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>
