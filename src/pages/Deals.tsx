@@ -1,3 +1,8 @@
+import { DealFilters } from "../components/DealFilters";
+import { emptyFilters, filterDeals } from "../lib/deal-filters";
+import { dealFlags } from "../lib/workflow";
+import { getAttachments } from "../lib/attachments";
+import { workflowErrors } from "../lib/workflow";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Download, Search, Trash2, X } from "lucide-react";
@@ -20,8 +25,11 @@ export function DealsPage() {
   const stages = useCrm(getStagesLive);
   const { user } = useAuth();
   const { show: showToast } = useToast();
-  const [query, setQuery] = useState("");
-  const [segment, setSegment] = useState<Segment | "All">("All");
+  const [filters,setFilters]=useState({...emptyFilters});
+  const query=filters.query;
+  const setQuery=(value:string)=>setFilters(f=>({...f,query:value}));
+  const segment=filters.segment||"All";
+  const setSegment=(value:Segment|"All")=>setFilters(f=>({...f,segment:value==="All"?"":value}));
   const [params, setParams] = useSearchParams();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
@@ -36,7 +44,7 @@ export function DealsPage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return deals.filter((d) => {
+    return filterDeals(deals,filters,companyName).filter((d) => {
       if (segment !== "All" && d.segment !== segment) return false;
       if (!q) return true;
       return (
@@ -45,7 +53,7 @@ export function DealsPage() {
         companyName(d.companyId).toLowerCase().includes(q)
       );
     });
-  }, [deals, query, segment, companies]);
+  }, [deals, query, segment, companies, filters]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, pageCount);
@@ -106,13 +114,18 @@ export function DealsPage() {
     URL.revokeObjectURL(url);
   }
 
-  function bulkChangeStage(stage: StageKey) {
+  async function bulkChangeStage(stage: StageKey) {
     let reason = "";
     if (stage === "lost") {
       const input = window.prompt(`Why were these ${selected.size} deal(s) lost?`);
       if (!input || !input.trim()) return;
       reason = input.trim();
     }
+    const errors=(await Promise.all(Array.from(selected).map(async id=>{
+      const before=getDeal(id);
+      return before?workflowErrors({...before,stage,lostReason:stage==="lost"?reason:undefined},before,await getAttachments(id)).map(e=>before.title+": "+e):[];
+    }))).flat();
+    if(errors.length){window.alert(errors.join("\n"));return;}
     selected.forEach((id) => {
       updateDeal(id, { stage, lostReason: stage === "lost" ? reason : undefined });
       logActivity(id, "stage-change", stage === "lost" ? `Marked Lost — ${reason}` : `Moved to ${stageLabel(stage)} (bulk update)`, user?.id);
@@ -121,6 +134,8 @@ export function DealsPage() {
   }
 
   function bulkChangeOwner(ownerId: string) {
+    const errors=Array.from(selected).flatMap(id=>{const before=getDeal(id);return before?workflowErrors({...before,ownerId},before).map(e=>before.title+": "+e):[];});
+    if(errors.length){window.alert(errors.join("\n"));return;}
     selected.forEach((id) => {
       updateDeal(id, { ownerId });
       logActivity(id, "update", `Owner changed to ${ownerName(ownerId)} (bulk update)`, user?.id);
@@ -196,6 +211,8 @@ export function DealsPage() {
           ))}
         </div>
       </div>
+
+      <DealFilters value={filters} onChange={f=>{setFilters(f);setPage(1);}}/>
 
       {selected.size > 0 && (
         <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-pink-200 bg-pink-50 px-4 py-3">
@@ -280,6 +297,8 @@ export function DealsPage() {
                 </td>
                 <td className="px-4 py-3">
                   <div className="font-semibold text-neutral-900">{d.title}</div>
+                  {dealFlags(d).map(flag=><div key={flag} className="text-xs font-semibold text-amber-700">{flag}</div>)}
+                  {d.workflow?.nextAction&&<div className="text-xs text-neutral-500">Next: {d.workflow.nextAction.title} · {ownerName(d.workflow.nextAction.assigneeId)} · {d.workflow.nextAction.dueDate}</div>}
                   <div className="text-xs text-neutral-500">
                     {companyName(d.companyId)}
                     {d.productLine ? ` · ${d.productLine}` : ""}

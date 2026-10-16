@@ -1,3 +1,4 @@
+import { DealHistory } from "../components/DealHistory";
 import { Fragment, useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Printer } from "lucide-react";
@@ -39,7 +40,7 @@ export function ReportsPage() {
   const users = useUsers();
   const [range, setRange] = useState<RangeKey>("all");
 
-  const deals = useMemo(() => allDeals.filter((d) => withinRange(d.createdAt, range)), [allDeals, range]);
+  const deals = useMemo(() => allDeals.filter((d) => withinRange(d.stage==="won"&&d.workflow?.signedOn?d.workflow.signedOn+"T12:00:00+02:00":d.createdAt, range)), [allDeals, range]);
 
   const byDivision = DIVISIONS.map((d) => ({
     key: d.key,
@@ -86,6 +87,7 @@ export function ReportsPage() {
 
   return (
     <div className="space-y-6">
+      <DealHistory/>
       <div className="flex flex-wrap items-start justify-between gap-3 no-print">
         <div>
           <h1 className="text-3xl font-black text-neutral-900">Reports</h1>

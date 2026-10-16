@@ -1,3 +1,5 @@
+import { workflowErrors } from "../../lib/workflow";
+import { getAttachments } from "../../lib/attachments";
 import { StageTitle } from "../StageTitle";
 import { DragDropContext, Droppable, type DropResult } from "@hello-pangea/dnd";
 import type { Deal, StageKey } from "../../types";
@@ -21,11 +23,15 @@ export function KanbanBoard({ deals, onOpenDeal }: { deals: Deal[]; onOpenDeal: 
   const { user } = useAuth();
   const stages = useCrm(getStagesLive);
 
-  function handleDragEnd(result: DropResult) {
+  async function handleDragEnd(result: DropResult) {
     const { destination, draggableId } = result;
     if (!destination) return;
     const targetStage = destination.droppableId as StageKey;
 
+    if(result.source.droppableId===destination.droppableId)return;
+    try {
+    const current=getDeal(draggableId);
+    if(current&&targetStage!=="lost"){const errors=workflowErrors({...current,stage:targetStage},current,await getAttachments(draggableId));if(errors.length)throw new Error(errors.join("\n"));}
     if (targetStage === "lost") {
       // Dropping straight into Lost still needs a reason — same requirement
       // as changing the stage from inside the deal modal — so it's asked
@@ -40,6 +46,7 @@ export function KanbanBoard({ deals, onOpenDeal }: { deals: Deal[]; onOpenDeal: 
     }
 
     moveDealStage(draggableId, targetStage);
+    } catch(e){window.alert((e as Error).message+"\nOpen the deal to complete the required details.");const deal=getDeal(draggableId);if(deal)onOpenDeal(deal);}
   }
 
   return (

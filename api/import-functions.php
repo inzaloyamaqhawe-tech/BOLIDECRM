@@ -80,11 +80,11 @@ function upsert_deals(PDO $pdo, array $rows): int
         'INSERT INTO deals (id, title, company_id, primary_contact_id, primary_contact_name, site,
          division, segment, product_line, stage, once_off, mrr, owner_id, close_date, notes,
          lost_reason, secure_details_json, energy_details_json, water_details_json,
-         financing_details_json, lead_tracker_json, received_at, proposal_sent_at, stage_changed_at, created_at, updated_at)
+         financing_details_json, workflow_json, lead_tracker_json, received_at, proposal_sent_at, stage_changed_at, created_at, updated_at)
          VALUES (:id, :title, :company_id, :primary_contact_id, :primary_contact_name, :site,
          :division, :segment, :product_line, :stage, :once_off, :mrr, :owner_id, :close_date,
          :notes, :lost_reason, :secure_details_json, :energy_details_json, :water_details_json,
-         :financing_details_json, :lead_tracker_json, :received_at, :proposal_sent_at, :stage_changed_at, :created_at, :updated_at)
+         :financing_details_json, :workflow_json, :lead_tracker_json, :received_at, :proposal_sent_at, :stage_changed_at, :created_at, :updated_at)
          ON DUPLICATE KEY UPDATE title = VALUES(title), company_id = VALUES(company_id),
          primary_contact_id = VALUES(primary_contact_id), primary_contact_name = VALUES(primary_contact_name),
          site = VALUES(site), division = VALUES(division), segment = VALUES(segment),
@@ -92,7 +92,7 @@ function upsert_deals(PDO $pdo, array $rows): int
          mrr = VALUES(mrr), owner_id = VALUES(owner_id), close_date = VALUES(close_date),
          notes = VALUES(notes), lost_reason = VALUES(lost_reason),
          secure_details_json = VALUES(secure_details_json), energy_details_json = VALUES(energy_details_json),
-         water_details_json = VALUES(water_details_json), financing_details_json = VALUES(financing_details_json), lead_tracker_json = VALUES(lead_tracker_json),
+         water_details_json = VALUES(water_details_json), financing_details_json = VALUES(financing_details_json), workflow_json = VALUES(workflow_json), lead_tracker_json = VALUES(lead_tracker_json),
          received_at = VALUES(received_at), proposal_sent_at = VALUES(proposal_sent_at), stage_changed_at = VALUES(stage_changed_at), updated_at = VALUES(updated_at)'
     );
     foreach ($rows as $row) {
@@ -117,6 +117,7 @@ function upsert_deals(PDO $pdo, array $rows): int
             ':secure_details_json' => json_or_null($row['secureDetails'] ?? $row['secure_details_json'] ?? null),
             ':energy_details_json' => json_or_null($row['energyDetails'] ?? $row['energy_details_json'] ?? null),
             ':water_details_json' => json_or_null($row['waterDetails'] ?? $row['water_details_json'] ?? null),
+            ':workflow_json' => json_or_null($row['workflow'] ?? null),
             ':lead_tracker_json' => json_or_null($row['leadTracker'] ?? null),
             ':received_at' => crm_iso_to_mysql($row['receivedAt'] ?? $row['createdAt'] ?? null),
             ':proposal_sent_at' => crm_iso_to_mysql($row['proposalSentAt'] ?? null),
@@ -132,10 +133,10 @@ function upsert_deals(PDO $pdo, array $rows): int
 function upsert_activities(PDO $pdo, array $rows): int
 {
     $stmt = $pdo->prepare(
-        'INSERT INTO activities (id, deal_id, company_id, type, body, user_id, created_at)
-         VALUES (:id, :deal_id, :company_id, :type, :body, :user_id, :created_at)
+        'INSERT INTO activities (id, deal_id, company_id, type, body, user_id, changes_json, created_at)
+         VALUES (:id, :deal_id, :company_id, :type, :body, :user_id, :changes_json, :created_at)
          ON DUPLICATE KEY UPDATE deal_id = VALUES(deal_id), company_id = VALUES(company_id),
-         type = VALUES(type), body = VALUES(body), user_id = VALUES(user_id)'
+         type = VALUES(type), body = VALUES(body), user_id = VALUES(user_id), changes_json = VALUES(changes_json)'
     );
     foreach ($rows as $row) {
         if (empty($row['dealId']) && empty($row['deal_id']) && empty($row['companyId']) && empty($row['company_id'])) throw new InvalidArgumentException('Activity must belong to a deal or company.');
@@ -144,6 +145,7 @@ function upsert_activities(PDO $pdo, array $rows): int
             ':deal_id' => $row['dealId'] ?? $row['deal_id'] ?? null,
             ':company_id' => $row['companyId'] ?? $row['company_id'] ?? null,
             ':type' => $row['type'] ?? 'note',
+            ':changes_json' => json_or_null($row['changes'] ?? null),
             ':body' => $row['body'],
             ':user_id' => ($row['userId'] ?? $row['user_id'] ?? null) === 'system' ? null : ($row['userId'] ?? $row['user_id'] ?? null),
             ':created_at' => crm_iso_to_mysql($row['createdAt'] ?? $row['created_at'] ?? null) ?? gmdate('Y-m-d H:i:s'),
@@ -155,10 +157,10 @@ function upsert_activities(PDO $pdo, array $rows): int
 function upsert_tasks(PDO $pdo, array $rows): int
 {
     $stmt = $pdo->prepare(
-        'INSERT INTO tasks (id, title, due_date, deal_id, done, created_at)
-         VALUES (:id, :title, :due_date, :deal_id, :done, :created_at)
+        'INSERT INTO tasks (id, title, due_date, deal_id, done, options_json, created_at)
+         VALUES (:id, :title, :due_date, :deal_id, :done, :options_json, :created_at)
          ON DUPLICATE KEY UPDATE title = VALUES(title), due_date = VALUES(due_date),
-         deal_id = VALUES(deal_id), done = VALUES(done)'
+         deal_id = VALUES(deal_id), done = VALUES(done), options_json = VALUES(options_json)'
     );
     foreach ($rows as $row) {
         $stmt->execute([
@@ -167,6 +169,7 @@ function upsert_tasks(PDO $pdo, array $rows): int
             ':due_date' => crm_date_or_null($row['dueDate'] ?? $row['due_date'] ?? null),
             ':deal_id' => $row['dealId'] ?? $row['deal_id'] ?? null,
             ':done' => !empty($row['done']) ? 1 : 0,
+            ':options_json' => json_or_null(array_intersect_key($row,array_flip(['assigneeId','priority','reminderAt','recurrence','recurrenceRootId','nextTaskId']))),
             ':created_at' => crm_iso_to_mysql($row['createdAt'] ?? $row['created_at'] ?? null) ?? gmdate('Y-m-d H:i:s'),
         ]);
     }

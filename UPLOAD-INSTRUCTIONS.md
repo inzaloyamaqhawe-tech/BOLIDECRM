@@ -1,5 +1,7 @@
 # Bolide CRM upload
 
+**For the latest update, follow [UPDATE-2026-10-16.md](UPDATE-2026-10-16.md). The database migration has already been applied; use that document's individual-file upload list.**
+
 The xneelo database is already created and populated: 10 tables, 36 leads, 36 companies, 1 named contact and 7 existing users. Do not re-import the schema or initialization files.
 
 1. Open your website's public web directory in the xneelo File Manager or FTP client.
@@ -34,7 +36,7 @@ crm/
 
 Do not upload `src`, `node_modules`, `database`, test scripts, or the entire `app` folder.
 
-The proposal deadline is seven Monday–Friday working days after receipt, with the receipt day counted as day zero. Public holidays are currently not excluded. You can set the receipt date when creating or editing a lead. Existing proposal stages are treated as already sent.
+The proposal deadline is seven South African working days after receipt, with the receipt day counted as day zero. Weekends and public holidays are excluded. Received-date corrections and deadline overrides require an explanation. Existing proposal stages are treated as already sent.
 
 Monthly cards show leads received this month and leads currently in stages entered this month, using Johannesburg dates. Counts are actual database records; example numbers were not added as fictitious leads.
 

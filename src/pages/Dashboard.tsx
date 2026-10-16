@@ -1,3 +1,4 @@
+import { useAuth } from "../lib/auth";
 import { StageTitle } from "../components/StageTitle";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Wallet, Target, Repeat, TrendingUp, Trophy, Percent, AlertTriangle } from "lucide-react";
@@ -22,7 +23,9 @@ export function DashboardPage() {
   const activities = useActivities();
   const companies = useCompanies();
   const stages = useCrm(getStagesLive);
-  const tasks = useCrm(getTasks);
+  const allTasks = useCrm(getTasks);
+  const {user}=useAuth();
+  const tasks=allTasks.filter(t=>t.assigneeId===user?.id);
 
   const openDeals = deals.filter((d) => d.stage !== "won" && d.stage !== "lost");
   const totalPipeline = openDeals.reduce((s, d) => s + d.onceOff, 0);
@@ -36,8 +39,8 @@ export function DashboardPage() {
   const now = new Date();
   const monthKey = (iso: string) => new Intl.DateTimeFormat("en-ZA", { timeZone: "Africa/Johannesburg", year: "numeric", month: "2-digit" }).format(new Date(iso));
   const receivedThisMonth = deals.filter(d => (!d.leadTracker || !!d.receivedAt) && monthKey(d.receivedAt ?? d.createdAt) === monthKey(now.toISOString()));
-  const monthlyStages = stages.map(stage => ({ stage, count: deals.filter(d => d.stage === stage.key && (!d.leadTracker || !!d.stageChangedAt) && monthKey(d.stageChangedAt ?? d.createdAt) === monthKey(now.toISOString())).length }));
-  const wonThisMonth = deals.filter((d) => d.stage === "won" && new Date(d.updatedAt).getMonth() === now.getMonth() && new Date(d.updatedAt).getFullYear() === now.getFullYear());
+  const monthlyStages = stages.map(stage => ({ stage, count: deals.filter(d => d.stage === stage.key && (stage.key==="won" ? !!d.workflow?.signedOn && monthKey(d.workflow.signedOn+"T12:00:00+02:00")===monthKey(now.toISOString()) : (!d.leadTracker || !!d.stageChangedAt) && monthKey(d.stageChangedAt ?? d.createdAt) === monthKey(now.toISOString()))).length }));
+  const wonThisMonth = deals.filter((d) => d.stage === "won" && !!d.workflow?.signedOn && monthKey(d.workflow.signedOn+"T12:00:00+02:00") === monthKey(now.toISOString()));
   const wonThisMonthValue = wonThisMonth.reduce((s, d) => s + d.onceOff, 0);
 
   const wonCount = deals.filter((d) => d.stage === "won").length;

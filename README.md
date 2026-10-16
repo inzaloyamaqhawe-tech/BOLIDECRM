@@ -11,6 +11,10 @@ CRM for the Bolide Group, built with React, TypeScript and Vite, with a PHP/MySQ
 
 ## Latest changes
 
+- 16 October: assigned tasks, personal desktop reminders, recurring follow-ups, mandatory next actions, holiday-aware deadlines/escalation, document-backed KYC, signed-proposal confirmation, combined filters and personal saved views, and attributed field history under Reports.
+- Xneelo's database was backed up and migrated without replacing existing leads or accounts. See [the current upload instructions](UPDATE-2026-10-16.md).
+- Desktop notifications need valid HTTPS, browser permission and an open/minimised CRM tab. Closed-browser push is not configured.
+
 - The 14 October tracker import replaces the prior pipeline with 36 leads from 37 workbook rows, consolidating duplicate Sasol Raceway entries. Stages: 21 Qualify/KYC, 14 Preliminary Proposal, 1 Lost. Approval means modelling approval and does not imply Negotiation or Won. Full source rows are preserved in each lead's metadata and notes.
 - Deals scroll within the table; table headings and search/filter controls remain visible.
 
@@ -20,7 +24,7 @@ CRM for the Bolide Group, built with React, TypeScript and Vite, with a PHP/MySQ
 - Stages: Lead Received, Qualify/KYC Onboarding, Preliminary Proposal, Final Proposal, Negotiation, Won (Final Proposal Signed), Lost.
 - Hover or focus on dashboard stage titles or pipeline headings to read their definitions.
 - A lost reason is compulsory for edits, drag-and-drop and bulk changes, and is validated by the PHP API and database.
-- Proposal deadlines are seven Monday?Friday days after the lead received date; the receipt day is day zero. Public holidays are currently counted as working days.
+- Proposal deadlines are seven Monday?Friday days after the lead received date; the receipt day is day zero. South African public holidays and observed Mondays are excluded.
 - Proposal cards show working days remaining, due today, overdue, or proposal sent.
 - Langelihle's invited email is `langelihle@bolide.co.za`.
 - Production includes server-side password hashing, secure session cookies, CSRF protection, shared attachments and save status.

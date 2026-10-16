@@ -1,3 +1,7 @@
+import { WorkflowFields } from "./WorkflowFields";
+import { TaskEditor } from "./TaskEditor";
+import { workflowErrors } from "../lib/workflow";
+import type { DealWorkflow } from "../types";
 import { proposalStatus } from "../lib/proposal";
 import { useEffect, useRef, useState } from "react";
 import { X, Copy, Paperclip, Download, Trash2, Send, CalendarClock } from "lucide-react";
@@ -30,6 +34,7 @@ const SEGMENTS: Segment[] = ["Commercial", "Industrial", "Forecourt", "MDU"];
 // dropdown of these four now, not a free-text field suggesting a division's
 // product lines.
 const PRODUCT_LINES = ["Water", "Security", "Solar", "Fibre"];
+const optionalNumber=(value:string)=>value.trim()===""?undefined:Number(value);
 
 interface Props {
   /** Pass an existing deal to edit/view it; omit to create a new one. */
@@ -91,6 +96,8 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
   const [rentalIrr, setRentalIrr] = useState(deal?.financingDetails?.rentalIrr?.toString() ?? "");
 
   const [receivedAt, setReceivedAt] = useState(deal?.leadTracker ? (deal.leadTracker.enquiryReceived ?? "") : (deal?.receivedAt ?? deal?.createdAt ?? new Date().toISOString()).slice(0,10));
+  const [workflow,setWorkflow]=useState<DealWorkflow>(deal?.workflow??{});
+  const [showTask,setShowTask]=useState(false);
   const [error, setError] = useState("");
 
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -129,7 +136,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
         companies.map((c) => c.name)
       );
 
-  function handleSave() {
+  async function handleSave() {
     if((contactPhone.trim() || contactEmail.trim()) && !primaryContactName.trim()) {setError("Enter the contact person's name.");return;}
     if(contactEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail.trim())) {setError("Enter a valid contact email address.");return;}
     if (!receivedAt && !deal?.leadTracker) { setError("Enter the lead received date."); return; }
@@ -146,6 +153,9 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
       setError("Say why this deal was lost — price, timing, went with a competitor, etc.");
       return;
     }
+    const candidate={...deal,id:deal?.id??"new",stage,receivedAt:receivedAt?receivedAt+"T08:00:00+02:00":undefined,lostReason,workflow} as Deal;
+    const validation=workflowErrors(candidate,deal,attachments);
+    if(validation.length){setError(validation.join(" "));return;}
     // Matches an existing company by name (case-insensitive) so typing an
     // existing client's name reuses their record; anything new — a
     // brand-new client — is created on the fly rather than requiring a
@@ -155,6 +165,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
     const contact=primaryContactName.trim() ? saveDealContact({companyId:finalCompanyId,name:primaryContactName,phone:contactPhone,email:contactEmail},linkedContact?.id) : undefined;
 
     const payload = {
+      workflow,
       receivedAt: receivedAt ? receivedAt + "T08:00:00+02:00" : undefined,
       title: title.trim(),
       companyId: finalCompanyId,
@@ -173,31 +184,32 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
       notes: notes.trim() || undefined,
       secureDetails:
         division === "secure"
-          ? { camerasInstalled: Number(camerasInstalled) || undefined, camerasMonitored: Number(camerasMonitored) || undefined }
-          : undefined,
+          ? { camerasInstalled: optionalNumber(camerasInstalled), camerasMonitored: optionalNumber(camerasMonitored) }
+          : deal?.secureDetails,
       energyDetails:
         division === "energy"
           ? {
-              solarKwp: Number(solarKwp) || undefined,
-              bessKwh: Number(bessKwh) || undefined,
-              ratePerKwh: Number(ratePerKwh) || undefined,
+              solarKwp: optionalNumber(solarKwp),
+              bessKwh: optionalNumber(bessKwh),
+              ratePerKwh: optionalNumber(ratePerKwh),
             }
-          : undefined,
-      waterDetails: division === "water" ? { litresPerDay: Number(litresPerDay) || undefined } : undefined,
+          : deal?.energyDetails,
+      waterDetails: division === "water" ? { litresPerDay: optionalNumber(litresPerDay) } : deal?.waterDetails,
       financingDetails:
         division === "energy"
           ? {
               bankModelStatus: bankModelStatus || undefined,
               contractSignatureDate: contractSignatureDate || undefined,
               operationsStartDate: operationsStartDate || undefined,
-              capexPpa: Number(capexPpa) || undefined,
-              capexRental: Number(capexRental) || undefined,
-              ppaIrr: Number(ppaIrr) || undefined,
-              rentalIrr: Number(rentalIrr) || undefined,
+              capexPpa: optionalNumber(capexPpa),
+              capexRental: optionalNumber(capexRental),
+              ppaIrr: optionalNumber(ppaIrr),
+              rentalIrr: optionalNumber(rentalIrr),
             }
-          : undefined,
+          : deal?.financingDetails,
     };
 
+    try {
     if (isNew) {
       createDeal(payload);
     } else {
@@ -210,6 +222,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
       }
     }
     onClose();
+    } catch(e) {setError((e as Error).message);}
   }
 
   function handleDelete() {
@@ -236,14 +249,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
     setNewNote("");
   }
 
-  function handleAddFollowUp() {
-    if (!deal) return;
-    const title = window.prompt("Follow up on what?");
-    if (!title || !title.trim()) return;
-    const due = window.prompt("Due date (YYYY-MM-DD), or leave blank:");
-    createTask({ title: title.trim(), dueDate: due?.trim() || undefined, dealId: deal.id });
-    showToast("Follow-up added — see it under Tasks");
-  }
+  function handleAddFollowUp() {setShowTask(!showTask);}
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (!deal || !e.target.files?.length) return;
@@ -254,7 +260,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
       }
       setAttachments(await getAttachments(deal.id));
       logActivity(deal.id, "note", `Attached ${e.target.files.length} file(s)`, user?.id);
-    } finally {
+    } catch(e) {setError((e as Error).message);} finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
@@ -262,6 +268,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
 
   async function handleDeleteAttachment(id: string) {
     if (!deal) return;
+    if(workflow.signedAttachmentId===id || workflow.kyc?.some(i=>i.attachmentId===id)){setError("Remove the document from signature / KYC selections and save before deleting it.");return;}
     await deleteAttachment(id);
     setAttachments(await getAttachments(deal.id));
   }
@@ -292,7 +299,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
         )}
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="mb-3"><label className="text-xs font-semibold">Lead received date<input type="date" required value={receivedAt} onChange={e=>setReceivedAt(e.target.value)} className="input mt-1" /></label><p className="mt-1 text-xs text-neutral-500">{receivedAt ? proposalStatus({ ...(deal ?? {}), stage, leadTracker: deal?.leadTracker ? {...deal.leadTracker,enquiryReceived:receivedAt} : undefined, createdAt: receivedAt + "T08:00:00+02:00", receivedAt: receivedAt + "T08:00:00+02:00" } as Deal) : "Enter the lead received date."}</p></div>
+          <div className="mb-3"><label className="text-xs font-semibold">Lead received date<input type="date" required value={receivedAt} onChange={e=>{setReceivedAt(e.target.value);setWorkflow(w=>({...w,deadlineReason:""}));}} className="input mt-1" /></label><p className="mt-1 text-xs text-neutral-500">{receivedAt ? proposalStatus({ ...(deal ?? {}), workflow, stage, leadTracker: deal?.leadTracker ? {...deal.leadTracker,enquiryReceived:receivedAt} : undefined, createdAt: receivedAt + "T08:00:00+02:00", receivedAt: receivedAt + "T08:00:00+02:00" } as Deal) : "Enter the lead received date."}</p></div>
               <Field label="Title" span={2}>
             <input value={title} onChange={(e) => setTitle(e.target.value)} className="input" placeholder="e.g. AJ — Kingsburgh" />
           </Field>
@@ -499,6 +506,8 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
             </>
           )}
 
+          <WorkflowFields value={workflow} onChange={setWorkflow} stage={stage} attachments={attachments} isNew={isNew}/>
+
           <Field label="Notes" span={2}>
             <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} className="input resize-y" />
           </Field>
@@ -539,6 +548,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
                 <CalendarClock className="h-3.5 w-3.5" /> Add follow-up
               </button>
             </div>
+            {showTask&&<TaskEditor dealId={deal?.id} onSaved={()=>{setShowTask(false);showToast("Follow-up saved");}}/>}
             <div className="flex gap-2">
               <input
                 value={newNote}

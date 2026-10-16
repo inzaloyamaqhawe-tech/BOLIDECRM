@@ -1,3 +1,4 @@
+import { nextOccurrence, workflowErrors } from "./workflow";
 import { api, hosted } from "./remote";
 import { matchDealContact } from "./contact-match";
 import { getAllAttachments, replaceRemoteAttachments, resetPreviewAttachments } from "./attachments";
@@ -49,6 +50,8 @@ let saving=false;
 let dirty=false;
 let blocked=false;
 const cache = new Map<string, unknown>();
+let actorId="system";
+export function setActor(id: string | null) {actorId=id ?? "system";}
 
 function load<T>(key: string, fallback: T): T {
   if (cache.has(key)) return cache.get(key) as T;
@@ -219,8 +222,10 @@ export function createDeal(input: Omit<Deal, "id" | "createdAt" | "updatedAt">):
   if(input.stage === "lost" && !input.lostReason?.trim()) throw new Error("A lost reason is required.");
   const nowIso = new Date().toISOString();
   const deal: Deal = { ...input, id: uid("d"), receivedAt: input.receivedAt ?? nowIso, stageChangedAt: nowIso, proposalSentAt: ["quote","final_proposal","negotiation","won"].includes(input.stage) ? nowIso : undefined, createdAt: nowIso, updatedAt: nowIso };
+  const errors=workflowErrors(deal);if(errors.length)throw new Error(errors.join("\n"));
   save(KEYS.deals, [...getDeals(), deal]);
   logActivity(deal.id, "note", `Deal created: ${deal.title}`);
+  auditDeal({} as Deal,deal);
   return deal;
 }
 
@@ -229,12 +234,26 @@ export function updateDeal(id: string, patch: Partial<Deal>) {
   if(patch.receivedAt && before.leadTracker) patch.leadTracker={...before.leadTracker,enquiryReceived:patch.receivedAt.slice(0,10)};
   const after={...before,...patch};
   if(after.stage === "lost" && !after.lostReason?.trim()) throw new Error("A lost reason is required.");
+  const errors=workflowErrors(after,before);if(errors.length)throw new Error(errors.join("\n"));
   if(patch.stage && patch.stage!==before.stage) patch.stageChangedAt=new Date().toISOString();
   if(!before.proposalSentAt && patch.stage && ["quote","final_proposal","negotiation","won"].includes(patch.stage)) patch.proposalSentAt=new Date().toISOString();
   save(
     KEYS.deals,
     getDeals().map((d) => (d.id === id ? { ...d, ...patch, updatedAt: new Date().toISOString() } : d))
   );
+  auditDeal(before,getDeal(id)!);
+}
+
+function auditDeal(before: Deal, after: Deal) {
+ const changes: NonNullable<Activity["changes"]>=[];
+ function compare(a: any,b: any,path: string) {
+  if(JSON.stringify(a??null)===JSON.stringify(b??null))return;
+  if((a&&typeof a==="object"&&!Array.isArray(a))||(b&&typeof b==="object"&&!Array.isArray(b))) {
+   for(const key of new Set([...Object.keys(a??{}),...Object.keys(b??{})]))compare(a?.[key],b?.[key],path?path+"."+key:key);
+  } else changes.push({field:path,before:a??null,after:b??null});
+ }
+ for(const key of new Set([...Object.keys(before),...Object.keys(after)]))if(!["id","updatedAt","createdAt","stageChangedAt"].includes(key))compare((before as any)[key],(after as any)[key],key);
+ if(changes.length){const entry:Activity={id:uid("audit"),dealId:after.id,type:"update",body:"Deal fields changed",userId:actorId,createdAt:new Date().toISOString(),changes};save(KEYS.activities,[...load<Activity[]>(KEYS.activities,[]),entry]);}
 }
 
 export function moveDealStage(id: string, stage: StageKey) {
@@ -269,6 +288,7 @@ export function cloneDeal(id: string): Deal | undefined {
     id: uid("d"),
     title: `${source.title} (Copy)`,
     stage: "lead",
+    workflow:{nextAction:source.workflow?.nextAction??{title:"Review duplicated lead",assigneeId:source.ownerId,dueDate:nowIso.slice(0,10)}},
     receivedAt: nowIso,
     stageChangedAt: nowIso,
     proposalSentAt: undefined,
@@ -322,14 +342,14 @@ export function getCompanyActivities(companyId: string): Activity[] {
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function logActivity(dealId: string, type: Activity["type"], body: string, userId = "system") {
+export function logActivity(dealId: string, type: Activity["type"], body: string, userId = actorId) {
   const activity: Activity = { id: uid("a"), dealId, type, body, userId, createdAt: new Date().toISOString() };
   const all = load<Activity[]>(KEYS.activities, []);
   save(KEYS.activities, [...all, activity]);
   return activity;
 }
 
-export function logCompanyActivity(companyId: string, type: Activity["type"], body: string, userId = "system") {
+export function logCompanyActivity(companyId: string, type: Activity["type"], body: string, userId = actorId) {
   const activity: Activity = { id: uid("a"), companyId, type, body, userId, createdAt: new Date().toISOString() };
   const all = load<Activity[]>(KEYS.activities, []);
   save(KEYS.activities, [...all, activity]);
@@ -348,17 +368,25 @@ export function getTasks(): Task[] {
 }
 
 export function createTask(input: Omit<Task, "id" | "createdAt" | "done">): Task {
-  const task: Task = { ...input, id: uid("t"), done: false, createdAt: new Date().toISOString() };
+  const task: Task = { ...input, assigneeId:input.assigneeId ?? (actorId!=="system"?actorId:undefined), priority:input.priority ?? "normal", id: uid("t"), done: false, createdAt: new Date().toISOString() };
   save(KEYS.tasks, [...getTasks(), task]);
   if (task.dealId) logActivity(task.dealId, "task", `Follow-up added: ${task.title}`);
   return task;
 }
 
-export function setTaskDone(id: string, done: boolean) {
-  save(
-    KEYS.tasks,
-    getTasks().map((t) => (t.id === id ? { ...t, done } : t))
-  );
+export function updateTask(id: string,patch: Partial<Task>) {
+ const task=getTasks().find(t=>t.id===id);if(!task)return;
+ const next={...task,...patch};
+ if(!next.title.trim()||!next.assigneeId)throw new Error("Task title and assignee are required.");
+ if(next.recurrence&&next.recurrence!=="none"&&!next.dueDate)throw new Error("Recurring tasks need a due date.");
+ save(KEYS.tasks,getTasks().map(t=>t.id===id?next:t));
+}
+export function setTaskDone(id: string,done: boolean) {
+ const task=getTasks().find(t=>t.id===id);if(!task)return;
+ const occurrence=done&&!task.done&&!task.nextTaskId?nextOccurrence(task):undefined;
+ let nextTaskId=task.nextTaskId;
+ if(occurrence){const {id:_,createdAt,done:__,nextTaskId:___,...input}=task;nextTaskId=createTask({...input,...occurrence,recurrenceRootId:task.recurrenceRootId??task.id}).id;}
+ save(KEYS.tasks,getTasks().map(t=>t.id===id?{...t,done,nextTaskId}:t));
 }
 
 export function deleteTask(id: string) {
@@ -454,6 +482,7 @@ async function flushRemoteSave() {
    const base=exportCrmSnapshot();
    const snapshot={...base,attachments:(await getAllAttachments()).filter(a=>base.deals.some(d=>d.id===a.dealId))};
    const data=await api("state",{revision:remoteRevision,snapshot}); remoteRevision=data.revision;
+   if(!dirty){if(data.activities)cache.set(KEYS.activities,data.activities);if(data.deals)cache.set(KEYS.deals,data.deals);notify();}
    window.dispatchEvent(new CustomEvent("crm-save-status",{detail:dirty?"Saving changes…":"All changes saved"}));
  } catch(e) {blocked=true;window.dispatchEvent(new CustomEvent("crm-save-status",{detail:(e as Error).message}));window.alert((e as Error).message + "\nPlease keep this tab open. Export your snapshot from Settings before reloading if you need to preserve unsaved changes.");}
  finally {saving=false;if(dirty && !blocked)void flushRemoteSave();}

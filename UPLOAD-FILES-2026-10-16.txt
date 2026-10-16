@@ -1,0 +1,15 @@
+Xneelo update files (upload individually; keep paths relative to crm/):
+
+api/workflow.php
+api/import-functions.php
+api/state.php
+assets/index-BknTYZ87.js
+assets/index-C-G6XTPI.css
+assets/vendor-charts-BHuxWsbc.js
+assets/vendor-dnd-C-c8qG_2.js
+assets/vendor-icons-BQ66S41C.js
+assets/vendor-react-PGvNAZat.js
+reminders-sw.js
+index.html
+
+Database already migrated. Keep api/config.php unchanged. Upload index.html last.

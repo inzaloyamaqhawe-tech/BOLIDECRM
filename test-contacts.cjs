@@ -11,7 +11,7 @@ function load(file){
  if(modules[file])return modules[file];
  const exports={};modules[file]=exports;
  const source=fs.readFileSync(file,'utf8').replaceAll('import.meta.env.BASE_URL','"/"');
- const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
+ const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
  new Function('exports','require',code)(exports,name=>name.endsWith('.json')?JSON.parse(fs.readFileSync(path.resolve(path.dirname(file),name),'utf8')):load(path.resolve(path.dirname(file),name+'.ts')));return exports;
 }
 const store=load('src/lib/store.ts');
@@ -24,7 +24,7 @@ assert.equal(tracker.deals.filter(d=>d.leadTracker.sourceRows.includes(8) && d.l
 assert.equal(tracker.deals.find(d=>d.id==="d-tracker-11").stage,"quote");
 assert.equal(tracker.deals.filter(d=>d.stage==="won").length,0);
 const linda=store.saveDealContact({companyId:'c-aj',name:'Linda',phone:'+27 82 123 4567',email:''});
-const deal=store.createDeal({title:'Contact verification',companyId:'c-aj',primaryContactId:linda.id,primaryContactName:linda.name,division:'secure',stage:'lead',onceOff:0,mrr:0,ownerId:'u-langelihle'});
+const deal=store.createDeal({title:'Contact verification',companyId:'c-aj',primaryContactId:linda.id,primaryContactName:linda.name,division:'secure',stage:'lead',onceOff:0,mrr:0,ownerId:'u-langelihle',workflow:{nextAction:{title:'Call Linda',assigneeId:'u-langelihle',dueDate:'2026-10-30'}}});
 assert.equal(store.getContacts().find(c=>c.id===store.getDeal(deal.id).primaryContactId).phone,'+27 82 123 4567');
 assert.equal(store.saveDealContact({companyId:'c-aj',name:' Linda ',phone:'+27 82 123 4567',email:''}).id,linda.id);
 assert.equal(store.saveDealContact({companyId:'c-aj',name:'Linda',phone:'0829999999',email:'LINDA@EXAMPLE.COM'},linda.id).id,linda.id);
@@ -36,3 +36,26 @@ delete modules[path.resolve('src/lib/store.ts')];
 assert.equal(load('src/lib/store.ts').getDeal(deal.id).id,deal.id);
 console.log('PASS: tracker replaces stale leads once, accounts/session preserved, duplicate consolidated, modelling approval mapping, subsequent edits preserved.');
 console.log('PASS: saved deal links to Contacts, phone-only contact, duplicate reuse, contact edits, email normalization, company isolation, replacement person preserves original.');
+
+store.setActor('u-langelihle');
+assert.throws(()=>store.createDeal({title:'Missing action',companyId:'c-aj',division:'secure',stage:'lead',onceOff:0,mrr:0,ownerId:'u-langelihle'}),/next action/);
+store.updateDeal(deal.id,{ownerId:'u-other',onceOff:123});
+const audit=store.getActivities(deal.id).find(a=>a.changes?.some(c=>c.field==='ownerId'));
+assert.equal(audit.userId,'u-langelihle');assert.equal(audit.changes.find(c=>c.field==='ownerId').before,'u-langelihle');assert.equal(audit.changes.find(c=>c.field==='ownerId').after,'u-other');
+assert.throws(()=>store.moveDealStage(deal.id,'quote'),/KYC/);
+assert.throws(()=>store.moveDealStage(deal.id,'won'),/signature/);
+assert.throws(()=>store.updateDeal(deal.id,{receivedAt:'2026-10-01T06:00:00Z'}),/Explain/);
+const task=store.createTask({title:'Monthly follow-up',assigneeId:'u-langelihle',dueDate:'2026-01-31',reminderAt:'2026-01-31T07:00:00Z',priority:'high',recurrence:'monthly'});
+store.setTaskDone(task.id,true);const next=store.getTasks().find(t=>t.id===store.getTasks().find(t=>t.id===task.id).nextTaskId);
+assert.equal(next.dueDate,'2026-02-28');assert.equal(next.assigneeId,'u-langelihle');assert.equal(next.reminderAt,'2026-02-28T07:00:00.000Z');
+store.setTaskDone(task.id,false);store.setTaskDone(task.id,true);assert.equal(store.getTasks().filter(t=>t.recurrenceRootId===task.id).length,1);
+const workflow=load('src/lib/workflow.ts'),filters=load('src/lib/deal-filters.ts');
+const base={...deal,workflow:{nextAction:{title:'Next',assigneeId:'u-langelihle',dueDate:'2026-10-30'}}};
+const kyc=workflow.defaultKyc().map(i=>({...i,status:'verified',attachmentId:'kyc',verifiedBy:'u-langelihle',verifiedAt:new Date().toISOString()}));
+const signed={...base,stage:'won',workflow:{...base.workflow,kyc,signedOn:'2026-01-01',signedAttachmentId:'signed'}};
+assert.deepEqual(workflow.workflowErrors(signed,base,[{id:'signed',dealId:base.id},{id:'kyc',dealId:base.id}]),[]);
+assert(workflow.workflowErrors(signed,base,[{id:'kyc',dealId:base.id}]).some(e=>e.includes('signed final')));
+assert(workflow.kycIssues(kyc.map(i=>({...i,expiresOn:'2020-01-01'}))).length===3);
+assert(filters.filterDeals([base],{...filters.emptyFilters,owner:'other'}).length===0);
+assert(filters.filterDeals([base],{...filters.emptyFilters,owner:base.ownerId}).length===1);
+console.log('PASS: required actions, attributed field audit, KYC/signature gates, deadline reasons, recurring task dates and duplicate prevention, combined owner filters.');

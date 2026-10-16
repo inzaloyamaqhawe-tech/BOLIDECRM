@@ -1,23 +1,25 @@
+import { DealFilters } from "../components/DealFilters";
+import { emptyFilters, filterDeals } from "../lib/deal-filters";
+import { useCompanies } from "../lib/use-store";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import type { Deal } from "../types";
-import { useDeals, useUsers } from "../lib/use-store";
-import { OwnerFilterDropdown } from "../components/OwnerFilterDropdown";
+import { useDeals } from "../lib/use-store";
 import { KanbanBoard } from "../components/kanban/KanbanBoard";
 import { DealModal } from "../components/DealModal";
 import { getDeal } from "../lib/store";
 
 export function PipelinePage() {
   const deals = useDeals();
-  const users = useUsers();
-  const [owner, setOwner] = useState<string | "everyone">("everyone");
+  const companies=useCompanies();
+  const [filters,setFilters]=useState({...emptyFilters});
   const [params, setParams] = useSearchParams();
 
   const openId = params.get("open");
   const openDeal = openId ? getDeal(openId) : undefined;
   const [selectedDeal, setSelectedDeal] = useState<Deal | undefined>(openDeal);
 
-  const filtered = owner === "everyone" ? deals : deals.filter((d) => d.ownerId === owner);
+  const filtered = filterDeals(deals,filters,id=>companies.find(c=>c.id===id)?.name??"");
 
   function closeModal() {
     setSelectedDeal(undefined);
@@ -34,10 +36,7 @@ export function PipelinePage() {
         <p className="text-sm text-neutral-500">Drag deals between stages, or click one to view its details · ZAR, excl. VAT</p>
       </div>
 
-      <div className="flex items-center gap-3">
-        <span className="text-xs font-bold uppercase tracking-widest text-neutral-400">Owner</span>
-        <OwnerFilterDropdown users={users} value={owner} onChange={setOwner} />
-      </div>
+      <DealFilters value={filters} onChange={setFilters}/>
 
       <KanbanBoard deals={filtered} onOpenDeal={setSelectedDeal} />
 

@@ -1,5 +1,5 @@
 import { api, hosted } from "./remote";
-import { initializeRemoteStore } from "./store";
+import { initializeRemoteStore, setActor } from "./store";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { ALLOWED_EMAIL_DOMAINS } from "../types";
 import type { User } from "../types";
@@ -63,6 +63,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     setLoading(false);
   }, []);
+
+  useEffect(()=>{setActor(user?.id ?? null);},[user?.id]);
 
   function findUserByEmailOrId(id: string): User | undefined {
     // session stores id; users list is small so a linear scan is fine

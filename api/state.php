@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require __DIR__.'/session.php';
 require __DIR__.'/import-functions.php';
+require __DIR__.'/workflow.php';
 $user=crm_session_user();
 function frontend_row(array $row): array {
     $out=[];
@@ -12,6 +13,7 @@ function frontend_row(array $row): array {
         if(in_array($key,['createdAt','updatedAt','receivedAt','proposalSentAt','stageChangedAt']) && $value) $value=str_replace(' ','T',$value).'Z';
         if(in_array($key,['onceOff','mrr'])) $value=(float)$value;
         if($key==='done') $value=(bool)$value;
+        if($key==='options') {if(is_array($value))$out=array_merge($out,$value);continue;}
         if($value!==null) $out[$key]=$value;
     }
     return $out;
@@ -59,6 +61,8 @@ try {
         $q=$pdo->prepare('SELECT role FROM users WHERE id=?');$q->execute([$user['id']]);if($q->fetchColumn()!=='admin') throw new InvalidArgumentException('You cannot remove your own administrator access.');
         upsert_division_overrides($pdo,$snapshot['divisionOverrides']); upsert_stage_overrides($pdo,$snapshot['stageOverrides']);
     }
+    workflow_prepare($snapshot,$old,$user);
+    foreach($snapshot['users'] as $row) if($row['id']===$user['id']){$q=$pdo->prepare('UPDATE users SET saved_views_json=? WHERE id=?');$q->execute([json_encode($row['savedViews']??[]),$user['id']]);}
     upsert_companies($pdo,$snapshot['companies']); upsert_contacts($pdo,$snapshot['contacts']); upsert_deals($pdo,$snapshot['deals']);
     upsert_activities($pdo,$snapshot['activities']); upsert_tasks($pdo,$snapshot['tasks']); upsert_attachments($pdo,$snapshot['attachments']);
     foreach(['attachments','activities','tasks','deals','contacts','companies'] as $table) {
@@ -67,7 +71,7 @@ try {
         else { $q=$pdo->prepare('DELETE FROM '.$table.' WHERE id NOT IN ('.implode(',',array_fill(0,count($ids),'?')).')');$q->execute($ids); }
     }
     $pdo->exec('UPDATE crm_revision SET revision=revision+1 WHERE id=1'); $pdo->commit();
-    crm_json(['ok'=>true,'revision'=>$revision+1]);
+    crm_json(['ok'=>true,'revision'=>$revision+1,'deals'=>$snapshot['deals'],'activities'=>$snapshot['activities']]);
 } catch(Throwable $e) {
     if(isset($pdo) && $pdo->inTransaction()) $pdo->rollBack();
     error_log((string)$e); crm_json(['ok'=>false,'error'=>$e instanceof InvalidArgumentException?$e->getMessage():'Save failed. Your changes have not been saved to the database.'],400);

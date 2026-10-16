@@ -87,6 +87,7 @@ export interface FinancingDetails {
 }
 
 export interface Deal {
+  workflow?: DealWorkflow;
   id: string;
   title: string;
   companyId: string;
@@ -122,6 +123,7 @@ export interface Deal {
 export type UserRole = "admin" | "rep";
 
 export interface User {
+  savedViews?: {id:string;name:string;filters:import("./lib/deal-filters").DealFilters}[];
   id: string;
   name: string;
   email: string;
@@ -136,6 +138,7 @@ export type ActivityType = "note" | "call" | "task" | "stage-change" | "update" 
  * merging two companies — are tied to a company instead (`companyId`).
  * `getAllActivities()` is the project-wide feed either way. */
 export interface Activity {
+  changes?: { field: string; before: unknown; after: unknown }[];
   id: string;
   dealId?: string;
   companyId?: string;
@@ -146,12 +149,39 @@ export interface Activity {
 }
 
 export interface Task {
+  assigneeId?: string;
+  priority?: "low" | "normal" | "high";
+  reminderAt?: string;
+  recurrence?: "none" | "daily" | "weekly" | "monthly";
+  recurrenceRootId?: string;
+  nextTaskId?: string;
   id: string;
   title: string;
   dueDate?: string; // ISO date
   dealId?: string;
   done: boolean;
   createdAt: string;
+}
+
+export interface KycItem {
+  id: string;
+  label: string;
+  required: boolean;
+  status: "missing" | "received" | "verified";
+  attachmentId?: string;
+  expiresOn?: string;
+  verifiedBy?: string;
+  verifiedAt?: string;
+}
+
+export interface DealWorkflow {
+  nextAction?: { title: string; assigneeId: string; dueDate: string };
+  kyc?: KycItem[];
+  proposalDueOverride?: string;
+  deadlineReason?: string;
+  escalationUserId?: string;
+  signedOn?: string;
+  signedAttachmentId?: string;
 }
 
 /** A file attached to a deal (quote PDF, contract, photo). Stored as a data
