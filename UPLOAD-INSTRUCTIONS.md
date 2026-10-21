@@ -1,5 +1,7 @@
 # Bolide CRM upload
 
+**Latest update: [21 October account/banner update](UPDATE-2026-10-21.md). Use UPLOAD-FILES-2026-10-21.txt for the current three-file upload.**
+
 **For the latest update, follow [UPDATE-2026-10-16.md](UPDATE-2026-10-16.md). The database migration has already been applied; use that document's individual-file upload list.**
 
 The xneelo database is already created and populated: 10 tables, 36 leads, 36 companies, 1 named contact and 7 existing users. Do not re-import the schema or initialization files.

@@ -11,6 +11,8 @@ CRM for the Bolide Group, built with React, TypeScript and Vite, with a PHP/MySQ
 
 ## Latest changes
 
+- 21 October: removed the idle shared-database banner while preserving save/error feedback; prepared canonical-host rules and documented the separate Railway redirect requirement. See UPDATE-2026-10-21.md.
+
 - Corrected deal actions: automatically derived from stage, never assigned to the logged-in developer; task assignments are explicit and independent.
 - Personal header inbox beside New deal: unread badge, persistent read/unread state, missed reminders and recipient isolation, backed by MySQL.
 - Live search for every deal picker (tasks and report history), matching title, company and site with a bounded result list; checked with 5,000 deals.

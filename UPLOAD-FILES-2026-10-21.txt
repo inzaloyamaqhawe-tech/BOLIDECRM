@@ -1,0 +1,8 @@
+21 October 2026: upload only these files from deploy-crm into crm/, preserving subfolders.
+
+assets/index-MyYMdO_0.js
+.htaccess
+index.html
+
+Upload index.html last. Account reset is already applied. No API upload or database import.
+The www redirect still requires a separate Railway deployment by Centenary; see WWW-CRM-REDIRECT.md.
