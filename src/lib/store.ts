@@ -1,7 +1,9 @@
+import { CrmApiError } from "./remote";
+import { localDuplicateMatches, normaliseDealText, mergeDraft, dealVersion, type DealDraft, type DealWriteOptions, type DuplicateMatch } from "./deal-duplicates";
 import { nextOccurrence, stageWorkflow, workflowErrors } from "./workflow";
 import { api, hosted } from "./remote";
 import { matchDealContact } from "./contact-match";
-import { getAllAttachments, replaceRemoteAttachments, resetPreviewAttachments } from "./attachments";
+import { getAllAttachments, replaceRemoteAttachments, resetPreviewAttachments, reassignDealAttachments } from "./attachments";
 import type { Activity, Company, Contact, Deal, Division, DivisionKey, Stage, StageKey, Task, User } from "../types";
 import { DIVISIONS, SEED_COMPANIES, SEED_DEALS, SEED_USERS, SEED_CONTACTS, PREVIEW_DATASET_VERSION, STAGES } from "./seed-data";
 
@@ -493,3 +495,56 @@ async function flushRemoteSave() {
 }
 window.addEventListener("beforeunload",e=>{if(hosted && (dirty || saving || blocked)){e.preventDefault();e.returnValue="";}});
 if(hosted) setInterval(()=>{if(remoteReady && !saving && !dirty && !blocked && !document.querySelector('[role="dialog"]')) void initializeRemoteStore(true).catch(()=>{});},30000);
+
+// Deal forms use a transactional API rather than optimistic snapshot insertion.
+export async function waitForCrmSave(){
+ if(!hosted)return;
+ while(saving)await new Promise(r=>setTimeout(r,50));
+ if(blocked)throw new Error("Resolve the unsaved-change warning before saving a deal.");
+ clearTimeout(remoteTimer);if(dirty)await flushRemoteSave();
+ if(blocked)throw new Error("Your pending changes could not be saved. Keep this tab open.");
+}
+export async function checkDealDuplicates(draft:DealDraft,exclude?:string):Promise<DuplicateMatch[]>{
+ if(hosted)return (await api("deals",{action:"check",draft,sourceId:exclude})).matches;
+ return localDuplicateMatches(draft,getDeals(),getCompanies(),getUsers(),getContacts(),exclude);
+}
+export async function saveDealDraft(draft:DealDraft,options:DealWriteOptions):Promise<Deal>{
+ await waitForCrmSave();
+ if(hosted){const result=await api("deals",{draft,...options});remoteReady=false;
+  for(const name of ["users","companies","contacts","deals","activities","tasks","divisionOverrides","stageOverrides"] as const)cache.set(KEYS[name],result.snapshot[name]);
+  replaceRemoteAttachments(result.snapshot.attachments);remoteRevision=result.revision;remoteReady=true;notify();
+  window.dispatchEvent(new CustomEvent("crm-save-status",{detail:"All changes saved"}));return getDeal(result.id)!;
+ }
+ const before=options.sourceId?getDeal(options.sourceId):undefined;
+ if(before&&await dealVersion(before,getContacts().find(c=>c.id===before.primaryContactId))!==options.sourceVersion)throw new Error("The deal changed. Reopen its latest details.");
+ let matches=await checkDealDuplicates(draft,options.sourceId),target:Deal|undefined;
+ const incomingDraft=JSON.parse(JSON.stringify(draft)) as DealDraft;
+ if(options.action==="merge"){
+  target=getDeal(options.targetId??"");if(!target||target.id===before?.id)throw new Error("Choose an existing deal to merge into.");
+  if(await dealVersion(target,getContacts().find(c=>c.id===target!.primaryContactId))!==options.targetVersion)throw new CrmApiError("The existing deal changed. Review it again.",409,{matches});
+  if(!matches.some(m=>m.deal.id===target!.id&&m.potential))throw new Error("Different solutions or locations should remain separate deals.");
+  const person=getContacts().find(c=>c.id===target!.primaryContactId);
+  const sourceDraft=draft;
+  if(before?.notes&&before.notes!==draft.deal.notes)draft={...draft,deal:{...draft.deal,notes:[before.notes,draft.deal.notes].filter(Boolean).join("\n\n")}};
+  draft=mergeDraft({deal:target,companyName:getCompany(target.companyId)?.name??"",contact:{name:person?.name??target.primaryContactName??"",phone:person?.phone,email:person?.email??""}},draft,options.choices??[]);
+  const errors=workflowErrors({...target,...draft.deal} as Deal,target,[...await getAllAttachments()]);if(errors.length)throw new Error(errors.join(" "));
+  if(before)await reassignDealAttachments(before.id,target.id);
+  const archives=load<any[]>("bolide-crm:deal-merges",[]);save("bolide-crm:deal-merges",[...archives,{source:before,incoming:sourceDraft,keptId:target.id,by:actorId,at:new Date().toISOString()}]);
+ } else {
+  const oldCompany=before?getCompany(before.companyId)?.name:undefined;
+  const identityChanged=!before||normaliseDealText(oldCompany)!==normaliseDealText(draft.companyName)||before.division!==draft.deal.division||normaliseDealText(before.site)!==normaliseDealText(draft.deal.site)||normaliseDealText(before.productLine)!==normaliseDealText(draft.deal.productLine);
+  if(identityChanged&&matches.some(m=>m.potential&&(!options.separate||options.separate.reason.trim().length<5||!options.separate.matches.some(r=>r.id===m.deal.id&&r.version===m.version))))throw new CrmApiError("A similar deal exists. Review it before saving.",409,{matches});
+ }
+ const company=target?getCompany(target.companyId)!:getCompanies().find(c=>normaliseDealText(c.name)===normaliseDealText(draft.companyName))??createCompany({name:draft.companyName.trim(),industry:"—",status:"Prospect",divisions:[draft.deal.division!]});
+ if(target&&incomingDraft.contact.name.trim()&&normaliseDealText(incomingDraft.contact.name)!==normaliseDealText(draft.contact.name))saveDealContact({companyId:company.id,...incomingDraft.contact});
+ const linked=target??before;
+ const contact=draft.contact.name.trim()?saveDealContact({companyId:company.id,...draft.contact},linked?.primaryContactId):undefined;
+ const payload={...draft.deal,companyId:company.id,primaryContactId:contact?.id,primaryContactName:contact?.name} as Omit<Deal,"id"|"createdAt"|"updatedAt">;
+ if(options.separate)payload.duplicateDetails={separate:{...options.separate,by:actorId,at:new Date().toISOString()}};
+ let saved:Deal;
+ if(target){updateDeal(target.id,payload);saved=getDeal(target.id)!;
+  if(before){save(KEYS.activities,load<Activity[]>(KEYS.activities,[]).map(a=>a.dealId===before.id?{...a,dealId:target!.id}:a));save(KEYS.tasks,getTasks().map(t=>t.dealId===before.id?{...t,dealId:target!.id}:t));save(KEYS.deals,getDeals().filter(d=>d.id!==before.id));}
+  logActivity(target.id,"system","Merged "+(before?.title??"new draft")+" into this deal. Incoming information: "+JSON.stringify(incomingDraft));
+ }else if(before){updateDeal(before.id,payload);saved=getDeal(before.id)!;}else saved=createDeal({...payload,createdById:actorId});
+ return saved;
+}

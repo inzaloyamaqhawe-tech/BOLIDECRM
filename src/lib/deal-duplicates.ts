@@ -1,0 +1,33 @@
+import type { Company, Contact, Deal, User } from "../types";
+export interface DealDraft {companyName:string;contact:{name:string;phone?:string;email:string};deal:Partial<Deal>;}
+export interface DuplicateMatch {deal:Deal;companyName:string;ownerName:string;creatorName?:string;contact?:Contact;version:string;potential:boolean;reason:string;}
+export interface DealWriteOptions {action:"create"|"update"|"merge";sourceId?:string;sourceVersion?:string;targetId?:string;targetVersion?:string;choices?:string[];separate?:{reason:string;matches:{id:string;version:string}[]};}
+export const normaliseDealText=(s?:string)=> (s??"").toLowerCase().replace(/[^a-z0-9]/g,"");
+export function duplicateKind(draft:DealDraft,existing:Deal,companyName:string):"potential"|"related"|null {
+ const a=normaliseDealText(draft.companyName),b=normaliseDealText(companyName);if(!a||!b)return null;
+ if(a!==b)return a.length>=3&&(b.includes(a)||a.includes(b))?"related":null;
+ if(draft.deal.division!==existing.division)return "related";
+ const site=normaliseDealText(draft.deal.site),oldSite=normaliseDealText(existing.site),product=normaliseDealText(draft.deal.productLine),oldProduct=normaliseDealText(existing.productLine);
+ return (site&&oldSite&&site!==oldSite)||(product&&oldProduct&&product!==oldProduct)?"related":"potential";
+}
+export function canonical(value:unknown):string {if(value===undefined||value===null)return "null";if(Array.isArray(value))return "["+value.map(canonical).join(",")+"]";if(typeof value==="object")return "{"+Object.keys(value).sort().filter(k=>(value as any)[k]!==undefined).map(k=>JSON.stringify(k)+":"+canonical((value as any)[k])).join(",")+"}";return JSON.stringify(value);}
+export async function dealVersion(deal:Deal,contact?:Contact){const digest=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(canonical([deal,contact??null])));return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,"0")).join("");}
+export async function localDuplicateMatches(draft:DealDraft,deals:Deal[],companies:Company[],users:User[],contacts:Contact[],exclude?:string):Promise<DuplicateMatch[]> {
+ const names=new Map(companies.map(c=>[c.id,c.name]));const matches=await Promise.all(deals.filter(d=>d.id!==exclude).map(async (deal):Promise<DuplicateMatch|null>=>{const companyName=names.get(deal.companyId)??"",kind=duplicateKind(draft,deal,companyName);if(!kind)return null;return {deal,companyName,ownerName:users.find(u=>u.id===deal.ownerId)?.name??"Unknown owner",creatorName:users.find(u=>u.id===deal.createdById)?.name,contact:contacts.find(c=>c.id===deal.primaryContactId),version:await dealVersion(deal,contacts.find(c=>c.id===deal.primaryContactId)),potential:kind==="potential",reason:kind==="potential"?"Same company and solution; location matches or needs confirmation":"Same or similar company, different or unconfirmed opportunity"};}));
+ return matches.filter((m):m is DuplicateMatch=>m!==null).sort((a,b)=>Number(b.potential)-Number(a.potential));
+}
+export const mergeRoots=["title","site","segment","productLine","stage","onceOff","mrr","ownerId","closeDate","receivedAt","lostReason","secureDetails","energyDetails","waterDetails","financingDetails","workflow","contact"];
+export interface MergeField {path:string;before:unknown;after:unknown;fill:boolean;}
+const missing=(v:unknown)=>v===null||v===undefined||v===""||(Array.isArray(v)&&!v.length)||(typeof v==="object"&&v!==null&&!Object.keys(v).length);
+export function mergeFields(target:DealDraft,incoming:DealDraft):MergeField[]{
+ const old:any={...target.deal,contact:target.contact},fresh:any={...incoming.deal,contact:incoming.contact};const rows:MergeField[]=[];
+ function compare(a:any,b:any,path:string){if(canonical(a)===canonical(b)||missing(b))return;if(path==="contact"&&a?.name&&b?.name&&normaliseDealText(a.name)!==normaliseDealText(b.name)){rows.push({path,before:a,after:b,fill:false});return;}if(b&&typeof b==="object"&&!Array.isArray(b)){for(const k of Object.keys(b)){if(path==="workflow"&&k==="nextAction")continue;compare(a?.[k],b[k],path+"."+k);}}else rows.push({path,before:a,after:b,fill:missing(a)});}
+ for(const root of mergeRoots)compare(old[root],fresh[root],root);return rows;
+}
+export function mergeDraft(target:DealDraft,incoming:DealDraft,choices:string[]):DealDraft {
+ const result=JSON.parse(JSON.stringify(target)) as DealDraft;const view:any={...result.deal,contact:result.contact};
+ for(const field of mergeFields(target,incoming))if(choices.includes(field.path)){const keys=field.path.split(".");let node=view;for(const key of keys.slice(0,-1))node=node[key]??=( {} );node[keys[keys.length-1]]=field.after;}
+ const {contact,...deal}=view;result.deal=deal;result.contact=contact;
+ if(incoming.deal.notes?.trim()&&incoming.deal.notes.trim()!==target.deal.notes?.trim())result.deal.notes=[target.deal.notes,"Merged information:\n"+incoming.deal.notes.trim()].filter(Boolean).join("\n\n");
+ return result;
+}

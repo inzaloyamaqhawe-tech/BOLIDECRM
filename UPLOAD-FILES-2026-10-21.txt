@@ -1,8 +1,26 @@
-21 October 2026: upload only these files from deploy-crm into crm/, preserving subfolders.
+21 October 2026: duplicate-deal review and merging
 
-assets/index-MyYMdO_0.js
-.htaccess
+Upload these individual files FROM deploy-crm INTO the existing website crm folder. Preserve subfolders; overwrite the corresponding files. Upload in this order:
+
+api/.htaccess
+api/state-functions.php
+api/deal-duplicates.php
+api/import-functions.php
+api/workflow.php
+api/state.php
+api/deals.php
+assets/index-BmzXgFqb.css
+assets/index-H26oZSeb.js
+assets/vendor-charts-BHuxWsbc.js
+assets/vendor-dnd-C-c8qG_2.js
+assets/vendor-icons-Cc-lgg2c.js
+assets/vendor-react-PGvNAZat.js
 index.html
 
-Upload index.html last. Account reset is already applied. No API upload or database import.
-The www redirect still requires a separate Railway deployment by Centenary; see WWW-CRM-REDIRECT.md.
+Upload index.html LAST, after all PHP files and assets. Refresh with Ctrl+F5.
+The Xneelo database migration is already applied; no SQL import is needed.
+Keep the existing api/config.php unchanged. No ZIP is required or provided.
+Existing deals were preserved; no automatic merging or reset occurred.
+
+GitHub Pages is a browser-only preview. The production feature becomes active after this upload.
+The separate www/Railway redirect and invitation-email configuration remain unchanged.

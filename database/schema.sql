@@ -77,6 +77,8 @@ CREATE TABLE IF NOT EXISTS deals (
   financing_details_json JSON NULL,
   workflow_json JSON NULL,
   lead_tracker_json JSON NULL,
+  created_by_id VARCHAR(64) NULL,
+  duplicate_details_json JSON NULL,
   created_at DATETIME NOT NULL,
   updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),
@@ -177,4 +179,16 @@ CREATE TABLE IF NOT EXISTS notifications (
   PRIMARY KEY (recipient_id, id),
   KEY idx_notifications_unread (recipient_id, read_at, created_at),
   CONSTRAINT fk_notifications_recipient FOREIGN KEY (recipient_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS deal_merge_history (
+ id VARCHAR(64) PRIMARY KEY,
+ kept_deal_id VARCHAR(64) NULL,
+ source_deal_id VARCHAR(64) NULL,
+ snapshot_json JSON NOT NULL,
+ merged_by VARCHAR(64) NULL,
+ merged_at DATETIME NOT NULL,
+ KEY idx_merge_kept (kept_deal_id, merged_at),
+ CONSTRAINT fk_merge_kept FOREIGN KEY (kept_deal_id) REFERENCES deals(id) ON DELETE SET NULL,
+ CONSTRAINT fk_merge_user FOREIGN KEY (merged_by) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

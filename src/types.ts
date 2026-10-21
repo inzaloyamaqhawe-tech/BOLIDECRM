@@ -87,6 +87,8 @@ export interface FinancingDetails {
 }
 
 export interface Deal {
+  createdById?: string;
+  duplicateDetails?: { separate?: {reason:string;matches:{id:string;version:string}[];by?:string;at?:string}; };
   workflow?: DealWorkflow;
   id: string;
   title: string;

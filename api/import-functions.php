@@ -80,11 +80,11 @@ function upsert_deals(PDO $pdo, array $rows): int
         'INSERT INTO deals (id, title, company_id, primary_contact_id, primary_contact_name, site,
          division, segment, product_line, stage, once_off, mrr, owner_id, close_date, notes,
          lost_reason, secure_details_json, energy_details_json, water_details_json,
-         financing_details_json, workflow_json, lead_tracker_json, received_at, proposal_sent_at, stage_changed_at, created_at, updated_at)
+         financing_details_json, workflow_json, lead_tracker_json, created_by_id, duplicate_details_json, received_at, proposal_sent_at, stage_changed_at, created_at, updated_at)
          VALUES (:id, :title, :company_id, :primary_contact_id, :primary_contact_name, :site,
          :division, :segment, :product_line, :stage, :once_off, :mrr, :owner_id, :close_date,
          :notes, :lost_reason, :secure_details_json, :energy_details_json, :water_details_json,
-         :financing_details_json, :workflow_json, :lead_tracker_json, :received_at, :proposal_sent_at, :stage_changed_at, :created_at, :updated_at)
+         :financing_details_json, :workflow_json, :lead_tracker_json, :created_by_id, :duplicate_details_json, :received_at, :proposal_sent_at, :stage_changed_at, :created_at, :updated_at)
          ON DUPLICATE KEY UPDATE title = VALUES(title), company_id = VALUES(company_id),
          primary_contact_id = VALUES(primary_contact_id), primary_contact_name = VALUES(primary_contact_name),
          site = VALUES(site), division = VALUES(division), segment = VALUES(segment),
@@ -92,7 +92,7 @@ function upsert_deals(PDO $pdo, array $rows): int
          mrr = VALUES(mrr), owner_id = VALUES(owner_id), close_date = VALUES(close_date),
          notes = VALUES(notes), lost_reason = VALUES(lost_reason),
          secure_details_json = VALUES(secure_details_json), energy_details_json = VALUES(energy_details_json),
-         water_details_json = VALUES(water_details_json), financing_details_json = VALUES(financing_details_json), workflow_json = VALUES(workflow_json), lead_tracker_json = VALUES(lead_tracker_json),
+         water_details_json = VALUES(water_details_json), financing_details_json = VALUES(financing_details_json), workflow_json = VALUES(workflow_json), lead_tracker_json = VALUES(lead_tracker_json), created_by_id = VALUES(created_by_id), duplicate_details_json = VALUES(duplicate_details_json),
          received_at = VALUES(received_at), proposal_sent_at = VALUES(proposal_sent_at), stage_changed_at = VALUES(stage_changed_at), updated_at = VALUES(updated_at)'
     );
     foreach ($rows as $row) {
@@ -117,6 +117,8 @@ function upsert_deals(PDO $pdo, array $rows): int
             ':secure_details_json' => json_or_null($row['secureDetails'] ?? $row['secure_details_json'] ?? null),
             ':energy_details_json' => json_or_null($row['energyDetails'] ?? $row['energy_details_json'] ?? null),
             ':water_details_json' => json_or_null($row['waterDetails'] ?? $row['water_details_json'] ?? null),
+            ':created_by_id' => $row['createdById'] ?? null,
+            ':duplicate_details_json' => json_or_null($row['duplicateDetails'] ?? null),
             ':workflow_json' => json_or_null($row['workflow'] ?? null),
             ':lead_tracker_json' => json_or_null($row['leadTracker'] ?? null),
             ':received_at' => crm_iso_to_mysql($row['receivedAt'] ?? $row['createdAt'] ?? null),
@@ -226,7 +228,7 @@ function upsert_attachments(PDO $pdo, array $rows): int
     $stmt = $pdo->prepare(
         'INSERT INTO attachments (id, deal_id, filename, mime_type, size_bytes, data_url, created_at)
          VALUES (:id, :deal_id, :filename, :mime_type, :size_bytes, :data_url, :created_at)
-         ON DUPLICATE KEY UPDATE filename = VALUES(filename), mime_type = VALUES(mime_type),
+         ON DUPLICATE KEY UPDATE deal_id = VALUES(deal_id), filename = VALUES(filename), mime_type = VALUES(mime_type),
          size_bytes = VALUES(size_bytes), data_url = VALUES(data_url)'
     );
     foreach ($rows as $row) {

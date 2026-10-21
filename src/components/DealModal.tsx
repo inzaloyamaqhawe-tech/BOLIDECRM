@@ -1,3 +1,6 @@
+import { DealDuplicatePanel, targetDraft } from "./DealDuplicatePanel";
+import { CrmApiError } from "../lib/remote";
+import { dealVersion, normaliseDealText, type DealDraft, type DuplicateMatch } from "../lib/deal-duplicates";
 import { WorkflowFields } from "./WorkflowFields";
 import { TaskEditor } from "./TaskEditor";
 import { workflowErrors } from "../lib/workflow";
@@ -10,6 +13,9 @@ import {
   cloneDeal,
   createCompany,
   createDeal,
+  checkDealDuplicates,
+  saveDealDraft,
+  getDeal,
   createTask,
   deleteDeal,
   getActivities,
@@ -59,7 +65,8 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
   const users = useUsers();
   const contacts = useContacts();
   const linkedContact=contacts.find(c=>c.id===deal?.primaryContactId) ?? contacts.find(c=>c.companyId===deal?.companyId && c.name.toLowerCase()===deal?.primaryContactName?.toLowerCase());
-  const isNew = !deal;
+  const [copyMode,setCopyMode]=useState(false);
+  const isNew = copyMode || !deal;
   const divisions = getDivisions();
   const stages = getStagesLive();
 
@@ -99,6 +106,8 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
   const [workflow,setWorkflow]=useState<DealWorkflow>(deal?.workflow??{});
   const [showTask,setShowTask]=useState(false);
   const [error, setError] = useState("");
+  const [matches,setMatches]=useState<DuplicateMatch[]>([]),[checking,setChecking]=useState(false),[duplicateError,setDuplicateError]=useState(""),[mergeTarget,setMergeTarget]=useState<DuplicateMatch|null>(null),[mergeChoices,setMergeChoices]=useState<string[]>([]),[separateReason,setSeparateReason]=useState(""),[forceReview,setForceReview]=useState(false),[saving,setSaving]=useState(false),[openExisting,setOpenExisting]=useState<Deal>();
+  const saveBusy=useRef(false);
 
   const [activities, setActivities] = useState<Activity[]>([]);
   const [newNote, setNewNote] = useState("");
@@ -108,7 +117,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape" && !saveBusy.current) onClose();
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
@@ -153,24 +162,15 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
       setError("Say why this deal was lost — price, timing, went with a competitor, etc.");
       return;
     }
-    const candidate={...deal,id:deal?.id??"new",stage,receivedAt:receivedAt?receivedAt+"T08:00:00+02:00":undefined,lostReason,workflow} as Deal;
-    const validation=workflowErrors(candidate,deal,attachments);
+    if(saveBusy.current)return;
+    const candidate={...(!isNew?deal:{}),id:!isNew?deal?.id:"new",stage,receivedAt:receivedAt?receivedAt+"T08:00:00+02:00":undefined,lostReason,workflow} as Deal;
+    const validation=workflowErrors(candidate,isNew?undefined:deal,attachments);
     if(validation.length){setError(validation.join(" "));return;}
-    // Matches an existing company by name (case-insensitive) so typing an
-    // existing client's name reuses their record; anything new — a
-    // brand-new client — is created on the fly rather than requiring a
-    // separate step first.
-    const existing = companies.find((c) => c.name.toLowerCase() === trimmedName.toLowerCase());
-    const finalCompanyId = existing ? existing.id : createCompany({ name: trimmedName, industry: "—", status: "Prospect", divisions: [division] }).id;
-    const contact=primaryContactName.trim() ? saveDealContact({companyId:finalCompanyId,name:primaryContactName,phone:contactPhone,email:contactEmail},linkedContact?.id) : undefined;
-
     const payload = {
       workflow,
       receivedAt: receivedAt ? receivedAt + "T08:00:00+02:00" : undefined,
       title: title.trim(),
-      companyId: finalCompanyId,
       primaryContactName: primaryContactName.trim() || undefined,
-      primaryContactId: contact?.id,
       site: site.trim() || undefined,
       division,
       segment: segment || undefined,
@@ -209,24 +209,21 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
           : deal?.financingDetails,
     };
 
+    const draft:DealDraft={companyName:trimmedName,contact:{name:primaryContactName.trim(),phone:contactPhone.trim(),email:contactEmail.trim()},deal:payload};
+    setError("");setSaving(true);saveBusy.current=true;
     try {
-    if (isNew) {
-      createDeal(payload);
-    } else {
-      const wasLost = deal.stage === "lost";
-      updateDeal(deal.id, payload);
-      if (stage === "lost" && !wasLost) {
-        logActivity(deal.id, "stage-change", `Marked Lost — ${payload.lostReason}`, user?.id);
-      } else {
-        logActivity(deal.id, "update", "Deal details updated", user?.id);
-      }
-    }
-    onClose();
-    } catch(e) {setError((e as Error).message);}
+      const latest=await checkDealDuplicates(draft,isNew?undefined:deal?.id);setMatches(latest);
+      const identityChanged=isNew||normaliseDealText(companies.find(c=>c.id===deal?.companyId)?.name)!==normaliseDealText(companyName)||division!==deal?.division||normaliseDealText(site)!==normaliseDealText(deal?.site)||normaliseDealText(productLine)!==normaliseDealText(deal?.productLine);
+      if(!mergeTarget&&identityChanged&&latest.some(m=>m.potential)&&separateReason.trim().length<5){setForceReview(true);return;}
+      if(!mergeTarget&&identityChanged&&separateReason.trim().length>=5&&latest.some(m=>m.potential&&!matches.some(old=>old.deal.id===m.deal.id&&old.version===m.version))){setError("New or changed matching information appeared. Review it before confirming a separate opportunity.");setForceReview(true);return;}
+      const saved=await saveDealDraft(draft,{action:mergeTarget?"merge":isNew?"create":"update",sourceId:isNew?undefined:deal?.id,sourceVersion:!isNew&&deal?await dealVersion(deal,contacts.find(c=>c.id===deal.primaryContactId)):undefined,targetId:mergeTarget?.deal.id,targetVersion:mergeTarget?.version,choices:mergeChoices,separate:separateReason.trim().length>=5?{reason:separateReason.trim(),matches:matches.filter(m=>m.potential).map(m=>({id:m.deal.id,version:m.version}))}:undefined});
+      showToast(mergeTarget?"Deal merged; related records preserved":"Deal saved");onClose();
+    }catch(e){setError((e as Error).message);if(e instanceof CrmApiError&&e.details?.matches){setMatches(e.details.matches);setForceReview(true);if(mergeTarget){const fresh=e.details.matches.find((m:DuplicateMatch)=>m.deal.id===mergeTarget.deal.id);setMergeTarget(fresh??null);}}}
+    finally{setSaving(false);saveBusy.current=false;}
   }
 
   function handleDelete() {
-    if (!deal) return;
+    if (!deal || saveBusy.current) return;
     const snapshot = deal;
     deleteDeal(snapshot.id);
     onClose();
@@ -237,10 +234,7 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
   }
 
   function handleDuplicate() {
-    if (!deal) return;
-    const clone = cloneDeal(deal.id);
-    onClose();
-    if (clone) showToast(`Duplicated as "${clone.title}"`);
+    if(!deal||saving)return;setCopyMode(true);setTitle(deal.title+" (Copy)");setStage("lead");setReceivedAt(new Date().toISOString().slice(0,10));setWorkflow({});setLostReason("");setMergeTarget(null);setSeparateReason("");setForceReview(true);setError("");
   }
 
   function handleAddNote() {
@@ -278,15 +272,20 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
     return users.find((u) => u.id === id)?.name ?? "Unknown";
   }
 
+  const liveDraft:DealDraft={companyName,contact:{name:primaryContactName,phone:contactPhone,email:contactEmail},deal:{title,division,productLine:productLine||undefined,site:site||undefined,stage,onceOff:Number(onceOff)||0,mrr:Number(mrr)||0,ownerId,closeDate:closeDate||undefined,notes,receivedAt:receivedAt?receivedAt+"T08:00:00+02:00":undefined,workflow}};
+  useEffect(()=>{if(companyName.trim().length<3){setMatches([]);return;}let cancelled=false;setChecking(true);const timer=setTimeout(()=>{checkDealDuplicates(liveDraft,isNew?undefined:deal?.id).then(rows=>{if(!cancelled){setMatches(rows);setDuplicateError("");}}).catch(e=>{if(!cancelled)setDuplicateError(e.message);}).finally(()=>{if(!cancelled)setChecking(false);});},350);return()=>{cancelled=true;clearTimeout(timer);};},[companyName,division,productLine,site,title,isNew,deal?.id]);
+  const reviewDraft:DealDraft={...liveDraft,deal:{...liveDraft.deal,segment:segment||undefined,lostReason:lostReason||undefined,secureDetails:division==="secure"?{camerasInstalled:optionalNumber(camerasInstalled),camerasMonitored:optionalNumber(camerasMonitored)}:deal?.secureDetails,energyDetails:division==="energy"?{solarKwp:optionalNumber(solarKwp),bessKwh:optionalNumber(bessKwh),ratePerKwh:optionalNumber(ratePerKwh)}:deal?.energyDetails,waterDetails:division==="water"?{litresPerDay:optionalNumber(litresPerDay)}:deal?.waterDetails,financingDetails:division==="energy"?{bankModelStatus:bankModelStatus||undefined,contractSignatureDate:contractSignatureDate||undefined,operationsStartDate:operationsStartDate||undefined,capexPpa:optionalNumber(capexPpa),capexRental:optionalNumber(capexRental),ppaIrr:optionalNumber(ppaIrr),rentalIrr:optionalNumber(rentalIrr)}:deal?.financingDetails}};
+  if(openExisting)return <DealModal deal={openExisting} onClose={onClose}/>;
   return (
-    <div role="dialog" aria-modal="true" aria-label="Lead details" className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-12" onClick={onClose}>
+    <div role="dialog" aria-modal="true" aria-label="Lead details" className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-12" onClick={()=>{if(!saving)onClose();}}>
       <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <fieldset disabled={saving} className="m-0 min-w-0 border-0 p-0">
         <div className="mb-4 flex items-start justify-between">
           <div className="flex flex-wrap items-center gap-2">
             <DivisionBadge division={division} />
             {!isNew && <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-semibold text-neutral-600">{stages.find(s=>s.key===stage)?.label}</span>}
           </div>
-          <button onClick={onClose} className="rounded-full p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700">
+          <button disabled={saving} onClick={onClose} className="rounded-full p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -331,6 +330,8 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
               </p>
             )}
           </Field>
+
+          <DealDuplicatePanel matches={matches} draft={reviewDraft} loading={checking} error={duplicateError} target={mergeTarget} onTarget={setMergeTarget} onOpen={m=>setOpenExisting(m.deal)} choices={mergeChoices} onChoices={setMergeChoices} separateReason={separateReason} onSeparateReason={setSeparateReason} forceReview={forceReview} busy={saving}/>
 
           <Field label="Primary contact" span={2}>
             <input
@@ -591,18 +592,20 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
             )}
           </div>
           <div className="flex gap-3">
-            <button type="button" onClick={onClose} className="rounded-full border border-neutral-200 px-5 py-2.5 text-sm font-semibold">
+            <button type="button" disabled={saving} onClick={onClose} className="rounded-full border border-neutral-200 px-5 py-2.5 text-sm font-semibold">
               Cancel
             </button>
             <button
               type="button"
               onClick={handleSave}
+              disabled={saving||uploading}
               className="rounded-full bg-brand-gradient px-6 py-2.5 text-sm font-bold text-white shadow-brand"
             >
-              {isNew ? "Create deal" : "Save deal"}
+              {saving?"Saving…":mergeTarget?"Confirm reviewed merge":isNew ? "Create deal" : "Save deal"}
             </button>
           </div>
         </div>
+        </fieldset>
       </div>
     </div>
   );

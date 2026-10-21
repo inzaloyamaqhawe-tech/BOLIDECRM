@@ -11,6 +11,8 @@ CRM for the Bolide Group, built with React, TypeScript and Vite, with a PHP/MySQ
 
 ## Latest changes
 
+- 21 October: live duplicate-opportunity review by company, solution/product and location; explicit field-by-field merges, source archive and related-record transfers; separate opportunities require an explanation when identities match. Xneelo migration applied without merging existing leads. See [the feature and deployment notes](DEAL-DUPLICATES-2026-10-21.md) and `UPLOAD-FILES-2026-10-21.txt` for the current upload list.
+
 - 21 October: removed the idle shared-database banner while preserving save/error feedback; prepared canonical-host rules and documented the separate Railway redirect requirement. See UPDATE-2026-10-21.md.
 
 - Corrected deal actions: automatically derived from stage, never assigned to the logged-in developer; task assignments are explicit and independent.

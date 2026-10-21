@@ -36,6 +36,7 @@ try:
  assert req('auth',{'action':'signup','email':uid+'@bolide.co.za','name':'Temporary workflow verification','password':password})[0]==200
  initial=state();save(initial)
  data=state();template=copy.deepcopy(data['snapshot']['deals'][0]);template.update(id=marker,title='Temporary workflow check',stage='lead',ownerId=uid,receivedAt='2026-10-16T06:00:00Z',createdAt='2026-10-16T06:00:00Z',updatedAt='2026-10-16T06:00:00Z');template.pop('leadTracker',None);template.pop('proposalSentAt',None);template.pop('lostReason',None);template.pop('workflow',None)
+ data['snapshot']['companies'].append({'id':marker,'name':marker,'industry':'Test','status':'Prospect','divisions':['energy'],'createdAt':'2026-10-16T06:00:00Z'});template['companyId']=marker;template.pop('primaryContactId',None);template.pop('primaryContactName',None)
  data['snapshot']['deals'].append(template);save(data)
  assert next(d for d in state()['snapshot']['deals'] if d['id']==marker)['workflow']['nextAction']=={'title':'Qualify/KYC Onboarding'}
  data=state();template=next(d for d in data['snapshot']['deals'] if d['id']==marker)
@@ -90,4 +91,4 @@ finally:
  # Delete only explicitly created test IDs; never restore a whole old snapshot.
  q.execute('START TRANSACTION');q.execute('SELECT revision FROM crm_revision WHERE id=1 FOR UPDATE')
  q.execute('DELETE FROM activities WHERE deal_id=%s',(marker,));q.execute('DELETE FROM attachments WHERE deal_id=%s',(marker,));q.execute('DELETE FROM tasks WHERE id=%s',(marker,));q.execute('DELETE FROM deals WHERE id=%s',(marker,));q.execute('DELETE FROM users WHERE id IN (%s,%s)',(uid,uid2));q.execute('UPDATE crm_revision SET revision=revision+1 WHERE id=1');c.commit()
- q.execute('SELECT COUNT(*) FROM deals');print('Lead count after test cleanup:',q.fetchone()[0]);c.close();server.terminate();server.wait();log.close()
+ q.execute('DELETE FROM companies WHERE id=%s',(marker,));q.execute('SELECT COUNT(*) FROM deals');print('Lead count after test cleanup:',q.fetchone()[0]);c.close();server.terminate();server.wait();log.close()

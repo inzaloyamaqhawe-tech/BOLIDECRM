@@ -38,7 +38,7 @@ function workflow_validate(array $deal, ?array $before, array $attachments, arra
 
 /** Called inside the revision-locked transaction. Existing unchanged imported deals
  * are not retroactively rejected; every changed active deal must meet the rules. */
-function workflow_prepare(array &$snapshot,array $old,array $actor): void {
+function workflow_prepare(array &$snapshot,array $old,array $actor,array $preservedKyc=[]): void {
     $oldDeals=array_column($old['deals'],null,'id');
     $oldActivities=array_column($old['activities'],null,'id');
     $oldUsers=array_column($old['users'],null,'id');
@@ -61,7 +61,9 @@ function workflow_prepare(array &$snapshot,array $old,array $actor): void {
         foreach(array_merge([$deal['workflow']['signedAttachmentId']??null],array_column($deal['workflow']['kyc']??[],'attachmentId')) as $fileId) if($fileId&&!in_array($fileId,$fileIds,true))throw new InvalidArgumentException('A selected signature / KYC document cannot be deleted. Update the deal selections first.');
         if(isset($deal['workflow']['kyc']))foreach($deal['workflow']['kyc'] as &$item) {
             $previous=current(array_filter($before['workflow']['kyc']??[],fn($i)=>($i['id']??'')===($item['id']??'')));
-            if(($item['status']??'')==='verified' && (!$previous||($previous['status']??'')!=='verified'||($previous['attachmentId']??null)!==($item['attachmentId']??null)||($previous['expiresOn']??null)!==($item['expiresOn']??null))) {$item['verifiedBy']=$actor['id'];$item['verifiedAt']=gmdate('Y-m-d\TH:i:s\Z');}
+            $trusted=current(array_filter($preservedKyc,fn($i)=>($i['status']??'')==='verified'&&workflow_diff($i,$item)===[]));
+            if($trusted){$item['verifiedBy']=$trusted['verifiedBy'];$item['verifiedAt']=$trusted['verifiedAt'];}
+            elseif(($item['status']??'')==='verified' && (!$previous||($previous['status']??'')!=='verified'||($previous['attachmentId']??null)!==($item['attachmentId']??null)||($previous['expiresOn']??null)!==($item['expiresOn']??null))) {$item['verifiedBy']=$actor['id'];$item['verifiedAt']=gmdate('Y-m-d\TH:i:s\Z');}
             elseif(($item['status']??'')==='verified'&&$previous){$item['verifiedBy']=$previous['verifiedBy']??null;$item['verifiedAt']=$previous['verifiedAt']??null;}
             else {unset($item['verifiedBy'],$item['verifiedAt']);}
         }

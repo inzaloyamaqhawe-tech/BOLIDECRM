@@ -4,35 +4,9 @@ require __DIR__.'/session.php';
 require __DIR__.'/import-functions.php';
 require __DIR__.'/workflow.php';
 $user=crm_session_user();
-function frontend_row(array $row): array {
-    $out=[];
-    foreach($row as $key=>$value) {
-        if($key==='password_hash') { $out['registered']=!empty($value); continue; }
-        if(str_ends_with($key,'_json')) { $key=substr($key,0,-5); $value=$value===null?null:json_decode($value,true); }
-        $key=lcfirst(str_replace(' ','',ucwords(str_replace('_',' ',$key))));
-        if(in_array($key,['createdAt','updatedAt','receivedAt','proposalSentAt','stageChangedAt']) && $value) $value=str_replace(' ','T',$value).'Z';
-        if(in_array($key,['onceOff','mrr'])) $value=(float)$value;
-        if($key==='done') $value=(bool)$value;
-        if($key==='options') {if(is_array($value))$out=array_merge($out,$value);continue;}
-        if($value!==null) $out[$key]=$value;
-    }
-    return $out;
-}
-function read_state(PDO $pdo): array {
-    $result=[];
-    foreach(['users','companies','contacts','deals','activities','tasks','attachments'] as $table) {
-        $result[$table]=array_map('frontend_row',$pdo->query('SELECT * FROM '.$table)->fetchAll());
-    }
-    foreach(['divisionOverrides'=>'division_overrides','stageOverrides'=>'stage_overrides'] as $key=>$table) {
-        $result[$key]=new stdClass();
-        foreach($pdo->query('SELECT * FROM '.$table)->fetchAll() as $row) {
-            $id=$row[$table==='stage_overrides'?'stage_key':'division_key'];
-            unset($row['stage_key'],$row['division_key'],$row['updated_at']);
-            $result[$key]->{$id}=frontend_row($row);
-        }
-    }
-    return $result;
-}
+require __DIR__.'/state-functions.php';
+require __DIR__.'/deal-duplicates.php';
+
 try {
     $pdo=crm_pdo();
     if($_SERVER['REQUEST_METHOD']==='GET') {
@@ -61,6 +35,7 @@ try {
         $q=$pdo->prepare('SELECT role FROM users WHERE id=?');$q->execute([$user['id']]);if($q->fetchColumn()!=='admin') throw new InvalidArgumentException('You cannot remove your own administrator access.');
         upsert_division_overrides($pdo,$snapshot['divisionOverrides']); upsert_stage_overrides($pdo,$snapshot['stageOverrides']);
     }
+    duplicate_guard($snapshot,$old,$user);
     workflow_prepare($snapshot,$old,$user);
     foreach($snapshot['users'] as $row) if($row['id']===$user['id']){$q=$pdo->prepare('UPDATE users SET saved_views_json=? WHERE id=?');$q->execute([json_encode($row['savedViews']??[]),$user['id']]);}
     upsert_companies($pdo,$snapshot['companies']); upsert_contacts($pdo,$snapshot['contacts']); upsert_deals($pdo,$snapshot['deals']);
@@ -74,5 +49,6 @@ try {
     crm_json(['ok'=>true,'revision'=>$revision+1,'deals'=>$snapshot['deals'],'activities'=>$snapshot['activities']]);
 } catch(Throwable $e) {
     if(isset($pdo) && $pdo->inTransaction()) $pdo->rollBack();
+    if($e instanceof DealDuplicateException){crm_json(['ok'=>false,'error'=>$e->getMessage(),'matches'=>$e->matches],409);exit;}
     error_log((string)$e); crm_json(['ok'=>false,'error'=>$e instanceof InvalidArgumentException?$e->getMessage():'Save failed. Your changes have not been saved to the database.'],400);
 }

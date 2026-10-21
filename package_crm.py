@@ -18,7 +18,7 @@ if assets.exists():
             file.unlink()
 shutil.copytree(p / 'dist', dest, dirs_exist_ok=True)
 (dest / 'api').mkdir(exist_ok=True)
-for name in ['.htaccess', '.user.ini', 'auth.php', 'state.php', 'session.php', 'db.php', 'health.php', 'import-functions.php', 'workflow.php', 'notifications.php', 'notification-functions.php', 'config.php']:
+for name in ['.htaccess', '.user.ini', 'auth.php', 'state.php', 'state-functions.php', 'deal-duplicates.php', 'deals.php', 'session.php', 'db.php', 'health.php', 'import-functions.php', 'workflow.php', 'notifications.php', 'notification-functions.php', 'config.php']:
     shutil.copy2(p / 'api' / name, dest / 'api' / name)
 match = re.search(r"'db_pass'\s*=>\s*'([^']*)'", config.read_text(encoding='utf-8'))
 for file in (dest / 'assets').glob('*.js'):

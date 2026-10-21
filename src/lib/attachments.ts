@@ -125,3 +125,9 @@ export async function resetPreviewAttachments() {
   const db=await openDb();
   await new Promise<void>((resolve,reject)=>{const tx=db.transaction(STORE_NAME,"readwrite");tx.objectStore(STORE_NAME).clear();tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});
 }
+
+export async function reassignDealAttachments(sourceId:string,targetId:string){
+ if(hosted){remoteAttachments=remoteAttachments.map(a=>a.dealId===sourceId?{...a,dealId:targetId}:a);return;}
+ const db=await openDb();const rows=await getAttachments(sourceId);
+ await new Promise<void>((resolve,reject)=>{const tx=db.transaction(STORE_NAME,"readwrite");for(const row of rows)tx.objectStore(STORE_NAME).put({...row,dealId:targetId});tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});
+}
