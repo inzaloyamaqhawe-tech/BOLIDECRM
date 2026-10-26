@@ -20,5 +20,7 @@ database/initialize.py
 database/initial-data.json
 
 .private-backups/
+.migration-backups/
+migration-backups/
 .import-work/
 replace_tracker_database.py

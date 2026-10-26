@@ -73,6 +73,8 @@ See [UPLOAD-INSTRUCTIONS.md](UPLOAD-INSTRUCTIONS.md) for individual file uploads
 
 For a new installation, import `database/schema.sql` into an empty MySQL/MariaDB database, then copy `api/config.example.php` to `api/config.php` and set credentials privately. PHP 8.2+ with PDO MySQL and Apache rewrite support is required.
 
+On 26 October 2026, `Deals/Lead Tracker October.xlsx` was reconciled into the 36 tracker-originated Xneelo deals. The database update preserved CRM-owned notes, contacts, tasks and owners while adding the workbook's populated proposal terms, system sizing, rates, savings and financing values. The two Sasol Raceway rows remain consolidated into one deal.
+
 After building with `/crm/`, `python package_crm.py` prepares the individual upload folder if a private configuration file is present. It never creates a ZIP. Upload the folder's contents into the website's `crm` folder, including hidden files, without adding an extra directory level.
 
 Do not commit `api/config.php`, environment files, upload folders, ZIP archives, database exports or local migration scripts. GitHub Pages must never receive the PHP folder or production database configuration.
