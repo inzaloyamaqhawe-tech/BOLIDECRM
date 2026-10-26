@@ -1,3 +1,4 @@
+import {firstYearValue,pipelineValues} from '../lib/pipeline-values';
 import { useAuth } from "../lib/auth";
 import { StageTitle } from "../components/StageTitle";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -27,21 +28,15 @@ export function DashboardPage() {
   const {user}=useAuth();
   const tasks=allTasks.filter(t=>t.assigneeId===user?.id);
 
-  const openDeals = deals.filter((d) => d.stage !== "won" && d.stage !== "lost");
-  const totalPipeline = openDeals.reduce((s, d) => s + d.onceOff, 0);
-  const weightedPipeline = openDeals.reduce((s, d) => {
-    const stage = stages.find((st) => st.key === d.stage);
-    return s + d.onceOff * ((stage?.probability ?? 0) / 100);
-  }, 0);
-  const mrrPipeline = openDeals.reduce((s, d) => s + d.mrr, 0);
-  const arrPipeline = mrrPipeline * 12;
+  const totals=pipelineValues(deals,stages);
+  const openDeals=totals.open,totalPipeline=totals.total,weightedPipeline=totals.weighted,mrrPipeline=totals.mrr,arrPipeline=totals.mrr*12;
 
   const now = new Date();
   const monthKey = (iso: string) => new Intl.DateTimeFormat("en-ZA", { timeZone: "Africa/Johannesburg", year: "numeric", month: "2-digit" }).format(new Date(iso));
   const receivedThisMonth = deals.filter(d => (!d.leadTracker || !!d.receivedAt) && monthKey(d.receivedAt ?? d.createdAt) === monthKey(now.toISOString()));
   const monthlyStages = stages.map(stage => ({ stage, count: deals.filter(d => d.stage === stage.key && (stage.key==="won" ? !!d.workflow?.signedOn && monthKey(d.workflow.signedOn+"T12:00:00+02:00")===monthKey(now.toISOString()) : (!d.leadTracker || !!d.stageChangedAt) && monthKey(d.stageChangedAt ?? d.createdAt) === monthKey(now.toISOString()))).length }));
   const wonThisMonth = deals.filter((d) => d.stage === "won" && !!d.workflow?.signedOn && monthKey(d.workflow.signedOn+"T12:00:00+02:00") === monthKey(now.toISOString()));
-  const wonThisMonthValue = wonThisMonth.reduce((s, d) => s + d.onceOff, 0);
+  const wonThisMonthValue = wonThisMonth.reduce((s, d) => s + firstYearValue(d), 0);
 
   const wonCount = deals.filter((d) => d.stage === "won").length;
   const lostCount = deals.filter((d) => d.stage === "lost").length;
@@ -50,7 +45,7 @@ export function DashboardPage() {
 
   const byDivision = DIVISIONS.map((d) => ({
     name: d.name.replace("Bolide ", ""),
-    value: deals.filter((deal) => deal.division === d.key).reduce((s, deal) => s + deal.onceOff, 0),
+    value: openDeals.filter((deal) => deal.division === d.key).reduce((s, deal) => s + firstYearValue(deal), 0),
     key: d.key,
   }));
 
@@ -58,7 +53,7 @@ export function DashboardPage() {
     .filter((s) => s.key !== "won" && s.key !== "lost")
     .map((s) => ({
       name: s.label,
-      value: deals.filter((d) => d.stage === s.key).reduce((sum, d) => sum + d.onceOff, 0),
+      value: openDeals.filter((d) => d.stage === s.key).reduce((sum, d) => sum + firstYearValue(d), 0),
     }));
 
   // Overdue first, then soonest — a deal past its expected close date and

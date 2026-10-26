@@ -1,5 +1,6 @@
+import {applyScreenshotImport,screenshotImportVersion} from './screenshot-import';
 import { CrmApiError } from "./remote";
-import { localDuplicateMatches, normaliseDealText, mergeDraft, dealVersion, type DealDraft, type DealWriteOptions, type DuplicateMatch } from "./deal-duplicates";
+import { localDuplicateMatches, normaliseDealText, mergeDraft, rebaseDraft, dealVersion, type DealDraft, type DealWriteOptions, type DuplicateMatch } from "./deal-duplicates";
 import { nextOccurrence, stageWorkflow, workflowErrors } from "./workflow";
 import { api, hosted } from "./remote";
 import { matchDealContact } from "./contact-match";
@@ -126,13 +127,12 @@ const oldStages=load<Record<string,Partial<Stage>>>(KEYS.stageOverrides,{});
 for(const key of ["qualified","quote","won"]) if(oldStages[key]) delete oldStages[key].label;
 if(!hosted) save(KEYS.stageOverrides,oldStages);
 
-// Replace the preview starting dataset once, retaining accounts and sessions.
-if(!hosted && localStorage.getItem("bolide-crm:preview-dataset") !== PREVIEW_DATASET_VERSION) {
-  save(KEYS.companies,SEED_COMPANIES);save(KEYS.contacts,SEED_CONTACTS);save(KEYS.deals,SEED_DEALS);
-  save(KEYS.activities,[]);save(KEYS.tasks,[]);
-  localStorage.setItem("bolide-crm:preview-dataset",PREVIEW_DATASET_VERSION);
-  void resetPreviewAttachments().catch(()=>{});
+// Add starting records without deleting browser edits, notes, tasks or attachments.
+if(!hosted && localStorage.getItem('bolide-crm:preview-dataset')!==PREVIEW_DATASET_VERSION){
+ for(const [key,seeds] of [[KEYS.companies,SEED_COMPANIES],[KEYS.contacts,SEED_CONTACTS],[KEYS.deals,SEED_DEALS]] as const){const rows=load<any[]>(key,[]);save(key,[...rows,...seeds.filter(seed=>!rows.some(row=>row.id===seed.id))]);}
+ localStorage.setItem('bolide-crm:preview-dataset',PREVIEW_DATASET_VERSION);
 }
+if(!hosted&&localStorage.getItem('bolide-crm:screenshot-import')!==screenshotImportVersion){const imported=applyScreenshotImport({companies:getCompanies(),contacts:getContacts(),deals:getDeals()});save(KEYS.companies,imported.companies);save(KEYS.contacts,imported.contacts);save(KEYS.deals,imported.deals);localStorage.setItem('bolide-crm:screenshot-import',screenshotImportVersion);}
 
 function uid(prefix: string) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -516,7 +516,8 @@ export async function saveDealDraft(draft:DealDraft,options:DealWriteOptions):Pr
   window.dispatchEvent(new CustomEvent("crm-save-status",{detail:"All changes saved"}));return getDeal(result.id)!;
  }
  const before=options.sourceId?getDeal(options.sourceId):undefined;
- if(before&&await dealVersion(before,getContacts().find(c=>c.id===before.primaryContactId))!==options.sourceVersion)throw new Error("The deal changed. Reopen its latest details.");
+ if(before&&!options.baseDraft&&await dealVersion(before,getContacts().find(c=>c.id===before.primaryContactId))!==options.sourceVersion)throw new Error("The deal changed. Reopen its latest details.");
+ if(before&&options.baseDraft&&options.action==='update'){const person=getContacts().find(c=>c.id===before.primaryContactId);draft=rebaseDraft(options.baseDraft,draft,{deal:before,companyName:getCompany(before.companyId)?.name??'',contact:{name:person?.name??before.primaryContactName??'',phone:person?.phone??'',email:person?.email??''}});}
  let matches=await checkDealDuplicates(draft,options.sourceId),target:Deal|undefined;
  const incomingDraft=JSON.parse(JSON.stringify(draft)) as DealDraft;
  if(options.action==="merge"){
@@ -533,7 +534,7 @@ export async function saveDealDraft(draft:DealDraft,options:DealWriteOptions):Pr
  } else {
   const oldCompany=before?getCompany(before.companyId)?.name:undefined;
   const identityChanged=!before||normaliseDealText(oldCompany)!==normaliseDealText(draft.companyName)||before.division!==draft.deal.division||normaliseDealText(before.site)!==normaliseDealText(draft.deal.site)||normaliseDealText(before.productLine)!==normaliseDealText(draft.deal.productLine);
-  if(identityChanged&&matches.some(m=>m.potential&&(!options.separate||options.separate.reason.trim().length<5||!options.separate.matches.some(r=>r.id===m.deal.id&&r.version===m.version))))throw new CrmApiError("A similar deal exists. Review it before saving.",409,{matches});
+  if(!before&&matches.some(m=>m.potential&&(!options.separate||options.separate.reason.trim().length<5||!options.separate.matches.some(r=>r.id===m.deal.id&&r.version===m.version))))throw new CrmApiError("A similar deal exists. Review it before saving.",409,{matches});
  }
  const company=target?getCompany(target.companyId)!:getCompanies().find(c=>normaliseDealText(c.name)===normaliseDealText(draft.companyName))??createCompany({name:draft.companyName.trim(),industry:"—",status:"Prospect",divisions:[draft.deal.division!]});
  if(target&&incomingDraft.contact.name.trim()&&normaliseDealText(incomingDraft.contact.name)!==normaliseDealText(draft.contact.name))saveDealContact({companyId:company.id,...incomingDraft.contact});
@@ -544,7 +545,15 @@ export async function saveDealDraft(draft:DealDraft,options:DealWriteOptions):Pr
  let saved:Deal;
  if(target){updateDeal(target.id,payload);saved=getDeal(target.id)!;
   if(before){save(KEYS.activities,load<Activity[]>(KEYS.activities,[]).map(a=>a.dealId===before.id?{...a,dealId:target!.id}:a));save(KEYS.tasks,getTasks().map(t=>t.dealId===before.id?{...t,dealId:target!.id}:t));save(KEYS.deals,getDeals().filter(d=>d.id!==before.id));}
-  logActivity(target.id,"system","Merged "+(before?.title??"new draft")+" into this deal. Incoming information: "+JSON.stringify(incomingDraft));
+  logActivity(target.id,"system","Merged "+(before?.title??"new draft")+" into this deal.");
  }else if(before){updateDeal(before.id,payload);saved=getDeal(before.id)!;}else saved=createDeal({...payload,createdById:actorId});
  return saved;
+}
+
+export async function saveCompanyDeals(requests:({draft:DealDraft}&DealWriteOptions)[],requestId:string):Promise<Deal[]> {
+ await waitForCrmSave();
+ if(hosted){const result=await api('deals',{action:'batch',requests,requestId});remoteReady=false;for(const name of ['users','companies','contacts','deals','activities','tasks','divisionOverrides','stageOverrides'] as const)cache.set(KEYS[name],result.snapshot[name]);replaceRemoteAttachments(result.snapshot.attachments);remoteRevision=result.revision;remoteReady=true;notify();window.dispatchEvent(new CustomEvent('crm-save-status',{detail:'All changes saved'}));return result.ids.map((id:string)=>getDeal(id)!);}
+ const oldCache=new Map(cache),oldStorage=new Map<string,string>();for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key?.startsWith('bolide-crm:'))oldStorage.set(key,localStorage.getItem(key)!);}
+ try{const result:Deal[]=[];for(let i=0;i<requests.length;i++){try{const {draft,...options}=requests[i];result.push(await saveDealDraft(draft,options));}catch(e){if(e instanceof CrmApiError)e.details={...e.details,requestIndex:i};throw e;}}return result;}
+ catch(e){cache.clear();oldCache.forEach((v,k)=>cache.set(k,v));for(let i=localStorage.length-1;i>=0;i--){const key=localStorage.key(i);if(key?.startsWith('bolide-crm:')&&!oldStorage.has(key))localStorage.removeItem(key);}oldStorage.forEach((v,k)=>localStorage.setItem(k,v));notify();throw e;}
 }

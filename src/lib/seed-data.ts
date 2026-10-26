@@ -1,3 +1,4 @@
+import {applyScreenshotImport} from './screenshot-import';
 import { companies as trackerCompanies, contacts as trackerContacts, deals as trackerDeals, datasetVersion } from "../data/lead-tracker.json";
 import type { Company, Contact, Deal, Division, Stage, User, WholesalePackage } from "../types";
 
@@ -64,10 +65,11 @@ export const SEED_USERS: User[] = import.meta.env.BASE_URL === "/crm/" ? [] : [
   { id: "u-welcome", name: "Welcome Nyathi", email: "welcome@bolide.co.za", passwordHash: "", role: "rep" },
 ];
 
+const screenshotSeed=applyScreenshotImport({companies:trackerCompanies as Company[],contacts:trackerContacts as Contact[],deals:trackerDeals as Deal[]});
 export const PREVIEW_DATASET_VERSION = datasetVersion;
-export const SEED_COMPANIES: Company[] = import.meta.env.BASE_URL === "/crm/" ? [] : trackerCompanies as Company[];
-export const SEED_CONTACTS: Contact[] = import.meta.env.BASE_URL === "/crm/" ? [] : trackerContacts as Contact[];
-export const SEED_DEALS: Deal[] = import.meta.env.BASE_URL === "/crm/" ? [] : trackerDeals as Deal[];
+export const SEED_COMPANIES: Company[] = import.meta.env.BASE_URL === "/crm/" ? [] : screenshotSeed.companies;
+export const SEED_CONTACTS: Contact[] = import.meta.env.BASE_URL === "/crm/" ? [] : screenshotSeed.contacts;
+export const SEED_DEALS: Deal[] = import.meta.env.BASE_URL === "/crm/" ? [] : screenshotSeed.deals;
 
 export const WHOLESALE_CATALOGUE: WholesalePackage[] = [
   { package: "HB WTTB 6/6", family: "WTTB", access: "PTMP", nrc: 3478, m12: 1599, m24: 1099, m36: 999, m48: null, m60: null },

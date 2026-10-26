@@ -4,12 +4,14 @@ CRM for the Bolide Group, built with React, TypeScript and Vite, with a PHP/MySQ
 
 ## Two deployments
 
-- **GitHub Pages preview:** https://inzaloyamaqhawe-tech.github.io/BOLIDECRM/ ? builds use `/BOLIDECRM/`. Sign-in, pipeline data and changes are stored in the current browser. This preview does not connect to the production database. The preview now starts from the updated Lead Tracker workbook; its dataset is reset once when this version first loads, while accounts and sessions are retained.
-- **xneelo production:** https://bolide.co.za/crm/ ? builds use `/crm/`. Invited accounts, PHP sessions and shared MySQL records are used. HTTPS with a valid certificate is required. Certificate renewal was pending with xneelo Support on 7 October 2026.
+- **GitHub Pages preview:** https://inzaloyamaqhawe-tech.github.io/BOLIDECRM/ ? builds use `/BOLIDECRM/`. Sign-in, pipeline data and changes are stored in the current browser. This preview does not connect to the production database. Updated seed records are added without deleting browser-created records, accounts or sessions.
+- **xneelo production:** https://bolide.co.za/crm/ ? builds use `/crm/`. Invited accounts, PHP sessions and shared MySQL records are used over HTTPS.
 
 `main` contains source code. `gh-pages` contains the built static preview. Source changes alone do not update the preview; publish a new `/BOLIDECRM/` build to `gh-pages`.
 
 ## Latest changes
+
+- 26 October: one company workspace can create several solution opportunities in one atomic save; existing cards now persist contact and solution details; local drafts recover after refresh; simultaneous edits are reconciled field by field; ambiguous network retries are idempotent. Eighteen historical opportunity records were reconciled into the shared database as 13 additions and 5 updates without deleting the original 36 deals. Technical import messages are excluded from company-facing notes and activity. See `UPDATE-2026-10-26.md` and `UPLOAD-FILES-2026-10-26.txt`.
 
 - 21 October: live duplicate-opportunity review by company, solution/product and location; explicit field-by-field merges, source archive and related-record transfers; separate opportunities require an explanation when identities match. Xneelo migration applied without merging existing leads. See [the feature and deployment notes](DEAL-DUPLICATES-2026-10-21.md) and `UPLOAD-FILES-2026-10-21.txt` for the current upload list.
 
@@ -23,7 +25,7 @@ CRM for the Bolide Group, built with React, TypeScript and Vite, with a PHP/MySQ
 - Xneelo's database was backed up and migrated without replacing existing leads or accounts. See [the current upload instructions](UPDATE-2026-10-16.md).
 - Desktop notifications need valid HTTPS, browser permission and an open/minimised CRM tab. Closed-browser push is not configured.
 
-- The 14 October tracker import replaces the prior pipeline with 36 leads from 37 workbook rows, consolidating duplicate Sasol Raceway entries. Stages: 21 Qualify/KYC, 14 Preliminary Proposal, 1 Lost. Approval means modelling approval and does not imply Negotiation or Won. Full source rows are preserved in each lead's metadata and notes.
+- The 14 October tracker import created 36 leads from 37 workbook rows, consolidating duplicate Sasol Raceway entries. The 26 October reconciliation retained all 36 and added or enriched the historical opportunity records. Approval means modelling approval and does not imply Negotiation or Won. Source evidence is retained in private metadata and the import archive rather than displayed as sales notes.
 - Deals scroll within the table; table headings and search/filter controls remain visible.
 
 - The deal form captures contact name, cell/phone and optional email. Saving creates or updates the company contact and links it to the deal. Existing contacts can be selected by name; contacts from other companies are kept separate.
@@ -67,7 +69,7 @@ The PHP/database integration check in `test_hosted.py` requires a local, private
 
 ## Production setup
 
-See [UPLOAD-INSTRUCTIONS.md](UPLOAD-INSTRUCTIONS.md) for individual file uploads, root redirect exceptions, and HTTPS requirements. The existing production database was populated with 36 leads, 36 companies, 1 named contact and 7 existing users. Do not reinitialize that database.
+See [UPLOAD-INSTRUCTIONS.md](UPLOAD-INSTRUCTIONS.md) for individual file uploads, root redirect exceptions, and HTTPS requirements. The existing production database contains 49 preserved and reconciled deals and 8 users. Do not reinitialize that database.
 
 For a new installation, import `database/schema.sql` into an empty MySQL/MariaDB database, then copy `api/config.example.php` to `api/config.php` and set credentials privately. PHP 8.2+ with PDO MySQL and Apache rewrite support is required.
 
@@ -77,4 +79,4 @@ Do not commit `api/config.php`, environment files, upload folders, ZIP archives,
 
 ## Limitations
 
-GitHub Pages authentication is only a browser-local preview; its accounts are separate from production. Invitations create account records but do not send email. Reports' MRR trend remains a synthetic chart, not a historical time series. Public holidays are not yet excluded from proposal deadlines. Production is ready for secure access only after the hosting certificate is valid.
+GitHub Pages authentication is only a browser-local preview; its accounts are separate from production. Invitations create account records but do not send email. Reports' MRR trend remains a synthetic chart, not a historical time series. Desktop notifications require an open or minimised CRM browser tab.

@@ -1,6 +1,8 @@
+import {CompanyDealModal} from './CompanyDealModal';
+import {SolutionDetails,cleanSolutionDetails,parseAmount} from './SolutionDetails';
 import { DealDuplicatePanel, targetDraft } from "./DealDuplicatePanel";
 import { CrmApiError } from "../lib/remote";
-import { dealVersion, normaliseDealText, type DealDraft, type DuplicateMatch } from "../lib/deal-duplicates";
+import { DealFieldConflict, canonical, dealVersion, normaliseDealText, type DealDraft, type DuplicateMatch } from "../lib/deal-duplicates";
 import { WorkflowFields } from "./WorkflowFields";
 import { TaskEditor } from "./TaskEditor";
 import { workflowErrors } from "../lib/workflow";
@@ -40,7 +42,7 @@ const SEGMENTS: Segment[] = ["Commercial", "Industrial", "Forecourt", "MDU"];
 // dropdown of these four now, not a free-text field suggesting a division's
 // product lines.
 const PRODUCT_LINES = ["Water", "Security", "Solar", "Fibre"];
-const optionalNumber=(value:string)=>value.trim()===""?undefined:Number(value);
+const optionalNumber=(value:string)=>value.trim()===""?undefined:parseAmount(value);
 
 interface Props {
   /** Pass an existing deal to edit/view it; omit to create a new one. */
@@ -58,66 +60,75 @@ interface Props {
  * between stages — there was no way to see what a client was actually
  * quoted before it became a Deal).
  */
-export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Props) {
+export function DealModal(props:Props){return props.deal?<SingleDealEditor {...props}/>:<CompanyDealModal defaultDivision={props.defaultDivision} defaultStage={props.defaultStage} onClose={props.onClose}/>;}
+export function SingleDealEditor({ deal, defaultDivision, defaultStage, onClose }: Props) {
   const { user } = useAuth();
   const { show: showToast } = useToast();
   const companies = useCompanies();
   const users = useUsers();
   const contacts = useContacts();
   const linkedContact=contacts.find(c=>c.id===deal?.primaryContactId) ?? contacts.find(c=>c.companyId===deal?.companyId && c.name.toLowerCase()===deal?.primaryContactName?.toLowerCase());
-  const [copyMode,setCopyMode]=useState(false);
+  const draftStorageKey='crm:deal-draft:'+user?.id+':'+(deal?.id??'new');
+  const restored=useRef<any>((()=>{try{return JSON.parse(sessionStorage.getItem(draftStorageKey)??'null');}catch{return null;}})());
+  const initialDeal={...deal,...restored.current?.draft?.deal} as Partial<Deal>;
+  const baseline=useRef<DealDraft>(restored.current?.baseline??{companyName:companies.find(c=>c.id===deal?.companyId)?.name??'',contact:{name:linkedContact?.name??deal?.primaryContactName??'',phone:linkedContact?.phone??'',email:linkedContact?.email??''},deal:JSON.parse(JSON.stringify(deal??{}))});
+  const closeEditorRef=useRef(onClose);
+  const [extraDetails,setExtraDetails]=useState<Partial<Deal>>({energyDetails:initialDeal.energyDetails,waterDetails:initialDeal.waterDetails,connectDetails:initialDeal.connectDetails});
+  const [addSolutionsSeed,setAddSolutionsSeed]=useState<Deal>();
+  const [copyMode,setCopyMode]=useState(!!restored.current?.copyMode);
   const isNew = copyMode || !deal;
   const divisions = getDivisions();
   const stages = getStagesLive();
 
-  const [title, setTitle] = useState(deal?.title ?? "");
-  const [companyName, setCompanyName] = useState(() => companies.find((c) => c.id === deal?.companyId)?.name ?? "");
-  const [primaryContactName, setPrimaryContactName] = useState(linkedContact?.name ?? deal?.primaryContactName ?? "");
-  const [contactPhone, setContactPhone] = useState(linkedContact?.phone ?? "");
-  const [contactEmail, setContactEmail] = useState(linkedContact?.email ?? "");
-  const [division, setDivision] = useState<DivisionKey>(deal?.division ?? defaultDivision ?? "secure");
-  const [segment, setSegment] = useState<Segment | "">(deal?.segment ?? "");
-  const [site, setSite] = useState(deal?.site ?? "");
-  const [productLine, setProductLine] = useState(deal?.productLine ?? "");
-  const [stage, setStage] = useState<StageKey>(deal?.stage ?? defaultStage ?? "lead");
-  const [lostReason, setLostReason] = useState(deal?.lostReason ?? "");
-  const [onceOff, setOnceOff] = useState(deal?.onceOff?.toString() ?? "0");
-  const [mrr, setMrr] = useState(deal?.mrr?.toString() ?? "0");
-  const [ownerId, setOwnerId] = useState(deal?.ownerId ?? users[0]?.id ?? "");
-  const [closeDate, setCloseDate] = useState(deal?.closeDate ?? "");
-  const [notes, setNotes] = useState(deal?.notes ?? "");
+  const [title, setTitle] = useState(initialDeal?.title ?? "");
+  const [companyName, setCompanyName] = useState(restored.current?.draft?.companyName??companies.find(c=>c.id===deal?.companyId)?.name??"");
+  const [primaryContactName, setPrimaryContactName] = useState(restored.current?.draft?.contact?.name??linkedContact?.name??initialDeal?.primaryContactName??"");
+  const [contactPhone, setContactPhone] = useState(restored.current?.draft?.contact?.phone??linkedContact?.phone??"");
+  const [contactEmail, setContactEmail] = useState(restored.current?.draft?.contact?.email??linkedContact?.email??"");
+  const [division, setDivision] = useState<DivisionKey>(initialDeal?.division ?? defaultDivision ?? "secure");
+  const [segment, setSegment] = useState<Segment | "">(initialDeal?.segment ?? "");
+  const [site, setSite] = useState(initialDeal?.site ?? "");
+  const [productLine, setProductLine] = useState(initialDeal?.productLine ?? "");
+  const [stage, setStage] = useState<StageKey>(initialDeal?.stage ?? defaultStage ?? "lead");
+  const [lostReason, setLostReason] = useState(initialDeal?.lostReason ?? "");
+  const [onceOff, setOnceOff] = useState(restored.current?.rawNumbers?.onceOff??initialDeal?.onceOff?.toString() ?? "0");
+  const [mrr, setMrr] = useState(restored.current?.rawNumbers?.mrr??initialDeal?.mrr?.toString() ?? "0");
+  const [ownerId, setOwnerId] = useState(initialDeal?.ownerId ?? users[0]?.id ?? "");
+  const [closeDate, setCloseDate] = useState(initialDeal?.closeDate ?? "");
+  const [notes, setNotes] = useState(initialDeal?.notes ?? "");
 
-  const [camerasInstalled, setCamerasInstalled] = useState(deal?.secureDetails?.camerasInstalled?.toString() ?? "");
-  const [camerasMonitored, setCamerasMonitored] = useState(deal?.secureDetails?.camerasMonitored?.toString() ?? "");
-  const [solarKwp, setSolarKwp] = useState(deal?.energyDetails?.solarKwp?.toString() ?? "");
-  const [bessKwh, setBessKwh] = useState(deal?.energyDetails?.bessKwh?.toString() ?? "");
-  const [ratePerKwh, setRatePerKwh] = useState(deal?.energyDetails?.ratePerKwh?.toString() ?? "");
-  const [litresPerDay, setLitresPerDay] = useState(deal?.waterDetails?.litresPerDay?.toString() ?? "");
+  const [camerasInstalled, setCamerasInstalled] = useState(restored.current?.rawNumbers?.camerasInstalled??initialDeal?.secureDetails?.camerasInstalled?.toString() ?? "");
+  const [camerasMonitored, setCamerasMonitored] = useState(restored.current?.rawNumbers?.camerasMonitored??initialDeal?.secureDetails?.camerasMonitored?.toString() ?? "");
+  const [solarKwp, setSolarKwp] = useState(restored.current?.rawNumbers?.solarKwp??initialDeal?.energyDetails?.solarKwp?.toString() ?? "");
+  const [bessKwh, setBessKwh] = useState(restored.current?.rawNumbers?.bessKwh??initialDeal?.energyDetails?.bessKwh?.toString() ?? "");
+  const [ratePerKwh, setRatePerKwh] = useState(restored.current?.rawNumbers?.ratePerKwh??initialDeal?.energyDetails?.ratePerKwh?.toString() ?? "");
+  const [litresPerDay, setLitresPerDay] = useState(restored.current?.rawNumbers?.litresPerDay??initialDeal?.waterDetails?.litresPerDay?.toString() ?? "");
 
-  const [bankModelStatus, setBankModelStatus] = useState<BankModelStatus | "">(deal?.financingDetails?.bankModelStatus ?? "");
-  const [contractSignatureDate, setContractSignatureDate] = useState(deal?.financingDetails?.contractSignatureDate ?? "");
-  const [operationsStartDate, setOperationsStartDate] = useState(deal?.financingDetails?.operationsStartDate ?? "");
-  const [capexPpa, setCapexPpa] = useState(deal?.financingDetails?.capexPpa?.toString() ?? "");
-  const [capexRental, setCapexRental] = useState(deal?.financingDetails?.capexRental?.toString() ?? "");
-  const [ppaIrr, setPpaIrr] = useState(deal?.financingDetails?.ppaIrr?.toString() ?? "");
-  const [rentalIrr, setRentalIrr] = useState(deal?.financingDetails?.rentalIrr?.toString() ?? "");
+  const [bankModelStatus, setBankModelStatus] = useState<BankModelStatus | "">(initialDeal?.financingDetails?.bankModelStatus ?? "");
+  const [contractSignatureDate, setContractSignatureDate] = useState(initialDeal?.financingDetails?.contractSignatureDate ?? "");
+  const [operationsStartDate, setOperationsStartDate] = useState(initialDeal?.financingDetails?.operationsStartDate ?? "");
+  const [capexPpa, setCapexPpa] = useState(restored.current?.rawNumbers?.capexPpa??initialDeal?.financingDetails?.capexPpa?.toString() ?? "");
+  const [capexRental, setCapexRental] = useState(restored.current?.rawNumbers?.capexRental??initialDeal?.financingDetails?.capexRental?.toString() ?? "");
+  const [ppaIrr, setPpaIrr] = useState(restored.current?.rawNumbers?.ppaIrr??initialDeal?.financingDetails?.ppaIrr?.toString() ?? "");
+  const [rentalIrr, setRentalIrr] = useState(restored.current?.rawNumbers?.rentalIrr??initialDeal?.financingDetails?.rentalIrr?.toString() ?? "");
 
-  const [receivedAt, setReceivedAt] = useState(deal?.leadTracker ? (deal.leadTracker.enquiryReceived ?? "") : (deal?.receivedAt ?? deal?.createdAt ?? new Date().toISOString()).slice(0,10));
-  const [workflow,setWorkflow]=useState<DealWorkflow>(deal?.workflow??{});
+  const [receivedAt, setReceivedAt] = useState(restored.current?.rawNumbers?.receivedAt??(initialDeal?.leadTracker ? (initialDeal.leadTracker!.enquiryReceived ?? "") : (initialDeal?.receivedAt ?? initialDeal?.createdAt ?? new Date().toISOString()).slice(0,10)));
+  const [workflow,setWorkflow]=useState<DealWorkflow>(initialDeal?.workflow??{});
   const [showTask,setShowTask]=useState(false);
   const [error, setError] = useState("");
+  const [fieldConflict,setFieldConflict]=useState<{field:string;current:any;incoming:any}>();
   const [matches,setMatches]=useState<DuplicateMatch[]>([]),[checking,setChecking]=useState(false),[duplicateError,setDuplicateError]=useState(""),[mergeTarget,setMergeTarget]=useState<DuplicateMatch|null>(null),[mergeChoices,setMergeChoices]=useState<string[]>([]),[separateReason,setSeparateReason]=useState(""),[forceReview,setForceReview]=useState(false),[saving,setSaving]=useState(false),[openExisting,setOpenExisting]=useState<Deal>();
   const saveBusy=useRef(false);
 
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [newNote, setNewNote] = useState("");
+  const [newNote, setNewNote] = useState(restored.current?.newNote??"");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape" && !saveBusy.current) onClose();
+      if (e.key === "Escape" && !saveBusy.current) closeEditorRef.current();
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
@@ -145,7 +156,8 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
         companies.map((c) => c.name)
       );
 
-  async function handleSave() {
+  async function handleSave(addSolutions=false) {
+    if([onceOff,mrr,camerasInstalled,camerasMonitored,solarKwp,bessKwh,ratePerKwh,litresPerDay,capexPpa,capexRental,ppaIrr,rentalIrr].some(v=>v.trim()!==''&&(!Number.isFinite(parseAmount(v))||parseAmount(v)<0))){setError('Enter valid non-negative numeric amounts; a decimal point or comma is accepted.');return;}
     if((contactPhone.trim() || contactEmail.trim()) && !primaryContactName.trim()) {setError("Enter the contact person's name.");return;}
     if(contactEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail.trim())) {setError("Enter a valid contact email address.");return;}
     if (!receivedAt && !deal?.leadTracker) { setError("Enter the lead received date."); return; }
@@ -163,12 +175,13 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
       return;
     }
     if(saveBusy.current)return;
-    const candidate={...(!isNew?deal:{}),id:!isNew?deal?.id:"new",stage,receivedAt:receivedAt?receivedAt+"T08:00:00+02:00":undefined,lostReason,workflow} as Deal;
+    const receiptValue=!isNew&&(!receivedAt||receivedAt===(deal?.receivedAt??deal?.leadTracker?.enquiryReceived??'').slice(0,10))?deal?.receivedAt:receivedAt?receivedAt+'T08:00:00+02:00':undefined;
+    const candidate={...(!isNew?deal:{}),id:!isNew?deal?.id:"new",stage,receivedAt:receiptValue,lostReason,workflow} as Deal;
     const validation=workflowErrors(candidate,isNew?undefined:deal,attachments);
     if(validation.length){setError(validation.join(" "));return;}
     const payload = {
       workflow,
-      receivedAt: receivedAt ? receivedAt + "T08:00:00+02:00" : undefined,
+      receivedAt: receiptValue,
       title: title.trim(),
       primaryContactName: primaryContactName.trim() || undefined,
       site: site.trim() || undefined,
@@ -177,8 +190,8 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
       productLine: productLine.trim() || undefined,
       stage,
       lostReason: stage === "lost" ? lostReason.trim() : undefined,
-      onceOff: Number(onceOff) || 0,
-      mrr: Number(mrr) || 0,
+      onceOff: parseAmount(onceOff),
+      mrr: parseAmount(mrr),
       ownerId,
       closeDate: closeDate || undefined,
       notes: notes.trim() || undefined,
@@ -188,13 +201,14 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
           : deal?.secureDetails,
       energyDetails:
         division === "energy"
-          ? {
+          ? {...extraDetails.energyDetails,
               solarKwp: optionalNumber(solarKwp),
               bessKwh: optionalNumber(bessKwh),
               ratePerKwh: optionalNumber(ratePerKwh),
             }
           : deal?.energyDetails,
-      waterDetails: division === "water" ? { litresPerDay: optionalNumber(litresPerDay) } : deal?.waterDetails,
+      connectDetails: extraDetails.connectDetails,
+      waterDetails: division === "water" ? {...extraDetails.waterDetails, litresPerDay: optionalNumber(litresPerDay) } : deal?.waterDetails,
       financingDetails:
         division === "energy"
           ? {
@@ -210,17 +224,29 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
     };
 
     const draft:DealDraft={companyName:trimmedName,contact:{name:primaryContactName.trim(),phone:contactPhone.trim(),email:contactEmail.trim()},deal:payload};
+    try{draft.deal=cleanSolutionDetails(draft.deal);}catch(e){setError((e as Error).message);return;}
     setError("");setSaving(true);saveBusy.current=true;
     try {
       const latest=await checkDealDuplicates(draft,isNew?undefined:deal?.id);setMatches(latest);
       const identityChanged=isNew||normaliseDealText(companies.find(c=>c.id===deal?.companyId)?.name)!==normaliseDealText(companyName)||division!==deal?.division||normaliseDealText(site)!==normaliseDealText(deal?.site)||normaliseDealText(productLine)!==normaliseDealText(deal?.productLine);
-      if(!mergeTarget&&identityChanged&&latest.some(m=>m.potential)&&separateReason.trim().length<5){setForceReview(true);return;}
-      if(!mergeTarget&&identityChanged&&separateReason.trim().length>=5&&latest.some(m=>m.potential&&!matches.some(old=>old.deal.id===m.deal.id&&old.version===m.version))){setError("New or changed matching information appeared. Review it before confirming a separate opportunity.");setForceReview(true);return;}
-      const saved=await saveDealDraft(draft,{action:mergeTarget?"merge":isNew?"create":"update",sourceId:isNew?undefined:deal?.id,sourceVersion:!isNew&&deal?await dealVersion(deal,contacts.find(c=>c.id===deal.primaryContactId)):undefined,targetId:mergeTarget?.deal.id,targetVersion:mergeTarget?.version,choices:mergeChoices,separate:separateReason.trim().length>=5?{reason:separateReason.trim(),matches:matches.filter(m=>m.potential).map(m=>({id:m.deal.id,version:m.version}))}:undefined});
-      showToast(mergeTarget?"Deal merged; related records preserved":"Deal saved");onClose();
-    }catch(e){setError((e as Error).message);if(e instanceof CrmApiError&&e.details?.matches){setMatches(e.details.matches);setForceReview(true);if(mergeTarget){const fresh=e.details.matches.find((m:DuplicateMatch)=>m.deal.id===mergeTarget.deal.id);setMergeTarget(fresh??null);}}}
+      if(!mergeTarget&&isNew&&latest.some(m=>m.potential)&&separateReason.trim().length<5){setForceReview(true);return;}
+      if(!mergeTarget&&isNew&&separateReason.trim().length>=5&&latest.some(m=>m.potential&&!matches.some(old=>old.deal.id===m.deal.id&&old.version===m.version))){setError("New or changed matching information appeared. Review it before confirming a separate opportunity.");setForceReview(true);return;}
+      const saved=await saveDealDraft(draft,{action:mergeTarget?"merge":isNew?"create":"update",sourceId:isNew?undefined:deal?.id,baseDraft:!isNew?baseline.current:undefined,sourceVersion:!isNew&&deal?await dealVersion(deal,contacts.find(c=>c.id===deal.primaryContactId)):undefined,targetId:mergeTarget?.deal.id,targetVersion:mergeTarget?.version,choices:mergeChoices,separate:separateReason.trim().length>=5?{reason:separateReason.trim(),matches:matches.filter(m=>m.potential).map(m=>({id:m.deal.id,version:m.version}))}:undefined});
+      sessionStorage.removeItem(draftStorageKey);restored.current=null;showToast(mergeTarget?"Deal merged; related records preserved":"Deal saved");if(addSolutions)setAddSolutionsSeed(saved);else onClose();
+    }catch(e){setError((e as Error).message);if(e instanceof DealFieldConflict)setFieldConflict(e);if(e instanceof CrmApiError&&e.details?.fieldConflict)setFieldConflict(e.details.fieldConflict);if(e instanceof CrmApiError&&e.details?.matches){setMatches(e.details.matches);setForceReview(true);if(mergeTarget){const fresh=e.details.matches.find((m:DuplicateMatch)=>m.deal.id===mergeTarget.deal.id);setMergeTarget(fresh??null);}}}
     finally{setSaving(false);saveBusy.current=false;}
   }
+
+  function resolveField(keepLatest:boolean){
+    if(!fieldConflict)return;const {field,current}=fieldConflict;
+    function put(root:any,path:string,value:any){const keys=path.split('.');let node=root;for(const key of keys.slice(0,-1))node=node[key]??={};if(value===null||value===undefined)delete node[keys[keys.length-1]];else node[keys[keys.length-1]]=value;}
+    const base=structuredClone(baseline.current);if(field==='company')base.companyName=current??'';else if(field.startsWith('contact.'))put(base.contact,field.slice(8),current);else put(base.deal,field,current);baseline.current=base;
+    if(keepLatest){
+      const setters:Record<string,(value:any)=>void>={company:setCompanyName,title:setTitle,site:setSite,division:setDivision,segment:setSegment,productLine:setProductLine,stage:setStage,lostReason:setLostReason,ownerId:setOwnerId,closeDate:setCloseDate,notes:setNotes,'contact.name':setPrimaryContactName,'contact.phone':setContactPhone,'contact.email':setContactEmail,onceOff:setOnceOff,mrr:setMrr,'secureDetails.camerasInstalled':setCamerasInstalled,'secureDetails.camerasMonitored':setCamerasMonitored,'energyDetails.solarKwp':setSolarKwp,'energyDetails.bessKwh':setBessKwh,'energyDetails.ratePerKwh':setRatePerKwh,'waterDetails.litresPerDay':setLitresPerDay,'financingDetails.bankModelStatus':setBankModelStatus,'financingDetails.contractSignatureDate':setContractSignatureDate,'financingDetails.operationsStartDate':setOperationsStartDate,'financingDetails.capexPpa':setCapexPpa,'financingDetails.capexRental':setCapexRental,'financingDetails.ppaIrr':setPpaIrr,'financingDetails.rentalIrr':setRentalIrr};
+      if(field==='receivedAt')setReceivedAt(current?.slice(0,10)??'');else if(setters[field])setters[field](current===null||current===undefined?'':String(current));else if(field.startsWith('workflow.'))setWorkflow(old=>{const next=structuredClone(old);put(next,field.slice(9),current);return next;});else setExtraDetails(old=>{const next=structuredClone(old);put(next,field,current);return next;});
+    }setFieldConflict(undefined);setError('');showToast('Value selected. Save the deal to apply your choice.');
+  }
+  function conflictValue(value:any):string{return value===null||value===undefined?'Not recorded':Array.isArray(value)?value.map(v=>typeof v==='object'?[v.label,v.status].filter(Boolean).join(': '):String(v)).join('\n'):typeof value==='object'?Object.values(value).join(' ? '):String(value);}
 
   function handleDelete() {
     if (!deal || saveBusy.current) return;
@@ -272,12 +298,18 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
     return users.find((u) => u.id === id)?.name ?? "Unknown";
   }
 
-  const liveDraft:DealDraft={companyName,contact:{name:primaryContactName,phone:contactPhone,email:contactEmail},deal:{title,division,productLine:productLine||undefined,site:site||undefined,stage,onceOff:Number(onceOff)||0,mrr:Number(mrr)||0,ownerId,closeDate:closeDate||undefined,notes,receivedAt:receivedAt?receivedAt+"T08:00:00+02:00":undefined,workflow}};
+  const liveDraft:DealDraft={companyName,contact:{name:primaryContactName,phone:contactPhone,email:contactEmail},deal:{title,division,productLine:productLine||undefined,site:site||undefined,stage,onceOff:parseAmount(onceOff)||0,mrr:parseAmount(mrr)||0,ownerId,closeDate:closeDate||undefined,notes,receivedAt:receivedAt?receivedAt+"T08:00:00+02:00":undefined,workflow}};
   useEffect(()=>{if(companyName.trim().length<3){setMatches([]);return;}let cancelled=false;setChecking(true);const timer=setTimeout(()=>{checkDealDuplicates(liveDraft,isNew?undefined:deal?.id).then(rows=>{if(!cancelled){setMatches(rows);setDuplicateError("");}}).catch(e=>{if(!cancelled)setDuplicateError(e.message);}).finally(()=>{if(!cancelled)setChecking(false);});},350);return()=>{cancelled=true;clearTimeout(timer);};},[companyName,division,productLine,site,title,isNew,deal?.id]);
-  const reviewDraft:DealDraft={...liveDraft,deal:{...liveDraft.deal,segment:segment||undefined,lostReason:lostReason||undefined,secureDetails:division==="secure"?{camerasInstalled:optionalNumber(camerasInstalled),camerasMonitored:optionalNumber(camerasMonitored)}:deal?.secureDetails,energyDetails:division==="energy"?{solarKwp:optionalNumber(solarKwp),bessKwh:optionalNumber(bessKwh),ratePerKwh:optionalNumber(ratePerKwh)}:deal?.energyDetails,waterDetails:division==="water"?{litresPerDay:optionalNumber(litresPerDay)}:deal?.waterDetails,financingDetails:division==="energy"?{bankModelStatus:bankModelStatus||undefined,contractSignatureDate:contractSignatureDate||undefined,operationsStartDate:operationsStartDate||undefined,capexPpa:optionalNumber(capexPpa),capexRental:optionalNumber(capexRental),ppaIrr:optionalNumber(ppaIrr),rentalIrr:optionalNumber(rentalIrr)}:deal?.financingDetails}};
+  const reviewDraft:DealDraft={...liveDraft,deal:{...liveDraft.deal,segment:segment||undefined,lostReason:lostReason||undefined,secureDetails:division==="secure"?{camerasInstalled:optionalNumber(camerasInstalled),camerasMonitored:optionalNumber(camerasMonitored)}:deal?.secureDetails,energyDetails:division==="energy"?{...extraDetails.energyDetails,solarKwp:optionalNumber(solarKwp),bessKwh:optionalNumber(bessKwh),ratePerKwh:optionalNumber(ratePerKwh)}:deal?.energyDetails,connectDetails:extraDetails.connectDetails,waterDetails:division==="water"?{...extraDetails.waterDetails,litresPerDay:optionalNumber(litresPerDay)}:deal?.waterDetails,financingDetails:division==="energy"?{bankModelStatus:bankModelStatus||undefined,contractSignatureDate:contractSignatureDate||undefined,operationsStartDate:operationsStartDate||undefined,capexPpa:optionalNumber(capexPpa),capexRental:optionalNumber(capexRental),ppaIrr:optionalNumber(ppaIrr),rentalIrr:optionalNumber(rentalIrr)}:deal?.financingDetails}};
+  const signature=canonical(reviewDraft),initialSignature=useRef(signature);
+  const hasDraftChanges=signature!==initialSignature.current||!!restored.current||!!newNote.trim();
+  useEffect(()=>{try{if(hasDraftChanges)sessionStorage.setItem(draftStorageKey,JSON.stringify({draft:reviewDraft,baseline:baseline.current,copyMode,newNote,rawNumbers:{receivedAt,onceOff,mrr,camerasInstalled,camerasMonitored,solarKwp,bessKwh,ratePerKwh,litresPerDay,capexPpa,capexRental,ppaIrr,rentalIrr}}));else sessionStorage.removeItem(draftStorageKey);}catch{}},[signature,newNote,copyMode,receivedAt,onceOff,mrr,camerasInstalled,camerasMonitored,solarKwp,bessKwh,ratePerKwh,litresPerDay,capexPpa,capexRental,ppaIrr,rentalIrr]);
+  useEffect(()=>{const handler=(e:BeforeUnloadEvent)=>{if(hasDraftChanges){e.preventDefault();e.returnValue='';}};window.addEventListener('beforeunload',handler);return()=>window.removeEventListener('beforeunload',handler);},[hasDraftChanges]);
+  closeEditorRef.current=()=>{if(saving)return;if(hasDraftChanges&&!window.confirm('Discard the unsaved changes to this deal?'))return;sessionStorage.removeItem(draftStorageKey);onClose();};
+  if(addSolutionsSeed)return <CompanyDealModal seed={addSolutionsSeed} defaultDivision={division} onClose={onClose}/>;
   if(openExisting)return <DealModal deal={openExisting} onClose={onClose}/>;
   return (
-    <div role="dialog" aria-modal="true" aria-label="Lead details" className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-12" onClick={()=>{if(!saving)onClose();}}>
+    <div role="dialog" aria-modal="true" aria-label="Lead details" className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-12" onClick={()=>closeEditorRef.current()}>
       <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <fieldset disabled={saving} className="m-0 min-w-0 border-0 p-0">
         <div className="mb-4 flex items-start justify-between">
@@ -285,11 +317,12 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
             <DivisionBadge division={division} />
             {!isNew && <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-semibold text-neutral-600">{stages.find(s=>s.key===stage)?.label}</span>}
           </div>
-          <button disabled={saving} onClick={onClose} className="rounded-full p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700">
+          <button disabled={saving} onClick={()=>closeEditorRef.current()} className="rounded-full p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700">
             <X className="h-5 w-5" />
           </button>
         </div>
 
+        {!isNew&&<button type="button" disabled={saving||uploading} onClick={()=>void handleSave(true)} className="mb-3 rounded-full border border-pink-300 px-4 py-2 text-sm font-bold text-pink-600">Save & add company solutions</button>}
         <h2 className="mb-1 text-xl font-black">{isNew ? "New deal" : deal!.title}</h2>
         {!isNew && (
           <p className="mb-4 text-sm text-neutral-500">
@@ -419,11 +452,11 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
           )}
 
           <Field label="Once-off (excl. VAT)">
-            <input type="number" value={onceOff} onChange={(e) => setOnceOff(e.target.value)} className="input" />
+            <input type="text" inputMode="decimal" value={onceOff} onChange={(e) => setOnceOff(e.target.value)} className="input" />
           </Field>
 
           <Field label="MRR (excl. VAT)">
-            <input type="number" value={mrr} onChange={(e) => setMrr(e.target.value)} className="input" />
+            <input type="text" inputMode="decimal" value={mrr} onChange={(e) => setMrr(e.target.value)} className="input" />
           </Field>
 
           <Field label="ARR (computed)">
@@ -448,10 +481,10 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
             <>
               <div className="sm:col-span-2 -mb-2 mt-2 text-xs font-bold uppercase tracking-widest text-neutral-400">Secure details</div>
               <Field label="Cameras installed">
-                <input type="number" value={camerasInstalled} onChange={(e) => setCamerasInstalled(e.target.value)} className="input" />
+                <input type="text" inputMode="decimal" value={camerasInstalled} onChange={(e) => setCamerasInstalled(e.target.value)} className="input" />
               </Field>
               <Field label="Cameras monitored">
-                <input type="number" value={camerasMonitored} onChange={(e) => setCamerasMonitored(e.target.value)} className="input" />
+                <input type="text" inputMode="decimal" value={camerasMonitored} onChange={(e) => setCamerasMonitored(e.target.value)} className="input" />
               </Field>
             </>
           )}
@@ -460,13 +493,13 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
             <>
               <div className="sm:col-span-2 -mb-2 mt-2 text-xs font-bold uppercase tracking-widest text-neutral-400">Energy details</div>
               <Field label="Solar (kWp)">
-                <input type="number" value={solarKwp} onChange={(e) => setSolarKwp(e.target.value)} className="input" />
+                <input type="text" inputMode="decimal" value={solarKwp} onChange={(e) => setSolarKwp(e.target.value)} className="input" />
               </Field>
               <Field label="BESS (kWh)">
-                <input type="number" value={bessKwh} onChange={(e) => setBessKwh(e.target.value)} className="input" />
+                <input type="text" inputMode="decimal" value={bessKwh} onChange={(e) => setBessKwh(e.target.value)} className="input" />
               </Field>
               <Field label="Rate (R/kWh)">
-                <input type="number" step="0.01" value={ratePerKwh} onChange={(e) => setRatePerKwh(e.target.value)} className="input" />
+                <input type="text" inputMode="decimal" step="0.01" value={ratePerKwh} onChange={(e) => setRatePerKwh(e.target.value)} className="input" />
               </Field>
 
               <div className="sm:col-span-2 -mb-2 mt-2 text-xs font-bold uppercase tracking-widest text-neutral-400">Financing</div>
@@ -484,16 +517,16 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
                 <input type="date" value={operationsStartDate} onChange={(e) => setOperationsStartDate(e.target.value)} className="input" />
               </Field>
               <Field label="Capex – PPA (incl. cont.)">
-                <input type="number" value={capexPpa} onChange={(e) => setCapexPpa(e.target.value)} className="input" />
+                <input type="text" inputMode="decimal" value={capexPpa} onChange={(e) => setCapexPpa(e.target.value)} className="input" />
               </Field>
               <Field label="Capex – Rental (incl. cont.)">
-                <input type="number" value={capexRental} onChange={(e) => setCapexRental(e.target.value)} className="input" />
+                <input type="text" inputMode="decimal" value={capexRental} onChange={(e) => setCapexRental(e.target.value)} className="input" />
               </Field>
               <Field label="PPA IRR (%)">
-                <input type="number" step="0.1" value={ppaIrr} onChange={(e) => setPpaIrr(e.target.value)} className="input" />
+                <input type="text" inputMode="decimal" step="0.1" value={ppaIrr} onChange={(e) => setPpaIrr(e.target.value)} className="input" />
               </Field>
               <Field label="Rental IRR (%)">
-                <input type="number" step="0.1" value={rentalIrr} onChange={(e) => setRentalIrr(e.target.value)} className="input" />
+                <input type="text" inputMode="decimal" step="0.1" value={rentalIrr} onChange={(e) => setRentalIrr(e.target.value)} className="input" />
               </Field>
             </>
           )}
@@ -502,11 +535,12 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
             <>
               <div className="sm:col-span-2 -mb-2 mt-2 text-xs font-bold uppercase tracking-widest text-neutral-400">Water details</div>
               <Field label="Litres / day">
-                <input type="number" value={litresPerDay} onChange={(e) => setLitresPerDay(e.target.value)} className="input" />
+                <input type="text" inputMode="decimal" value={litresPerDay} onChange={(e) => setLitresPerDay(e.target.value)} className="input" />
               </Field>
             </>
           )}
 
+          <SolutionDetails division={division} value={extraDetails} onChange={setExtraDetails} extrasOnly/>
           <WorkflowFields value={workflow} onChange={setWorkflow} stage={stage} attachments={attachments} isNew={isNew}/>
 
           <Field label="Notes" span={2}>
@@ -576,7 +610,8 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
           </div>
         )}
 
-        {error && <p className="mt-3 text-sm font-semibold text-red-600">{error}</p>}
+        {fieldConflict&&<section aria-label="Review changed field" className="mt-4 space-y-3 rounded-xl border border-amber-300 bg-amber-50 p-4"><h3 className="font-bold">Review a changed field</h3><p className="text-sm">{fieldConflict.field.replace(/([A-Z])/g,' $1').split('.').join(' / ')} changed while this form was open.</p><div className="grid gap-3 sm:grid-cols-2"><div className="whitespace-pre-wrap text-sm"><strong>Latest saved value</strong><p>{conflictValue(fieldConflict.current)}</p></div><div className="whitespace-pre-wrap text-sm"><strong>Your entered value</strong><p>{conflictValue(fieldConflict.incoming)}</p></div></div><div className="flex gap-4 text-sm font-bold"><button type="button" onClick={()=>resolveField(true)}>Keep latest value</button><button type="button" onClick={()=>resolveField(false)}>Use my value</button></div></section>}
+        {error && <p role="alert" className="mt-3 text-sm font-semibold text-red-600">{error}</p>}
 
         <div className="mt-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -592,12 +627,12 @@ export function DealModal({ deal, defaultDivision, defaultStage, onClose }: Prop
             )}
           </div>
           <div className="flex gap-3">
-            <button type="button" disabled={saving} onClick={onClose} className="rounded-full border border-neutral-200 px-5 py-2.5 text-sm font-semibold">
+            <button type="button" disabled={saving} onClick={()=>closeEditorRef.current()} className="rounded-full border border-neutral-200 px-5 py-2.5 text-sm font-semibold">
               Cancel
             </button>
             <button
               type="button"
-              onClick={handleSave}
+              onClick={()=>void handleSave()}
               disabled={saving||uploading}
               className="rounded-full bg-brand-gradient px-6 py-2.5 text-sm font-bold text-white shadow-brand"
             >

@@ -1,0 +1,417 @@
+{
+  "version": "screenshots-20261026-v1",
+  "ownerSource": "Existing matched record, otherwise historical CRM seed ownership (04182e6); additional ALT opportunities use the existing owner for that division/company.",
+  "records": [
+    {
+      "source": "Screenshot 2026-10-26 091256.png",
+      "companyName": "Lizhakandila",
+      "targetId": null,
+      "deal": {
+        "id": "d-screens-20261026-091256",
+        "title": "Lizhakandila ? Molepo Mall",
+        "site": "Molepo Mall",
+        "division": "secure",
+        "productLine": "Vumacam Monitoring",
+        "stage": "lost",
+        "onceOff": 1586523.88,
+        "mrr": 20150,
+        "ownerId": "u-suhail",
+        "secureDetails": {
+          "camerasInstalled": 81,
+          "camerasMonitored": 23
+        },
+        "lostReason": "Reason not recorded."
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091324.png",
+      "companyName": "AJ Properties",
+      "targetId": "d-tracker-35",
+      "deal": {
+        "id": "d-tracker-35",
+        "title": "AJ ? Inanda (Ikhwani)",
+        "site": "Inanda (Ikhwani)",
+        "division": "secure",
+        "productLine": "Vumacam Monitoring",
+        "stage": "quote",
+        "onceOff": 197351.43,
+        "mrr": 18600,
+        "ownerId": "u-suhail",
+        "secureDetails": {
+          "camerasInstalled": 20,
+          "camerasMonitored": 20
+        }
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091334.png",
+      "companyName": "AJ Properties",
+      "targetId": null,
+      "deal": {
+        "id": "d-screens-20261026-091334",
+        "title": "AJ ? Kingsburgh",
+        "site": "Kingsburgh",
+        "division": "secure",
+        "productLine": "Vumacam Monitoring",
+        "stage": "qualified",
+        "onceOff": 298022.29,
+        "mrr": 18500,
+        "ownerId": "u-suhail",
+        "secureDetails": {
+          "camerasInstalled": 20,
+          "camerasMonitored": 20
+        }
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091346.png",
+      "companyName": "ALT Capital Partners",
+      "targetId": "d-tracker-36",
+      "deal": {
+        "id": "d-tracker-36",
+        "title": "ALT ? Erica Square",
+        "site": "Erica Square",
+        "division": "secure",
+        "productLine": "Vumacam Monitoring",
+        "stage": "quote",
+        "onceOff": 405584.29,
+        "mrr": 18500,
+        "ownerId": "u-gianna",
+        "secureDetails": {
+          "camerasInstalled": 20,
+          "camerasMonitored": 20
+        }
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091359.png",
+      "companyName": "Lizhakandila",
+      "targetId": null,
+      "deal": {
+        "id": "d-screens-20261026-091359",
+        "title": "Lizhakandila ? Engen Tsakane",
+        "site": "Engen Tsakane",
+        "division": "secure",
+        "productLine": "Vumacam Monitoring",
+        "stage": "quote",
+        "onceOff": 33892.14,
+        "mrr": 9870,
+        "ownerId": "u-suhail",
+        "secureDetails": {
+          "camerasInstalled": 2,
+          "camerasMonitored": 12
+        }
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091409.png",
+      "companyName": "NewGx",
+      "targetId": null,
+      "deal": {
+        "id": "d-screens-20261026-091409",
+        "title": "NewGx ? Skipwaste",
+        "site": "Skipwaste",
+        "division": "secure",
+        "productLine": "Vumacam Monitoring",
+        "stage": "quote",
+        "onceOff": 407767.63,
+        "mrr": 18600,
+        "ownerId": "u-ravani",
+        "secureDetails": {
+          "camerasInstalled": 20,
+          "camerasMonitored": 20
+        }
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091428.png",
+      "companyName": "ALT Capital Partners",
+      "targetId": null,
+      "deal": {
+        "id": "d-screens-20261026-091428",
+        "title": "ALT ? Ganyesa",
+        "site": "Ganyesa",
+        "division": "energy",
+        "productLine": "Hybrid Solar + BESS",
+        "stage": "quote",
+        "onceOff": 3030000,
+        "mrr": 0,
+        "ownerId": "u-gianna",
+        "segment": "Commercial",
+        "energyDetails": {
+          "solarKwp": 250,
+          "ratePerKwh": 1.59,
+          "solutionType": "Solar + BESS",
+          "landlord": "ALT / Reimagine Retail Fund",
+          "anchorTenant": "Boxer",
+          "roofState": "Not set",
+          "timeframe": "Short-term",
+          "bessKwh": 300
+        }
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091456.png",
+      "companyName": "ALT Capital Partners",
+      "targetId": "d-tracker-28",
+      "deal": {
+        "id": "d-tracker-28",
+        "title": "ALT ? Ekuphumleni (Kenton)",
+        "site": "Ekuphumleni (Kenton)",
+        "division": "energy",
+        "productLine": "Hybrid Solar + BESS",
+        "stage": "quote",
+        "onceOff": 4230000,
+        "mrr": 0,
+        "ownerId": "u-gianna",
+        "segment": "Commercial",
+        "energyDetails": {
+          "solarKwp": 150,
+          "ratePerKwh": 1.68,
+          "solutionType": "Solar + BESS",
+          "landlord": "ALT / Reimagine Retail Fund",
+          "anchorTenant": "Retail anchor",
+          "roofState": "Not set",
+          "timeframe": "Short-term",
+          "bessKwh": 360
+        }
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091510.png",
+      "companyName": "BP Kew",
+      "targetId": "d-tracker-15",
+      "deal": {
+        "id": "d-tracker-15",
+        "title": "BP Kew (forecourt)",
+        "site": "BP Kew",
+        "division": "energy",
+        "productLine": "Solar PV",
+        "stage": "quote",
+        "onceOff": 640000,
+        "mrr": 0,
+        "ownerId": "u-khudusela",
+        "segment": "Forecourt",
+        "energyDetails": {
+          "solarKwp": 36,
+          "ratePerKwh": 2.42,
+          "solutionType": "Solar only",
+          "landlord": "BP",
+          "anchorTenant": "BP / Sasol",
+          "roofState": "Not set",
+          "timeframe": "Short-term"
+        }
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091528.png",
+      "companyName": "ALT Capital Partners",
+      "targetId": null,
+      "deal": {
+        "id": "d-screens-20261026-091528",
+        "title": "ALT ? Erica Square (Water Treatment Plant)",
+        "site": "Erica Square",
+        "division": "water",
+        "productLine": "Water Treatment Plant",
+        "stage": "quote",
+        "onceOff": 1100000,
+        "mrr": 0,
+        "ownerId": "u-khudusela",
+        "segment": "Commercial",
+        "waterDetails": {
+          "serviceModel": "Water-as-a-Service (WaaS)",
+          "wulaStatus": "To confirm",
+          "offBalanceSheet": true,
+          "solutions": [
+            "Recycle & re-use"
+          ]
+        }
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091545.png",
+      "companyName": "ALT Capital Partners",
+      "targetId": null,
+      "deal": {
+        "id": "d-screens-20261026-091545",
+        "title": "ALT ? Thembokwezi Square (Water Treatment Plant)",
+        "site": "Thembokwezi Square",
+        "division": "water",
+        "productLine": "Water Treatment Plant",
+        "stage": "quote",
+        "onceOff": 1100000,
+        "mrr": 0,
+        "ownerId": "u-khudusela",
+        "segment": "Commercial",
+        "waterDetails": {
+          "serviceModel": "Water-as-a-Service (WaaS)",
+          "wulaStatus": "To confirm",
+          "offBalanceSheet": true,
+          "solutions": [
+            "Recycle & re-use"
+          ]
+        }
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091607.png",
+      "companyName": "ALT Capital Partners",
+      "targetId": null,
+      "deal": {
+        "id": "d-screens-20261026-091607",
+        "title": "ALT ? Amsterdam KFC",
+        "site": "Amsterdam KFC",
+        "division": "energy",
+        "productLine": "Hybrid Solar + BESS",
+        "stage": "quote",
+        "onceOff": 4730000,
+        "mrr": 0,
+        "ownerId": "u-gianna",
+        "segment": "Commercial",
+        "energyDetails": {
+          "solarKwp": 159,
+          "ratePerKwh": 2.1,
+          "solutionType": "Solar + BESS",
+          "landlord": "ALT / Reimagine Retail Fund",
+          "anchorTenant": "KFC (Yum!)",
+          "roofState": "Not set",
+          "timeframe": "Short-term",
+          "bessKwh": 300
+        }
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091620.png",
+      "companyName": "AJ Properties",
+      "targetId": null,
+      "deal": {
+        "id": "d-screens-20261026-091620",
+        "title": "AJ Properties ? Connectivity (site TBC)",
+        "site": null,
+        "division": "connect",
+        "productLine": "",
+        "stage": "lead",
+        "onceOff": 0,
+        "mrr": 0,
+        "ownerId": "u-langelihle",
+        "connectDetails": {
+          "supplier": "Herotel Business"
+        },
+        "notes": ""
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091648.png",
+      "companyName": "ALT Capital Partners",
+      "targetId": null,
+      "deal": {
+        "id": "d-screens-20261026-091648",
+        "title": "ALT Capital Partners ? Connectivity (site TBC)",
+        "site": null,
+        "division": "connect",
+        "productLine": "",
+        "stage": "lead",
+        "onceOff": 0,
+        "mrr": 0,
+        "ownerId": "u-gianna",
+        "connectDetails": {
+          "supplier": "Herotel Business"
+        },
+        "notes": ""
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091747.png",
+      "companyName": "Sasol",
+      "targetId": null,
+      "deal": {
+        "id": "d-screens-20261026-091747",
+        "title": "Sasol ? Connectivity (sites TBC)",
+        "site": null,
+        "division": "connect",
+        "productLine": "",
+        "stage": "lead",
+        "onceOff": 0,
+        "mrr": 0,
+        "ownerId": "u-langelihle",
+        "connectDetails": {
+          "supplier": "Herotel Business"
+        },
+        "notes": "Covers multiple Sasol forecourt / retail sites."
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091758.png",
+      "companyName": "BP",
+      "targetId": null,
+      "deal": {
+        "id": "d-screens-20261026-091758",
+        "title": "BP ? Connectivity (sites TBC)",
+        "site": null,
+        "division": "connect",
+        "productLine": "",
+        "stage": "lead",
+        "onceOff": 0,
+        "mrr": 0,
+        "ownerId": "u-langelihle",
+        "connectDetails": {
+          "supplier": "Herotel Business"
+        },
+        "notes": "BP retail sites connectivity account (separate from BP Kew energy site)."
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091705.png",
+      "companyName": "ALT Capital Partners",
+      "targetId": null,
+      "deal": {
+        "id": "d-screens-20261026-091705",
+        "title": "ALT ? Amsterdam Shopping Centre",
+        "site": "Amsterdam Shopping Centre",
+        "division": "energy",
+        "productLine": "Solar PV",
+        "stage": "quote",
+        "onceOff": 2230000,
+        "mrr": 0,
+        "ownerId": "u-gianna",
+        "segment": "Commercial",
+        "energyDetails": {
+          "solarKwp": 160,
+          "ratePerKwh": 1.65,
+          "solutionType": "Solar only",
+          "landlord": "ALT / Reimagine Retail Fund",
+          "anchorTenant": "Shoprite",
+          "roofState": "Not set",
+          "timeframe": "Short-term"
+        }
+      }
+    },
+    {
+      "source": "Screenshot 2026-10-26 091808.png",
+      "companyName": "ALT Capital Partners",
+      "targetId": "d-tracker-27",
+      "deal": {
+        "id": "d-tracker-27",
+        "title": "ALT ? Piet Retief Shopping Centre",
+        "site": "Piet Retief Shopping Centre",
+        "division": "energy",
+        "productLine": "Hybrid Solar + BESS",
+        "stage": "quote",
+        "onceOff": 13300000,
+        "mrr": 0,
+        "ownerId": "u-gianna",
+        "segment": "Commercial",
+        "energyDetails": {
+          "solarKwp": 695,
+          "ratePerKwh": 1.91,
+          "solutionType": "Solar + BESS",
+          "landlord": "ALT / Reimagine Retail Fund",
+          "anchorTenant": "SPAR",
+          "roofState": "Not set",
+          "timeframe": "Short-term",
+          "bessKwh": 800
+        }
+      }
+    }
+  ]
+}

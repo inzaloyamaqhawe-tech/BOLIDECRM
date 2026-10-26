@@ -91,6 +91,26 @@ try:
  # Snapshot path cannot bypass the dedicated duplicate guard.
  status,state=a.req('state');clone=copy.deepcopy(next(d for d in state['snapshot']['deals'] if d['id']==target));clone['id']=marker+'-bypass';clone.pop('duplicateDetails',None);state['snapshot']['deals'].append(clone)
  status,result=a.req('state',dict(revision=state['revision'],snapshot=state['snapshot']));assert status==409,(status,result)
+ # A company batch is atomic and a retry returns the same saved cards.
+ batch_name='Company batch '+marker
+ requests=[dict(action='create',draft=draft(batch_name,division=division,site='Test site',productLine=division)) for division in ['energy','water','secure']]
+ broken=copy.deepcopy(requests);broken[1]['draft']['deal']['ownerId']='not-a-user'
+ status,result=a.req('deals',dict(action='batch',requests=broken,requestId=secrets.token_hex(16)));assert status==400,(status,result)
+ q.execute('SELECT COUNT(*) FROM companies WHERE name=%s',(batch_name,));assert q.fetchone()[0]==0
+ request_id=secrets.token_hex(16);status,result=a.req('deals',dict(action='batch',requests=requests,requestId=request_id));assert status==200,(status,result)
+ batch_ids=result['ids'];assert len(batch_ids)==3
+ for id in batch_ids:deal_ids.add(id);company_ids.add(next(d for d in result['snapshot']['deals'] if d['id']==id)['companyId'])
+ status,retry=a.req('deals',dict(action='batch',requests=requests,requestId=request_id));assert status==200 and retry['ids']==batch_ids
+ # An unrelated concurrent note survives a contact/financial edit from an older form.
+ model=next(d for d in result['snapshot']['deals'] if d['id']==batch_ids[0]);person=next(ct for ct in result['snapshot']['contacts'] if ct['id']==model['primaryContactId'])
+ baseline=dict(companyName=batch_name,deal=copy.deepcopy(model),contact=dict(name=person['name'],phone=person.get('phone',''),email=person.get('email','')))
+ version=a.version(baseline,model['id']);other=copy.deepcopy(baseline);other['deal']['notes']='Note entered by another person';b.deals('update',other,sourceId=model['id'],sourceVersion=version)
+ edited=copy.deepcopy(baseline);edited['contact']['phone']='0835551234';edited['contact']['email']='linda-test@example.com';edited['deal']['mrr']=4321.56
+ updated=a.deals('update',edited,sourceId=model['id'],sourceVersion=version,baseDraft=baseline)
+ kept=next(d for d in updated['snapshot']['deals'] if d['id']==model['id']);assert kept['notes']=='Note entered by another person' and kept['mrr']==4321.56
+ person=next(ct for ct in updated['snapshot']['contacts'] if ct['id']==kept['primaryContactId']);assert person['phone']=='0835551234' and person['email']=='linda-test@example.com'
+ conflicting=copy.deepcopy(baseline);conflicting['deal']['notes']='Conflicting replacement';a.deals('update',conflicting,409,sourceId=model['id'],sourceVersion=version,baseDraft=baseline)
+ print('PASS: atomic three-solution company saves, rollback on second-item failure, idempotent retry, persistent phone/email/amount edits, unrelated concurrent notes retained and true field conflicts rejected.')
  print('PASS: case-insensitive live matching; company/solution/location distinctions; reviewed separation; concurrent create protection; stale-edit rejection; selected-field merge; retained notes, creator, contact, task assignee, activities, attachment links and immutable source archive; snapshot bypass blocked.')
 finally:
  q.execute('START TRANSACTION');q.execute('SELECT revision FROM crm_revision WHERE id=1 FOR UPDATE')

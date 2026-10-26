@@ -63,13 +63,35 @@ export interface SecureDealDetails {
 }
 
 export interface EnergyDealDetails {
+  solutionType?: string;
+  landlord?: string;
+  anchorTenant?: string;
+  roofSizeM2?: number;
+  roofState?: string;
+  municipalTariff?: number;
+  timeframe?: string;
   solarKwp?: number;
   bessKwh?: number;
   ratePerKwh?: number;
 }
 
 export interface WaterDealDetails {
+  serviceModel?: string;
+  epcPartner?: string;
+  wulaStatus?: string;
+  litresPerMonth?: number;
+  offBalanceSheet?: boolean;
+  solutions?: string[];
   litresPerDay?: number;
+}
+export interface ConnectDealDetails {
+  product?: string;
+  contractMonths?: number;
+  supplier?: string;
+  mall?: string;
+  tenants?: string;
+  wholesaleNrc?: number;
+  wholesaleMrc?: number;
 }
 
 export type BankModelStatus = "Modelled" | "Not Modelled";
@@ -117,6 +139,7 @@ export interface Deal {
   secureDetails?: SecureDealDetails;
   energyDetails?: EnergyDealDetails;
   waterDetails?: WaterDealDetails;
+  connectDetails?: ConnectDealDetails;
   financingDetails?: FinancingDetails;
   createdAt: string;
   updatedAt: string;

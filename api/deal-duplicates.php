@@ -28,7 +28,7 @@ function duplicate_identity(array $deal,array $companies): string {return implod
 function duplicate_guard(array &$snapshot,array $old,array $actor): void {
     $before=array_column($old['deals'],null,'id');$companies=array_column($snapshot['companies'],'name','id');$oldCompanies=array_column($old['companies'],'name','id');
     foreach($snapshot['deals'] as &$deal){$previous=$before[$deal['id']]??null;$deal['createdById']=$previous['createdById']??$actor['id'];if($previous&&!isset($previous['createdById']))unset($deal['createdById']);
-        if($previous&&duplicate_identity($deal,$companies)===duplicate_identity($previous,$oldCompanies))continue;
+        if($previous)continue;
         $matches=deal_matches(['companyName'=>$companies[$deal['companyId']]??'','deal'=>$deal],$snapshot,$deal['id']);
         duplicate_decision($matches,$deal['duplicateDetails']['separate']??null);
         if(!empty($deal['duplicateDetails']['separate'])){$deal['duplicateDetails']['separate']['by']=$actor['id'];$deal['duplicateDetails']['separate']['at']=gmdate('c');}
@@ -38,7 +38,7 @@ function merge_missing(mixed $value): bool {return $value===null||$value===''||$
 function deal_merge_fields(array $target,array $incoming): array {
     $old=array_merge($target['deal'],['contact'=>$target['contact']]);$fresh=array_merge($incoming['deal'],['contact'=>$incoming['contact']]);$rows=[];
     $walk=function($a,$b,$path) use (&$walk,&$rows){if($a===$b||merge_missing($b))return;if($path==='contact'&&!empty($a['name'])&&!empty($b['name'])&&deal_normalise($a['name'])!==deal_normalise($b['name'])){$rows[]=['path'=>$path,'before'=>$a,'after'=>$b,'fill'=>false];return;}if(is_array($b)&&!array_is_list($b)){foreach($b as $k=>$v){if($path==='workflow'&&$k==='nextAction')continue;$walk($a[$k]??null,$v,$path.'.'.$k);}}else $rows[]=['path'=>$path,'before'=>$a,'after'=>$b,'fill'=>merge_missing($a)];};
-    foreach(['title','site','segment','productLine','stage','onceOff','mrr','ownerId','closeDate','receivedAt','lostReason','secureDetails','energyDetails','waterDetails','financingDetails','workflow','contact'] as $root)$walk($old[$root]??null,$fresh[$root]??null,$root);
+    foreach(['title','site','segment','productLine','stage','onceOff','mrr','ownerId','closeDate','receivedAt','lostReason','secureDetails','energyDetails','waterDetails','connectDetails','financingDetails','workflow','contact'] as $root)$walk($old[$root]??null,$fresh[$root]??null,$root);
     return $rows;
 }
 function deal_merge_draft(array $target,array $incoming,array $choices): array {

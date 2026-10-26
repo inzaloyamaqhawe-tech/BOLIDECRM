@@ -54,11 +54,13 @@ function workflow_prepare(array &$snapshot,array $old,array $actor,array $preser
     foreach($old['activities'] as $a)if(!empty($a['changes'])&&in_array($a['dealId']??'',$dealIds,true))$activities[$a['id']]=$a;
     foreach($snapshot['deals'] as &$deal) {
         $before=$oldDeals[$deal['id']]??null;
+        $unchanged=$before&&workflow_diff($before,$deal)===[];
         $actions=['lead'=>'Qualify/KYC Onboarding','qualified'=>'Preliminary Proposal','quote'=>'Final Proposal','final_proposal'=>'Negotiation','negotiation'=>'Final Proposal Signed'];
         unset($deal['workflow']['nextAction']);
         if(isset($actions[$deal['stage']]))$deal['workflow']['nextAction']=['title'=>$actions[$deal['stage']]];
         $fileIds=array_column(array_filter($snapshot['attachments'],fn($f)=>($f['dealId']??'')===$deal['id']),'id');
         foreach(array_merge([$deal['workflow']['signedAttachmentId']??null],array_column($deal['workflow']['kyc']??[],'attachmentId')) as $fileId) if($fileId&&!in_array($fileId,$fileIds,true))throw new InvalidArgumentException('A selected signature / KYC document cannot be deleted. Update the deal selections first.');
+        if($unchanged){$deal=$before;continue;}
         if(isset($deal['workflow']['kyc']))foreach($deal['workflow']['kyc'] as &$item) {
             $previous=current(array_filter($before['workflow']['kyc']??[],fn($i)=>($i['id']??'')===($item['id']??'')));
             $trusted=current(array_filter($preservedKyc,fn($i)=>($i['status']??'')==='verified'&&workflow_diff($i,$item)===[]));

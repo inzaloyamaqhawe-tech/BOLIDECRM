@@ -1,0 +1,32 @@
+XNEELO CRM UPLOAD — 26 OCTOBER 2026
+
+Source folder:
+deploy-crm
+
+Upload these files individually into the existing public crm folder. Preserve the paths below.
+
+1. Backend files
+api/.htaccess
+api/deal-duplicates.php
+api/deals-service.php          NEW FILE — REQUIRED
+api/deals.php
+api/import-functions.php
+api/workflow.php
+
+2. Frontend assets
+assets/index-B3-vNggU.css
+assets/index-CnKrV2aS.js
+assets/vendor-charts-BHuxWsbc.js
+assets/vendor-dnd-C-c8qG_2.js
+assets/vendor-icons-Cc-lgg2c.js
+assets/vendor-react-PGvNAZat.js
+
+3. Upload last
+index.html
+
+Important:
+- Do not upload api/config.php. Keep the working Xneelo copy already on the server.
+- Do not import database/schema.sql or database/20261026-company-solutions.sql. The production database is already updated.
+- Do not create another crm folder inside the existing crm folder.
+- Do not upload a ZIP.
+- Keep old hashed assets until index.html has been uploaded and the CRM has loaded successfully. They can be removed later.
