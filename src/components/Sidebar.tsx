@@ -28,7 +28,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
         }`}
       >
         <div className="mb-8 flex items-center justify-between">
-          <img src={`${import.meta.env.BASE_URL}bolide-logo.jpg`} alt="Bolide" className="h-9 w-auto object-contain object-left" />
+          <img src={`${import.meta.env.BASE_URL}bolide-logo.png`} alt="Bolide" className="h-11 w-auto object-contain object-left" />
           <button onClick={onClose} className="text-neutral-400 lg:hidden">
             <X className="h-5 w-5" />
           </button>
