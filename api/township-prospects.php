@@ -13,11 +13,24 @@ try {
     $data=crm_input();
     $config=crm_config();$expected=(string)($config['api_secret']??'');$received=(string)($_SERVER['HTTP_X_BOLIDE_API_SECRET']??'');
     $privateRequest=$expected!==''&&$received!==''&&hash_equals($expected,$received);
-    if($privateRequest){$actor=tp_actor($data);}else{$user=crm_session_user();crm_csrf();$actor=['id'=>(string)$user['id'],'email'=>(string)$user['email'],'name'=>(string)$user['name'],'active'=>true,'canEdit'=>in_array($user['role'],['admin','rep'],true)];}
+    if($privateRequest){$actor=tp_actor($data);$sessionUser=null;}else{$sessionUser=crm_session_user();crm_csrf();$actor=['id'=>(string)$sessionUser['id'],'email'=>(string)$sessionUser['email'],'name'=>(string)$sessionUser['name'],'active'=>true,'canEdit'=>in_array($sessionUser['role'],['admin','rep'],true)];}
     $action=(string)($data['action']??'list');$pdo=crm_pdo();
     if($action==='list'){crm_json(['ok'=>true,'leads'=>tp_all($pdo)]);exit;}
     if($action==='get'){$lead=tp_one($pdo,(string)($data['leadId']??''));if(!$lead)throw new InvalidArgumentException('Lead not found.');crm_json(['ok'=>true,'lead'=>$lead]);exit;}
     if($action==='owners'){$rows=$pdo->query('SELECT id,name,email FROM users ORDER BY name')->fetchAll();crm_json(['ok'=>true,'owners'=>$rows]);exit;}
+    if($action==='users'){
+        if(!$sessionUser||$sessionUser['role']!=='admin')throw new InvalidArgumentException('Admins only.');
+        $rows=$pdo->query('SELECT id,name,email,role,created_at FROM users ORDER BY name')->fetchAll();crm_json(['ok'=>true,'users'=>$rows]);exit;
+    }
+    if($action==='updateUserRole'){
+        if(!$sessionUser||$sessionUser['role']!=='admin')throw new InvalidArgumentException('Admins only.');
+        $userId=(string)($data['userId']??'');$role=(string)($data['role']??'');
+        if(!in_array($role,['admin','rep'],true))throw new InvalidArgumentException('Choose Admin or Member.');
+        $q=$pdo->prepare('SELECT role FROM users WHERE id=?');$q->execute([$userId]);$current=$q->fetchColumn();if($current===false)throw new InvalidArgumentException('User not found.');
+        if($current==='admin'&&$role!=='admin'&&(int)$pdo->query("SELECT COUNT(*) FROM users WHERE role='admin'")->fetchColumn()<=1)throw new InvalidArgumentException('At least one administrator is required.');
+        $q=$pdo->prepare('UPDATE users SET role=?,updated_at=UTC_TIMESTAMP() WHERE id=?');$q->execute([$role,$userId]);
+        crm_json(['ok'=>true]);exit;
+    }
     if($action==='utilityData'){
         $rules=$pdo->query('SELECT id,township,suburb_or_zone,electricity_provider,water_provider,confidence,source_url,note,created_at FROM township_utility_rules ORDER BY township,suburb_or_zone')->fetchAll();
         $context=$pdo->query('SELECT id,utility,service_area,tariff_increase,reliability,sseg_rules,verify_how,source_url,created_at FROM township_utility_context ORDER BY utility')->fetchAll();
