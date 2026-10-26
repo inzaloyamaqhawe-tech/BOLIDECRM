@@ -1,4 +1,4 @@
 Options -Indexes
-<FilesMatch "^(config(\.example)?|db|session|import-functions|state-functions|deal-duplicates|deals-service)\.php$">
+<FilesMatch "^(config(\.example)?|db|session|import-functions|state-functions|deal-duplicates|deals-service|township-functions)\.php$">
 Require all denied
 </FilesMatch>

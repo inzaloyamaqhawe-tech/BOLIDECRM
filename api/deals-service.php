@@ -69,7 +69,7 @@ function deal_write(PDO $pdo,array $data,array $actor,array $old): array {
     if($mergeContact&&deal_normalise($mergeContact['name']??'')!==deal_normalise($draft['contact']['name']??''))deal_contact($state,$company['id'],$mergeContact);
     $contact=deal_contact($state,$company['id'],$draft['contact']??[]);
     $base=$target?:$source?:['id'=>deal_uid('d'),'createdAt'=>gmdate('Y-m-d\TH:i:s\Z'),'createdById'=>$actor['id']];
-    $allowed=array_flip(['title','site','division','segment','productLine','stage','onceOff','mrr','ownerId','closeDate','notes','lostReason','receivedAt','secureDetails','energyDetails','waterDetails','connectDetails','financingDetails','workflow']);
+    $allowed=array_flip(['title','site','division','segment','productLine','stage','onceOff','mrr','ownerId','closeDate','notes','lostReason','receivedAt','secureDetails','energyDetails','waterDetails','connectDetails','financingDetails','workflow','leadTracker']);
     $saved=array_merge(array_diff_key($base,$allowed),array_intersect_key($draft['deal'],$allowed));$saved['companyId']=$company['id'];$saved['primaryContactName']=$contact['name']??null;$saved['primaryContactId']=$contact['id']??null;
     if(!in_array($saved['division']??'', ['energy','secure','connect','water','saas'],true)||!in_array($saved['stage']??'',['lead','qualified','quote','final_proposal','negotiation','won','lost'],true)||!in_array($saved['ownerId']??'',array_column($state['users'],'id'),true))throw new InvalidArgumentException('Select a valid division, stage and owner.');
     if(!is_numeric($saved['onceOff']??null)||!is_numeric($saved['mrr']??null))throw new InvalidArgumentException('Enter valid amounts.');
