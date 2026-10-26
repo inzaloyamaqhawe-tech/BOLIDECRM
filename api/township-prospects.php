@@ -1,19 +1,28 @@
 <?php
 declare(strict_types=1);
-require __DIR__.'/db.php';
+require __DIR__.'/session.php';
 require __DIR__.'/import-functions.php';
 require __DIR__.'/state-functions.php';
 require __DIR__.'/workflow.php';
 require __DIR__.'/deal-duplicates.php';
 require __DIR__.'/deals-service.php';
 require __DIR__.'/township-functions.php';
-crm_apply_cors();crm_require_secret();
+crm_apply_cors();
 try {
     if($_SERVER['REQUEST_METHOD']!=='POST')throw new InvalidArgumentException('Method not allowed.');
-    $data=crm_input();$action=(string)($data['action']??'list');$actor=tp_actor($data);$pdo=crm_pdo();
+    $data=crm_input();
+    $config=crm_config();$expected=(string)($config['api_secret']??'');$received=(string)($_SERVER['HTTP_X_BOLIDE_API_SECRET']??'');
+    $privateRequest=$expected!==''&&$received!==''&&hash_equals($expected,$received);
+    if($privateRequest){$actor=tp_actor($data);}else{$user=crm_session_user();crm_csrf();$actor=['id'=>(string)$user['id'],'email'=>(string)$user['email'],'name'=>(string)$user['name'],'active'=>true,'canEdit'=>in_array($user['role'],['admin','rep'],true)];}
+    $action=(string)($data['action']??'list');$pdo=crm_pdo();
     if($action==='list'){crm_json(['ok'=>true,'leads'=>tp_all($pdo)]);exit;}
     if($action==='get'){$lead=tp_one($pdo,(string)($data['leadId']??''));if(!$lead)throw new InvalidArgumentException('Lead not found.');crm_json(['ok'=>true,'lead'=>$lead]);exit;}
     if($action==='owners'){$rows=$pdo->query('SELECT id,name,email FROM users ORDER BY name')->fetchAll();crm_json(['ok'=>true,'owners'=>$rows]);exit;}
+    if($action==='utilityData'){
+        $rules=$pdo->query('SELECT id,township,suburb_or_zone,electricity_provider,water_provider,confidence,source_url,note,created_at FROM township_utility_rules ORDER BY township,suburb_or_zone')->fetchAll();
+        $context=$pdo->query('SELECT id,utility,service_area,tariff_increase,reliability,sseg_rules,verify_how,source_url,created_at FROM township_utility_context ORDER BY utility')->fetchAll();
+        crm_json(['ok'=>true,'rules'=>$rules,'context'=>$context]);exit;
+    }
     if($action==='activity'){$q=$pdo->prepare('SELECT id,lead_id,body AS text,created_by_external AS created_by,created_by_name,created_at FROM township_lead_activity WHERE lead_id=? ORDER BY created_at DESC');$q->execute([(string)($data['leadId']??'')]);crm_json(['ok'=>true,'activity'=>$q->fetchAll()]);exit;}
     if($action==='photos'){$q=$pdo->prepare('SELECT id,lead_id,storage_path,caption,uploaded_by_external AS uploaded_by,created_at FROM township_lead_photos WHERE lead_id=? ORDER BY created_at DESC');$q->execute([(string)($data['leadId']??'')]);crm_json(['ok'=>true,'photos'=>$q->fetchAll()]);exit;}
     tp_require_edit($actor);
