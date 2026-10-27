@@ -24,3 +24,11 @@ After upload:
 - No SQL or database update is required for this visual change.
 
 The black figure walks and climbs continuously while the login page remains open. Its arms tilt simultaneously in opposite directions from the shoulders. At Won, it faces forward, raises both arms and celebrates inside black confetti. Successful login navigates away and stops the animation.
+
+LOGIN SESSION REPAIR ? upload now:
+- api/session.php to /crm/api/session.php
+
+After uploading session.php:
+- Close all existing Bolide CRM tabs.
+- Open https://bolide.co.za/crm/login in one new tab and sign in.
+- The CRM now uses an isolated bolide_crm_v2 cookie scoped to /crm/, preventing stale root cookies and other Bolide tools from replacing the active CRM session.
