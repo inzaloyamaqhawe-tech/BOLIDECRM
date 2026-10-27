@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { MessageSquare, CheckCheck, X } from "lucide-react";
 import { hosted, api } from "../lib/remote";
 import { previewInbox, reminderCandidates, type ReminderMessage } from "../lib/notifications";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/auth";
 import { getDeals, getTasks } from "../lib/store";
 import { useCrm, useDeals } from "../lib/use-store";
 
 export function ReminderCenter(){
+ const navigate=useNavigate();
  const {user}=useAuth(),tasks=useCrm(getTasks),deals=useDeals();
  const [tick,setTick]=useState(Date.now()),[messages,setMessages]=useState<ReminderMessage[]>([]),[open,setOpen]=useState(false),[unreadOnly,setUnreadOnly]=useState(false),[limit,setLimit]=useState(50),[busy,setBusy]=useState(false),[permission,setPermission]=useState(typeof Notification==="undefined"?"unsupported":Notification.permission),[error,setError]=useState("");
  useEffect(()=>{const timer=setInterval(()=>setTick(Date.now()),15000);return()=>clearInterval(timer);},[]);
@@ -50,7 +51,8 @@ export function ReminderCenter(){
  },[user?.id,permission,JSON.stringify(reminders)]);
  async function enable(){if(!window.isSecureContext){setError("Desktop notifications require valid HTTPS.");return;}try{setPermission(await Notification.requestPermission());}catch{setError("Allow notifications in your browser's site settings.");}}
  if(!user)return null;
- const unread=messages.filter(n=>!n.readAt).length,visible=messages.filter(n=>!unreadOnly||!n.readAt);
+ const unread=messages.filter(n=>n.active&&!n.readAt).length,visible=messages.filter(n=>n.active&&(!unreadOnly||!n.readAt));
+ function openMessage(message:ReminderMessage){void mark("read",message.id);setOpen(false);navigate("/"+message.url);}
  return <div ref={ref} className="relative no-print">
   <button type="button" aria-label={"Reminder inbox, "+unread+" unread"} aria-expanded={open} onClick={()=>setOpen(!open)} className="relative flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 text-neutral-600 hover:bg-pink-50 hover:text-pink-600">
    <MessageSquare className="h-5 w-5"/>{unread>0&&<span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-pink-600 px-1 text-center text-[10px] font-bold leading-5 text-white">{unread>99?"99+":unread}</span>}{error&&<span className="absolute -bottom-1 right-0 rounded-full bg-amber-500 px-1 text-[10px] text-white">!</span>}
@@ -62,8 +64,8 @@ export function ReminderCenter(){
     {permission!=="granted"&&permission!=="unsupported"&&<button onClick={enable} className="text-xs font-bold text-pink-600">{permission==="denied"?"Notifications blocked — check browser settings":"Enable Windows notifications"}</button>}
     <p className="text-[11px] text-neutral-400">Only your reminders appear here. Read status is separate from task completion. Desktop alerts need an open or minimised CRM tab.</p>{error&&<p role="alert" className="text-xs text-amber-700">{error}</p>}
    </div>
-   {visible.slice(0,limit).map(n=><div key={n.id} className={"border-b p-4 "+(!n.readAt?"bg-pink-50/60":"bg-white")}>
-    <div className="flex items-start gap-2">{!n.readAt&&<span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-pink-600"/>}<Link to={"/"+n.url} onClick={()=>{void mark("read",n.id);setOpen(false);}} className="text-sm font-bold text-neutral-800 hover:text-pink-600">{n.title}</Link></div><p className="mt-1 text-xs text-neutral-600">{n.body}</p><div className="mt-2 flex items-center justify-between gap-2 text-[11px]"><span className="text-neutral-400">{new Date(n.createdAt).toLocaleString("en-ZA",{timeZone:"Africa/Johannesburg"})}</span><button disabled={busy} className="font-semibold text-pink-600" onClick={()=>void mark(n.readAt?"unread":"read",n.id)}>{n.readAt?"Mark as unread":"Mark as read"}</button></div>
+   {visible.slice(0,limit).map(n=><div key={n.id} role="link" tabIndex={0} onClick={()=>openMessage(n)} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openMessage(n);}}} className={"cursor-pointer border-b p-4 hover:bg-pink-50 "+(!n.readAt?"bg-pink-50/60":"bg-white")}>
+    <div className="flex items-start gap-2">{!n.readAt&&<span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-pink-600"/>}<span className="text-sm font-bold text-neutral-800">{n.title}</span></div><p className="mt-1 text-xs text-neutral-600">{n.body}</p><div className="mt-2 flex items-center justify-between gap-2 text-[11px]"><span className="text-neutral-400">{new Date(n.createdAt).toLocaleString("en-ZA",{timeZone:"Africa/Johannesburg"})}</span><button disabled={busy} className="font-semibold text-pink-600" onClick={e=>{e.stopPropagation();void mark(n.readAt?"unread":"read",n.id);}}>{n.readAt?"Mark as unread":"Mark as read"}</button></div>
    </div>)}
    {!visible.length&&<p className="p-8 text-center text-sm text-neutral-500">{unreadOnly?"No unread reminders.":"You have no reminders yet."}</p>}
    {visible.length>limit&&<button className="w-full p-3 text-sm font-bold" onClick={()=>setLimit(limit+50)}>Show more</button>}

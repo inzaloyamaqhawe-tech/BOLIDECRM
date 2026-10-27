@@ -17,17 +17,17 @@ function notification_proposal_due(string $received): string {
 }
 function notification_candidates(PDO $pdo,string $userId): array {
     $result=[];$now=time();$today=(new DateTimeImmutable('now',new DateTimeZone('Africa/Johannesburg')))->format('Y-m-d');
-    foreach($pdo->query('SELECT id,title,due_date,done,options_json FROM tasks')->fetchAll() as $task){
+    foreach($pdo->query('SELECT id,title,deal_id,due_date,done,options_json FROM tasks')->fetchAll() as $task){
         $o=json_decode($task['options_json']??'{}',true)??[];
         if($task['done']||($o['assigneeId']??'')!==$userId||empty($o['reminderAt'])||strtotime($o['reminderAt'])>$now)continue;
-        $result[]=['id'=>'task:'.$task['id'].':'.$o['reminderAt'],'title'=>$task['title'],'body'=>'Your '.($o['priority']??'normal').' priority task'.($task['due_date']?' · due '.$task['due_date']:''),'url'=>'tasks'];
+        $result[]=['id'=>'task:'.$task['id'],'title'=>$task['title'],'body'=>'Your '.($o['priority']??'normal').' priority task'.($task['due_date']?' ? due '.$task['due_date']:''),'url'=>$task['deal_id']?'deals?open='.rawurlencode($task['deal_id']):'tasks'];
     }
     foreach($pdo->query('SELECT id,title,owner_id,stage,proposal_sent_at,received_at,created_at,lead_tracker_json,workflow_json FROM deals')->fetchAll() as $deal){
         $w=json_decode($deal['workflow_json']??'{}',true)??[];$tracker=json_decode($deal['lead_tracker_json']??'null',true);
         if(($deal['owner_id']!==$userId&&($w['escalationUserId']??'')!==$userId)||$deal['proposal_sent_at']||in_array($deal['stage'],['quote','final_proposal','negotiation','won','lost'],true))continue;
         $due=$w['proposalDueOverride']??null;if(!$due&&$tracker&&empty($tracker['enquiryReceived']))continue;
         $due=$due?:notification_proposal_due($deal['received_at']?:$deal['created_at']);if($due>=$today)continue;
-        $result[]=['id'=>'proposal:'.$deal['id'].':'.$due.':'.$today,'title'=>'Overdue proposal: '.$deal['title'],'body'=>($deal['owner_id']===$userId?'Your proposal is overdue':'Proposal escalated to you').' · due '.$due,'url'=>'deals?open='.rawurlencode($deal['id'])];
+        $result[]=['id'=>'proposal:'.$deal['id'].':'.$due,'title'=>'Overdue proposal: '.$deal['title'],'body'=>($deal['owner_id']===$userId?'Your proposal is overdue':'Proposal escalated to you').' ? due '.$due,'url'=>'deals?open='.rawurlencode($deal['id'])];
     }
     return $result;
 }

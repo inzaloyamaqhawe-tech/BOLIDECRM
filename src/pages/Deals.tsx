@@ -3,7 +3,7 @@ import { emptyFilters, filterDeals } from "../lib/deal-filters";
 import { stageNextAction, dealFlags } from "../lib/workflow";
 import { getAttachments } from "../lib/attachments";
 import { workflowErrors } from "../lib/workflow";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Download, Search, Trash2, X } from "lucide-react";
 import type { Deal, Segment, StageKey } from "../types";
@@ -37,6 +37,7 @@ export function DealsPage() {
 
   const openId = params.get("open");
   const [selectedDeal, setSelectedDeal] = useState<Deal | undefined>(openId ? getDeal(openId) : undefined);
+  useEffect(()=>{setSelectedDeal(openId?getDeal(openId):undefined);},[openId,deals]);
 
   const companyName = (id: string) => companies.find((c) => c.id === id)?.name ?? "—";
   const ownerName = (id: string) => users.find((u) => u.id === id)?.name ?? "—";

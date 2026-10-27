@@ -1,26 +1,27 @@
-XNEELO CRM UPLOAD ? SESSION AND PORTFOLIO DEAL FIX
+XNEELO CRM UPLOAD ? LATEST CUMULATIVE UPDATE
 
 Source folder:
 deploy-crm
 
-Upload these files individually into the existing public /crm folder, preserving the subfolders:
+Upload these files individually into the existing public /crm folder, preserving subfolders:
 
 1. api/session.php
 2. api/deal-duplicates.php
-3. assets/index-DtvyTnJ7.js
-4. assets/index-QfoIjSa1.css
-5. assets/vendor-react-PGvNAZat.js
-6. assets/vendor-icons-Cc-lgg2c.js
-7. assets/vendor-charts-BHuxWsbc.js
-8. assets/vendor-dnd-C-c8qG_2.js
-9. index.html ? upload this last
+3. api/notification-functions.php
+4. api/notifications.php
+5. assets/index-wvA7y9M8.js
+6. assets/index-QfoIjSa1.css
+7. assets/vendor-react-PGvNAZat.js
+8. assets/vendor-icons-Cc-lgg2c.js
+9. assets/vendor-charts-BHuxWsbc.js
+10. assets/vendor-dnd-C-c8qG_2.js
+11. index.html ? upload this last
 
 After uploading:
-- Close all existing CRM tabs, then open https://bolide.co.za/crm/login in one new tab.
-- Refresh with Ctrl+F5 if the old interface remains cached.
+- Close existing CRM tabs, open https://bolide.co.za/crm/login in one new tab, and press Ctrl+F5 if needed.
+- Opening the reminder inbox once automatically consolidates repeated generated reminders for the logged-in user.
+- Clicking a proposal reminder or deal-linked task opens that deal. An unlinked task opens Tasks.
 - Keep all other API and database files unchanged.
 - Do not create another crm folder inside /crm.
 - Do not upload a ZIP.
-- No SQL or database update is required.
-
-Duplicate detection now treats a shared company as a portfolio account. A company name by itself never creates a merge warning. A warning requires the same division/product and either the same known site/location or a strongly matching deal title. Values such as site TBC, TBD and unknown are not treated as locations.
+- No SQL import is required.
