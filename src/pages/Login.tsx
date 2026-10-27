@@ -184,6 +184,13 @@ function PipelineJourney() {
       </g>
 
       <g className="text-neutral-950">
+        <animate
+          attributeName="opacity"
+          values="1;1;0;0"
+          keyTimes="0;.87;.9;1"
+          dur="10s"
+          repeatCount="indefinite"
+        />
         <animateMotion
           dur="10s"
           repeatCount="indefinite"
@@ -212,18 +219,35 @@ function PipelineJourney() {
         </g>
       </g>
 
-      <g className="text-white" transform="translate(823 55) scale(.88)">
+      <g className="text-white" transform="translate(823 55) scale(.88)" opacity="0">
+        <animate
+          attributeName="opacity"
+          values="0;0;1;1;0"
+          keyTimes="0;.87;.9;.985;1"
+          dur="10s"
+          repeatCount="indefinite"
+        />
         <circle cx="0" cy="-44" r="15" fill="currentColor" />
         <rect x="-18" y="-25" width="36" height="58" rx="14" fill="currentColor" />
         <rect x="-41" y="-36" width="10" height="54" rx="5" fill="currentColor" transform="rotate(-38 -36 -9)" />
         <rect x="31" y="-36" width="10" height="54" rx="5" fill="currentColor" transform="rotate(38 36 -9)" />
         <rect x="-16" y="24" width="12" height="47" rx="6" fill="currentColor" />
         <rect x="4" y="24" width="12" height="47" rx="6" fill="currentColor" />
-        <g transform="translate(0 -76)">
-          <path d="M-18 0h36v16c0 16-8 27-18 27S-18 32-18 16V0Z" fill="#171717" />
-          <path d="M-18 7h-12c0 13 6 20 17 20M18 7h12c0 13-6 20-17 20" fill="none" stroke="#171717" strokeWidth="6" strokeLinecap="round" />
-          <rect x="-4" y="40" width="8" height="14" rx="2" fill="#171717" />
-          <rect x="-15" y="52" width="30" height="7" rx="3.5" fill="#171717" />
+        <g>
+          <animateTransform
+            attributeName="transform"
+            type="translate"
+            values="0 34;0 34;0 0;0 -8;0 -8;0 34"
+            keyTimes="0;.87;.925;.955;.985;1"
+            dur="10s"
+            repeatCount="indefinite"
+          />
+          <g transform="translate(0 -76)">
+            <path d="M-18 0h36v16c0 16-8 27-18 27S-18 32-18 16V0Z" fill="#171717" />
+            <path d="M-18 7h-12c0 13 6 20 17 20M18 7h12c0 13-6 20-17 20" fill="none" stroke="#171717" strokeWidth="6" strokeLinecap="round" />
+            <rect x="-4" y="40" width="8" height="14" rx="2" fill="#171717" />
+            <rect x="-15" y="52" width="30" height="7" rx="3.5" fill="#171717" />
+          </g>
         </g>
       </g>
 
