@@ -1,4 +1,4 @@
-XNEELO CRM UPLOAD â€” ANIMATED LOGIN PAGE
+XNEELO CRM UPLOAD Ã¢â‚¬â€ ANIMATED LOGIN PAGE
 
 Source folder:
 deploy-crm
@@ -6,7 +6,7 @@ deploy-crm
 Upload these files individually into the existing public /crm folder:
 
 1. index.html
-2. assets/index-S77ioS3w.js
+2. assets/index-CLQO2a6q.js
 
 After upload:
 - Keep every vendor file, CSS file, API file and database file unchanged.

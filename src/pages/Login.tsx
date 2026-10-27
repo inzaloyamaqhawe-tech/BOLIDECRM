@@ -187,35 +187,57 @@ function PipelineJourney() {
         <animate
           attributeName="opacity"
           values="1;1;0;0"
-          keyTimes="0;.87;.9;1"
-          dur="10s"
+          keyTimes="0;.78;.82;1"
+          dur="20s"
           repeatCount="indefinite"
         />
-        <animateMotion
-          dur="10s"
+        <animateTransform
+          attributeName="transform"
+          type="translate"
+          dur="20s"
           repeatCount="indefinite"
-          calcMode="linear"
-          path="M105 426 L178 426 L226 363 L318 363 L366 300 L458 300 L506 237 L598 237 L646 174 L738 174 L782 111"
+          calcMode="spline"
+          keySplines=".4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1"
+          keyTimes="0;.08;.14;.16;.24;.30;.32;.40;.46;.48;.56;.62;.64;.72;.78;1"
+          values="165 426;215 363;255 363;305 363;355 300;395 300;445 300;495 237;535 237;585 237;635 174;675 174;725 174;775 111;805 111;805 111"
         />
         <g transform="scale(.78)">
-          <circle cx="0" cy="-78" r="14" fill="currentColor" />
-          <rect x="-18" y="-61" width="36" height="43" rx="13" fill="currentColor" />
-          <g>
-            <line x1="-15" y1="-53" x2="-28" y2="-20" stroke="currentColor" strokeWidth="10" strokeLinecap="round" />
-            <animateTransform attributeName="transform" type="rotate" values="-18 -15 -53;18 -15 -53;-18 -15 -53" dur="1s" repeatCount="indefinite" />
-          </g>
-          <g>
-            <line x1="15" y1="-53" x2="28" y2="-20" stroke="currentColor" strokeWidth="10" strokeLinecap="round" />
-            <animateTransform attributeName="transform" type="rotate" values="18 15 -53;-18 15 -53;18 15 -53" dur="1s" repeatCount="indefinite" />
-          </g>
-          <g>
-            <line x1="-9" y1="-21" x2="-9" y2="0" stroke="currentColor" strokeWidth="12" strokeLinecap="round" />
-            <animateTransform attributeName="transform" type="rotate" values="-24 -9 -21;24 -9 -21;-24 -9 -21" dur="1s" repeatCount="indefinite" />
-          </g>
-          <g>
-            <line x1="9" y1="-21" x2="9" y2="0" stroke="currentColor" strokeWidth="12" strokeLinecap="round" />
-            <animateTransform attributeName="transform" type="rotate" values="24 9 -21;-24 9 -21;24 9 -21" dur="1s" repeatCount="indefinite" />
-          </g>
+          <circle cx="5" cy="-77" r="14" fill="currentColor" />
+          <path d="M-10-61Q-16-50-11-30L-5-22H11L14-54Q12-63 3-64Z" fill="currentColor" />
+          <path d="M8-54L20-37L34-43" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M-7-54L-18-36L-21-19" fill="none" stroke="currentColor" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" opacity=".88" />
+          <path
+            d="M5-28L19-52L36-63"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="12"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <animate
+              attributeName="d"
+              dur="20s"
+              repeatCount="indefinite"
+              keyTimes="0;.08;.14;.16;.24;.30;.32;.40;.46;.48;.56;.62;.64;.72;.78;1"
+              values="M5-28L19-52L36-63;M5-28L15-13L20 0;M5-28L15-13L20 0;M5-28L15-13L20 0;M5-28L17 18L31 63;M5-28L15-13L20 0;M5-28L19-52L36-63;M5-28L15-13L20 0;M5-28L15-13L20 0;M5-28L15-13L20 0;M5-28L17 18L31 63;M5-28L15-13L20 0;M5-28L19-52L36-63;M5-28L15-13L20 0;M5-28L15-13L20 0;M5-28L15-13L20 0"
+            />
+          </path>
+          <path
+            d="M-4-28L-12-12L-18 0"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="12"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <animate
+              attributeName="d"
+              dur="20s"
+              repeatCount="indefinite"
+              keyTimes="0;.08;.14;.16;.24;.30;.32;.40;.46;.48;.56;.62;.64;.72;.78;1"
+              values="M-4-28L-12-12L-18 0;M-4-28L-16 18L-31 63;M-4-28L-12-12L-18 0;M-4-28L-20-52L-37-63;M-4-28L-12-12L-18 0;M-4-28L-12-12L-18 0;M-4-28L-12-12L-18 0;M-4-28L-16 18L-31 63;M-4-28L-12-12L-18 0;M-4-28L-20-52L-37-63;M-4-28L-12-12L-18 0;M-4-28L-12-12L-18 0;M-4-28L-12-12L-18 0;M-4-28L-16 18L-31 63;M-4-28L-12-12L-18 0;M-4-28L-12-12L-18 0"
+            />
+          </path>
         </g>
       </g>
 
@@ -223,8 +245,8 @@ function PipelineJourney() {
         <animate
           attributeName="opacity"
           values="0;0;1;1;0"
-          keyTimes="0;.87;.9;.985;1"
-          dur="10s"
+          keyTimes="0;.78;.82;.985;1"
+          dur="20s"
           repeatCount="indefinite"
         />
         <circle cx="0" cy="-44" r="15" fill="currentColor" />
@@ -238,8 +260,8 @@ function PipelineJourney() {
             attributeName="transform"
             type="translate"
             values="0 34;0 34;0 0;0 -8;0 -8;0 34"
-            keyTimes="0;.87;.925;.955;.985;1"
-            dur="10s"
+            keyTimes="0;.78;.86;.91;.985;1"
+            dur="20s"
             repeatCount="indefinite"
           />
           <g transform="translate(0 -76)">
