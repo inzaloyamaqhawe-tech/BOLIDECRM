@@ -1,12 +1,12 @@
-XNEELO CRM UPLOAD Ã¢â‚¬â€ ANIMATED LOGIN PAGE
+XNEELO CRM UPLOAD ? ANIMATED LOGIN PAGE
 
 Source folder:
 deploy-crm
 
 Upload these files individually into the existing public /crm folder:
 
-1. index.html
-2. assets/index-CLQO2a6q.js
+1. assets/index-BU9FAFez.js
+2. index.html (upload this last)
 
 After upload:
 - Keep every vendor file, CSS file, API file and database file unchanged.
@@ -14,4 +14,4 @@ After upload:
 - Do not upload a ZIP.
 - No SQL or database update is required for this visual change.
 
-The animated person repeats while the login page is open. Successful login navigates away and stops the animation automatically.
+The black figure walks and climbs continuously while the login page remains open. Its arms tilt simultaneously in opposite directions from the shoulders. At Won, it faces forward, raises both arms and celebrates inside black confetti. Successful login navigates away and stops the animation.

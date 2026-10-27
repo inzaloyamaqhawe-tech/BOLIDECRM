@@ -138,6 +138,48 @@ export function AuthShell({
 }
 
 function PipelineJourney() {
+  const journeyTimes = [
+    0, 0.03, 0.06, 0.09, 0.14, 0.17, 0.2, 0.23, 0.26, 0.31, 0.34, 0.37, 0.4,
+    0.43, 0.48, 0.51, 0.54, 0.57, 0.6, 0.65, 0.68, 0.71, 0.74, 0.77, 0.82, 0.86,
+    0.89, 1,
+  ].join(";");
+  const journeyPositions = [
+    "90 416", "115 416", "140 416", "170 416", "220 368",
+    "230 368", "255 368", "280 368", "305 368", "355 320",
+    "365 320", "390 320", "415 320", "440 320", "490 272",
+    "500 272", "525 272", "550 272", "575 272", "625 224",
+    "635 224", "660 224", "685 224", "710 224", "755 176", "785 176",
+    "815 176", "815 176",
+  ].join(";");
+  const frontLegFrames = [
+    "M5-68L14-34L20 0", "M5-68L18-36L30 0", "M5-68L-5-38L-24-5", "M5-68L25-84L38-62", "M5-68L14-34L20 0",
+    "M5-68L14-34L20 0", "M5-68L18-36L30 0", "M5-68L-5-38L-24-5", "M5-68L14-34L20 0", "M5-68L-8-38L-26-18",
+    "M5-68L14-34L20 0", "M5-68L18-36L30 0", "M5-68L-5-38L-24-5", "M5-68L25-84L38-62", "M5-68L14-34L20 0",
+    "M5-68L14-34L20 0", "M5-68L18-36L30 0", "M5-68L-5-38L-24-5", "M5-68L14-34L20 0", "M5-68L-8-38L-26-18",
+    "M5-68L14-34L20 0", "M5-68L18-36L30 0", "M5-68L-5-38L-24-5", "M5-68L25-84L38-62", "M5-68L14-34L20 0", "M5-68L18-36L30 0", "M5-68L14-34L20 0", "M5-68L14-34L20 0",
+  ].join(";");
+  const rearLegFrames = [
+    "M-4-68L-12-34L-18 0", "M-4-68L-8-38L-25-5", "M-4-68L15-36L28 0", "M-4-68L-12-34L-18 0", "M-4-68L-20-38L-34-18",
+    "M-4-68L-12-34L-18 0", "M-4-68L-8-38L-25-5", "M-4-68L15-36L28 0", "M-4-68L22-84L38-62", "M-4-68L-12-34L-18 0",
+    "M-4-68L-12-34L-18 0", "M-4-68L-8-38L-25-5", "M-4-68L15-36L28 0", "M-4-68L-12-34L-18 0", "M-4-68L-20-38L-34-18",
+    "M-4-68L-12-34L-18 0", "M-4-68L-8-38L-25-5", "M-4-68L15-36L28 0", "M-4-68L22-84L38-62", "M-4-68L-12-34L-18 0",
+    "M-4-68L-12-34L-18 0", "M-4-68L-8-38L-25-5", "M-4-68L15-36L28 0", "M-4-68L-12-34L-18 0", "M-4-68L-20-38L-34-18", "M-4-68L-8-38L-25-5", "M-4-68L-12-34L-18 0", "M-4-68L-12-34L-18 0",
+  ].join(";");
+  const frontArmTilts = [
+    "18 8 -96", "-24 8 -96", "24 8 -96", "-30 8 -96", "18 8 -96",
+    "18 8 -96", "-24 8 -96", "24 8 -96", "-30 8 -96", "18 8 -96",
+    "18 8 -96", "-24 8 -96", "24 8 -96", "-30 8 -96", "18 8 -96",
+    "18 8 -96", "-24 8 -96", "24 8 -96", "-30 8 -96", "18 8 -96",
+    "18 8 -96", "-24 8 -96", "24 8 -96", "-30 8 -96", "18 8 -96", "-24 8 -96", "0 8 -96", "0 8 -96",
+  ].join(";");
+  const rearArmTilts = [
+    "-18 -7 -96", "24 -7 -96", "-24 -7 -96", "30 -7 -96", "-18 -7 -96",
+    "-18 -7 -96", "24 -7 -96", "-24 -7 -96", "30 -7 -96", "-18 -7 -96",
+    "-18 -7 -96", "24 -7 -96", "-24 -7 -96", "30 -7 -96", "-18 -7 -96",
+    "-18 -7 -96", "24 -7 -96", "-24 -7 -96", "30 -7 -96", "-18 -7 -96",
+    "-18 -7 -96", "24 -7 -96", "-24 -7 -96", "30 -7 -96", "-18 -7 -96", "24 -7 -96", "0 -7 -96", "0 -7 -96",
+  ].join(";");
+
   return (
     <svg
       viewBox="0 0 920 510"
@@ -147,8 +189,8 @@ function PipelineJourney() {
     >
       <title id="pipeline-journey-title">A sales opportunity moving from Pipeline to Won</title>
       <desc id="pipeline-journey-description">
-        Solid human figures climb a staircase through the CRM stages and celebrate with a trophy at
-        the Won stage.
+        A solid human figure walks and climbs through the CRM stages, then raises both arms in
+        celebration at the Won stage.
       </desc>
 
       <defs>
@@ -158,15 +200,15 @@ function PipelineJourney() {
       </defs>
 
       <path
-        d="M65 430H205V367H345V304H485V241H625V178H765V115H884"
+        d="M65 420H205V372H340V324H475V276H610V228H745V180H884"
         fill="none"
         stroke="rgba(255,255,255,.22)"
-        strokeWidth="84"
+        strokeWidth="58"
         strokeLinejoin="round"
         filter="url(#step-shadow)"
       />
       <path
-        d="M65 430H205V367H345V304H485V241H625V178H765V115H884"
+        d="M65 420H205V372H340V324H475V276H610V228H745V180H884"
         fill="none"
         stroke="white"
         strokeWidth="4"
@@ -175,39 +217,42 @@ function PipelineJourney() {
       />
 
       <g fill="white" fontFamily="Outfit, sans-serif" fontWeight="700" fontSize="15">
-        <text x="75" y="480">PIPELINE</text>
-        <text x="210" y="417">QUALIFY / KYC</text>
-        <text x="355" y="354">PRELIMINARY</text>
-        <text x="497" y="291">FINAL PROPOSAL</text>
-        <text x="640" y="228">NEGOTIATION</text>
-        <text x="795" y="165">WON</text>
+        <text x="75" y="463">PIPELINE</text>
+        <text x="210" y="415">QUALIFY / KYC</text>
+        <text x="345" y="367">PRELIMINARY</text>
+        <text x="480" y="319">FINAL PROPOSAL</text>
+        <text x="615" y="271">NEGOTIATION</text>
+        <text x="760" y="223">WON</text>
       </g>
 
       <g className="text-neutral-950">
         <animate
           attributeName="opacity"
           values="1;1;0;0"
-          keyTimes="0;.78;.82;1"
-          dur="20s"
+          keyTimes="0;.89;.92;1"
+          dur="30s"
           repeatCount="indefinite"
         />
         <animateTransform
           attributeName="transform"
           type="translate"
-          dur="20s"
+          dur="30s"
           repeatCount="indefinite"
-          calcMode="spline"
-          keySplines=".4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1"
-          keyTimes="0;.08;.14;.16;.24;.30;.32;.40;.46;.48;.56;.62;.64;.72;.78;1"
-          values="165 426;215 363;255 363;305 363;355 300;395 300;445 300;495 237;535 237;585 237;635 174;675 174;725 174;775 111;805 111;805 111"
+          calcMode="linear"
+          keyTimes={journeyTimes}
+          values={journeyPositions}
         />
         <g transform="scale(.78)">
-          <circle cx="5" cy="-77" r="14" fill="currentColor" />
-          <path d="M-10-61Q-16-50-11-30L-5-22H11L14-54Q12-63 3-64Z" fill="currentColor" />
-          <path d="M8-54L20-37L34-43" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M-7-54L-18-36L-21-19" fill="none" stroke="currentColor" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" opacity=".88" />
+          <circle cx="5" cy="-119" r="14" fill="currentColor" />
+          <path d="M-10-103Q-16-92-11-72L-5-64H11L14-96Q12-105 3-106Z" fill="currentColor" />
+          <path d="M8-96L16-65" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round">
+            <animateTransform attributeName="transform" type="rotate" dur="30s" repeatCount="indefinite" keyTimes={journeyTimes} values={frontArmTilts} />
+          </path>
+          <path d="M-7-96L-15-65" fill="none" stroke="currentColor" strokeWidth="9" strokeLinecap="round" opacity=".78">
+            <animateTransform attributeName="transform" type="rotate" dur="30s" repeatCount="indefinite" keyTimes={journeyTimes} values={rearArmTilts} />
+          </path>
           <path
-            d="M5-28L19-52L36-63"
+            d="M5-68L25-84L38-62"
             fill="none"
             stroke="currentColor"
             strokeWidth="12"
@@ -216,14 +261,14 @@ function PipelineJourney() {
           >
             <animate
               attributeName="d"
-              dur="20s"
+              dur="30s"
               repeatCount="indefinite"
-              keyTimes="0;.08;.14;.16;.24;.30;.32;.40;.46;.48;.56;.62;.64;.72;.78;1"
-              values="M5-28L19-52L36-63;M5-28L15-13L20 0;M5-28L15-13L20 0;M5-28L15-13L20 0;M5-28L17 18L31 63;M5-28L15-13L20 0;M5-28L19-52L36-63;M5-28L15-13L20 0;M5-28L15-13L20 0;M5-28L15-13L20 0;M5-28L17 18L31 63;M5-28L15-13L20 0;M5-28L19-52L36-63;M5-28L15-13L20 0;M5-28L15-13L20 0;M5-28L15-13L20 0"
+              keyTimes={journeyTimes}
+              values={frontLegFrames}
             />
           </path>
           <path
-            d="M-4-28L-12-12L-18 0"
+            d="M-4-68L-12-34L-18 0"
             fill="none"
             stroke="currentColor"
             strokeWidth="12"
@@ -232,53 +277,54 @@ function PipelineJourney() {
           >
             <animate
               attributeName="d"
-              dur="20s"
+              dur="30s"
               repeatCount="indefinite"
-              keyTimes="0;.08;.14;.16;.24;.30;.32;.40;.46;.48;.56;.62;.64;.72;.78;1"
-              values="M-4-28L-12-12L-18 0;M-4-28L-16 18L-31 63;M-4-28L-12-12L-18 0;M-4-28L-20-52L-37-63;M-4-28L-12-12L-18 0;M-4-28L-12-12L-18 0;M-4-28L-12-12L-18 0;M-4-28L-16 18L-31 63;M-4-28L-12-12L-18 0;M-4-28L-20-52L-37-63;M-4-28L-12-12L-18 0;M-4-28L-12-12L-18 0;M-4-28L-12-12L-18 0;M-4-28L-16 18L-31 63;M-4-28L-12-12L-18 0;M-4-28L-12-12L-18 0"
+              keyTimes={journeyTimes}
+              values={rearLegFrames}
             />
           </path>
         </g>
       </g>
 
-      <g className="text-white" transform="translate(823 55) scale(.88)" opacity="0">
+      <g className="text-neutral-950" transform="translate(823 118) scale(.88)" opacity="0">
         <animate
           attributeName="opacity"
           values="0;0;1;1;0"
-          keyTimes="0;.78;.82;.985;1"
-          dur="20s"
+          keyTimes="0;.9;.93;.985;1"
+          dur="30s"
           repeatCount="indefinite"
         />
-        <circle cx="0" cy="-44" r="15" fill="currentColor" />
-        <rect x="-18" y="-25" width="36" height="58" rx="14" fill="currentColor" />
-        <rect x="-41" y="-36" width="10" height="54" rx="5" fill="currentColor" transform="rotate(-38 -36 -9)" />
-        <rect x="31" y="-36" width="10" height="54" rx="5" fill="currentColor" transform="rotate(38 36 -9)" />
-        <rect x="-16" y="24" width="12" height="47" rx="6" fill="currentColor" />
-        <rect x="4" y="24" width="12" height="47" rx="6" fill="currentColor" />
         <g>
           <animateTransform
             attributeName="transform"
             type="translate"
-            values="0 34;0 34;0 0;0 -8;0 -8;0 34"
-            keyTimes="0;.78;.86;.91;.985;1"
-            dur="20s"
+            values="0 8;0 8;0 0;0 -5;0 0;0 8"
+            keyTimes="0;.9;.93;.95;.985;1"
+            dur="30s"
             repeatCount="indefinite"
           />
-          <g transform="translate(0 -76)">
-            <path d="M-18 0h36v16c0 16-8 27-18 27S-18 32-18 16V0Z" fill="#171717" />
-            <path d="M-18 7h-12c0 13 6 20 17 20M18 7h12c0 13-6 20-17 20" fill="none" stroke="#171717" strokeWidth="6" strokeLinecap="round" />
-            <rect x="-4" y="40" width="8" height="14" rx="2" fill="#171717" />
-            <rect x="-15" y="52" width="30" height="7" rx="3.5" fill="#171717" />
+          <circle cx="0" cy="-55" r="14" fill="currentColor" />
+          <path d="M-15-37Q0-44 15-37L12 19H-12Z" fill="currentColor" />
+          <path d="M-11-31L-31-53L-43-75" fill="none" stroke="currentColor" strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M11-31L31-53L43-75" fill="none" stroke="currentColor" strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M-7 14L-13 51" fill="none" stroke="currentColor" strokeWidth="12" strokeLinecap="round" />
+          <path d="M7 14L13 51" fill="none" stroke="currentColor" strokeWidth="12" strokeLinecap="round" />
+          <g fill="currentColor">
+            <circle cx="-57" cy="-74" r="6" />
+            <circle cx="57" cy="-72" r="6" />
+            <circle cx="-49" cy="-103" r="5" />
+            <circle cx="50" cy="-102" r="5" />
+            <rect x="-7" y="-105" width="14" height="14" rx="2" transform="rotate(12 0 -98)" />
+            <rect x="-37" y="-96" width="11" height="11" rx="2" transform="rotate(38 -31 -90)" />
+            <rect x="27" y="-94" width="11" height="11" rx="2" transform="rotate(-34 32 -89)" />
+            <rect x="-68" y="-48" width="8" height="19" rx="4" transform="rotate(-58 -64 -38)" />
+            <rect x="60" y="-48" width="8" height="19" rx="4" transform="rotate(58 64 -38)" />
+            <rect x="-66" y="-91" width="8" height="18" rx="4" transform="rotate(54 -62 -82)" />
+            <rect x="58" y="-90" width="8" height="18" rx="4" transform="rotate(-54 62 -81)" />
+            <rect x="-25" y="-119" width="8" height="18" rx="4" transform="rotate(-20 -21 -110)" />
+            <rect x="18" y="-120" width="8" height="18" rx="4" transform="rotate(20 22 -111)" />
           </g>
         </g>
-      </g>
-
-      <g fill="white" opacity=".68">
-        <circle cx="739" cy="64" r="4" />
-        <circle cx="775" cy="34" r="5" />
-        <circle cx="872" cy="42" r="4" />
-        <path d="M718 93l8 2-6 6-2 8-6-6-8-2 6-6 2-8 6 6Z" />
-        <path d="M882 88l6 2-4 5-2 6-5-5-6-2 5-4 2-7 4 5Z" />
       </g>
     </svg>
   );
