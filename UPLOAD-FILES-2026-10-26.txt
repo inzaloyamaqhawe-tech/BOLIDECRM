@@ -3,13 +3,22 @@ XNEELO CRM UPLOAD ? ANIMATED LOGIN PAGE
 Source folder:
 deploy-crm
 
-Upload these files individually into the existing public /crm folder:
+Upload these files individually into the existing public /crm folder. Preserve the assets subfolder:
 
 1. assets/index-BU9FAFez.js
-2. index.html (upload this last)
+2. assets/index-QfoIjSa1.css
+3. assets/vendor-react-PGvNAZat.js
+4. assets/vendor-icons-Cc-lgg2c.js
+5. assets/vendor-charts-BHuxWsbc.js
+6. assets/vendor-dnd-C-c8qG_2.js
+7. index.html ? upload this last
+
+Immediate CSS repair:
+- If the JavaScript and vendor files are already uploaded, upload assets/index-QfoIjSa1.css now.
+- Refresh with Ctrl+F5 or open an Incognito window after uploading.
 
 After upload:
-- Keep every vendor file, CSS file, API file and database file unchanged.
+- Keep every API file and database file unchanged.
 - Do not create another crm folder inside /crm.
 - Do not upload a ZIP.
 - No SQL or database update is required for this visual change.
