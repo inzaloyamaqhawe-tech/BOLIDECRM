@@ -4,17 +4,24 @@ export interface DuplicateMatch {deal:Deal;companyName:string;ownerName:string;c
 export class DealFieldConflict extends Error {constructor(public field:string,public current:unknown,public incoming:unknown){super('Another person changed '+field+'. Review both values before saving.');}}
 export interface DealWriteOptions {action:"create"|"update"|"merge";baseDraft?:DealDraft;sourceId?:string;sourceVersion?:string;targetId?:string;targetVersion?:string;choices?:string[];separate?:{reason:string;matches:{id:string;version:string}[]};}
 export const normaliseDealText=(s?:string)=> (s??"").toLowerCase().replace(/[^a-z0-9]/g,"");
+const knownLocation=(value?:string)=>{const site=normaliseDealText(value);return ["","tbc","tbd","sitetbc","unknown","na","notsupplied","tobeconfirmed"].includes(site)?"":site;};
+function sameOpportunity(fresh:Partial<Deal>,existing:Deal):boolean {
+ if(fresh.division!==existing.division)return false;
+ const product=normaliseDealText(fresh.productLine),oldProduct=normaliseDealText(existing.productLine);if(product&&oldProduct&&product!==oldProduct)return false;
+ const site=knownLocation(fresh.site),oldSite=knownLocation(existing.site);if(site&&oldSite&&site===oldSite)return true;
+ const title=normaliseDealText(fresh.title),oldTitle=normaliseDealText(existing.title);
+ return !!title&&!!oldTitle&&(title===oldTitle||(Math.min(title.length,oldTitle.length)>=10&&(title.includes(oldTitle)||oldTitle.includes(title))));
+}
 export function duplicateKind(draft:DealDraft,existing:Deal,companyName:string):"potential"|"related"|null {
  const a=normaliseDealText(draft.companyName),b=normaliseDealText(companyName);if(!a||!b)return null;
- if(a!==b)return a.length>=3&&(b.includes(a)||a.includes(b))?"related":null;
- if(draft.deal.division!==existing.division)return "related";
- const site=normaliseDealText(draft.deal.site),oldSite=normaliseDealText(existing.site),product=normaliseDealText(draft.deal.productLine),oldProduct=normaliseDealText(existing.productLine);
- return (site&&oldSite&&site!==oldSite)||(product&&oldProduct&&product!==oldProduct)?"related":"potential";
+ if(!sameOpportunity(draft.deal,existing))return null;
+ if(a===b)return "potential";
+ return a.length>=3&&(b.includes(a)||a.includes(b))?"related":null;
 }
 export function canonical(value:unknown):string {if(value===undefined||value===null)return "null";if(Array.isArray(value))return "["+value.map(canonical).join(",")+"]";if(typeof value==="object")return "{"+Object.keys(value).sort().filter(k=>(value as any)[k]!==undefined).map(k=>JSON.stringify(k)+":"+canonical((value as any)[k])).join(",")+"}";return JSON.stringify(value);}
 export async function dealVersion(deal:Deal,contact?:Contact){const digest=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(canonical([deal,contact??null])));return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,"0")).join("");}
 export async function localDuplicateMatches(draft:DealDraft,deals:Deal[],companies:Company[],users:User[],contacts:Contact[],exclude?:string):Promise<DuplicateMatch[]> {
- const names=new Map(companies.map(c=>[c.id,c.name]));const matches=await Promise.all(deals.filter(d=>d.id!==exclude).map(async (deal):Promise<DuplicateMatch|null>=>{const companyName=names.get(deal.companyId)??"",kind=duplicateKind(draft,deal,companyName);if(!kind)return null;return {deal,companyName,ownerName:users.find(u=>u.id===deal.ownerId)?.name??"Unknown owner",creatorName:users.find(u=>u.id===deal.createdById)?.name,contact:contacts.find(c=>c.id===deal.primaryContactId),version:await dealVersion(deal,contacts.find(c=>c.id===deal.primaryContactId)),potential:kind==="potential",reason:kind==="potential"?"Same company and solution; location matches or needs confirmation":"Same or similar company, different or unconfirmed opportunity"};}));
+ const names=new Map(companies.map(c=>[c.id,c.name]));const matches=await Promise.all(deals.filter(d=>d.id!==exclude).map(async (deal):Promise<DuplicateMatch|null>=>{const companyName=names.get(deal.companyId)??"",kind=duplicateKind(draft,deal,companyName);if(!kind)return null;return {deal,companyName,ownerName:users.find(u=>u.id===deal.ownerId)?.name??"Unknown owner",creatorName:users.find(u=>u.id===deal.createdById)?.name,contact:contacts.find(c=>c.id===deal.primaryContactId),version:await dealVersion(deal,contacts.find(c=>c.id===deal.primaryContactId)),potential:kind==="potential",reason:kind==="potential"?"Same company, solution and project location or title":"Similar company name with the same project identity"};}));
  return matches.filter((m):m is DuplicateMatch=>m!==null).sort((a,b)=>Number(b.potential)-Number(a.potential));
 }
 export const mergeRoots=["title","site","segment","productLine","stage","onceOff","mrr","ownerId","closeDate","receivedAt","lostReason","secureDetails","energyDetails","waterDetails","connectDetails","financingDetails","workflow","contact"];

@@ -4,17 +4,28 @@ class DealDuplicateException extends RuntimeException {public function __constru
 function deal_normalise(?string $value): string {return preg_replace('/[^a-z0-9]/','',strtolower($value??''));}
 function deal_canonical(mixed $value): mixed {if(!is_array($value))return $value;if(!array_is_list($value))ksort($value,SORT_STRING);foreach($value as &$v)$v=deal_canonical($v);return $value;}
 function deal_version(array $deal,?array $contact=null): string {return hash('sha256',json_encode(deal_canonical([$deal,$contact]),JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_LINE_TERMINATORS));}
+function deal_known_location(?string $value): string {
+    $site=deal_normalise($value);return in_array($site,['','tbc','tbd','sitetbc','unknown','na','notsupplied','tobeconfirmed'],true)?'':$site;
+}
+function deal_same_opportunity(array $fresh,array $existing): bool {
+    if(($fresh['division']??'')!==($existing['division']??''))return false;
+    $product=deal_normalise($fresh['productLine']??'');$oldProduct=deal_normalise($existing['productLine']??'');
+    if($product&&$oldProduct&&$product!==$oldProduct)return false;
+    $site=deal_known_location($fresh['site']??'');$oldSite=deal_known_location($existing['site']??'');
+    if($site&&$oldSite&&$site===$oldSite)return true;
+    $title=deal_normalise($fresh['title']??'');$oldTitle=deal_normalise($existing['title']??'');
+    return $title&&$oldTitle&&($title===$oldTitle||(min(strlen($title),strlen($oldTitle))>=10&&(str_contains($title,$oldTitle)||str_contains($oldTitle,$title))));
+}
 function duplicate_kind(array $draft,array $existing,string $company): ?string {
     $a=deal_normalise($draft['companyName']??'');$b=deal_normalise($company);if(!$a||!$b)return null;
-    if($a!==$b)return strlen($a)>=3&&(str_contains($a,$b)||str_contains($b,$a))?'related':null;
-    $fresh=$draft['deal']??[];if(($fresh['division']??'')!==$existing['division'])return 'related';
-    $site=deal_normalise($fresh['site']??'');$oldSite=deal_normalise($existing['site']??'');$product=deal_normalise($fresh['productLine']??'');$oldProduct=deal_normalise($existing['productLine']??'');
-    return ($site&&$oldSite&&$site!==$oldSite)||($product&&$oldProduct&&$product!==$oldProduct)?'related':'potential';
+    $fresh=$draft['deal']??[];if(!deal_same_opportunity($fresh,$existing))return null;
+    if($a===$b)return 'potential';
+    return strlen($a)>=3&&(str_contains($a,$b)||str_contains($b,$a))?'related':null;
 }
 function deal_matches(array $draft,array $state,?string $exclude=null): array {
     $companies=array_column($state['companies'],'name','id');$users=array_column($state['users'],'name','id');$contacts=array_column($state['contacts'],null,'id');$matches=[];
     foreach($state['deals'] as $deal){if($deal['id']===$exclude)continue;$company=$companies[$deal['companyId']]??'';$kind=duplicate_kind($draft,$deal,$company);if(!$kind)continue;
-        $matches[]=['deal'=>$deal,'companyName'=>$company,'ownerName'=>$users[$deal['ownerId']]??'Unknown owner','creatorName'=>$users[$deal['createdById']??'']??null,'contact'=>$contacts[$deal['primaryContactId']??'']??null,'version'=>deal_version($deal,$contacts[$deal['primaryContactId']??'']??null),'potential'=>$kind==='potential','reason'=>$kind==='potential'?'Same company and solution; location matches or needs confirmation':'Same or similar company, different or unconfirmed opportunity'];
+        $matches[]=['deal'=>$deal,'companyName'=>$company,'ownerName'=>$users[$deal['ownerId']]??'Unknown owner','creatorName'=>$users[$deal['createdById']??'']??null,'contact'=>$contacts[$deal['primaryContactId']??'']??null,'version'=>deal_version($deal,$contacts[$deal['primaryContactId']??'']??null),'potential'=>$kind==='potential','reason'=>$kind==='potential'?'Same company, solution and project location or title':'Similar company name with the same project identity'];
     }
     usort($matches,fn($a,$b)=>(int)$b['potential']<=>(int)$a['potential']);return $matches;
 }

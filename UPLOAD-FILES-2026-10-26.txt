@@ -1,34 +1,26 @@
-XNEELO CRM UPLOAD ? ANIMATED LOGIN PAGE
+XNEELO CRM UPLOAD ? SESSION AND PORTFOLIO DEAL FIX
 
 Source folder:
 deploy-crm
 
-Upload these files individually into the existing public /crm folder. Preserve the assets subfolder:
+Upload these files individually into the existing public /crm folder, preserving the subfolders:
 
-1. assets/index-BU9FAFez.js
-2. assets/index-QfoIjSa1.css
-3. assets/vendor-react-PGvNAZat.js
-4. assets/vendor-icons-Cc-lgg2c.js
-5. assets/vendor-charts-BHuxWsbc.js
-6. assets/vendor-dnd-C-c8qG_2.js
-7. index.html ? upload this last
+1. api/session.php
+2. api/deal-duplicates.php
+3. assets/index-DtvyTnJ7.js
+4. assets/index-QfoIjSa1.css
+5. assets/vendor-react-PGvNAZat.js
+6. assets/vendor-icons-Cc-lgg2c.js
+7. assets/vendor-charts-BHuxWsbc.js
+8. assets/vendor-dnd-C-c8qG_2.js
+9. index.html ? upload this last
 
-Immediate CSS repair:
-- If the JavaScript and vendor files are already uploaded, upload assets/index-QfoIjSa1.css now.
-- Refresh with Ctrl+F5 or open an Incognito window after uploading.
-
-After upload:
-- Keep every API file and database file unchanged.
+After uploading:
+- Close all existing CRM tabs, then open https://bolide.co.za/crm/login in one new tab.
+- Refresh with Ctrl+F5 if the old interface remains cached.
+- Keep all other API and database files unchanged.
 - Do not create another crm folder inside /crm.
 - Do not upload a ZIP.
-- No SQL or database update is required for this visual change.
+- No SQL or database update is required.
 
-The black figure walks and climbs continuously while the login page remains open. Its arms tilt simultaneously in opposite directions from the shoulders. At Won, it faces forward, raises both arms and celebrates inside black confetti. Successful login navigates away and stops the animation.
-
-LOGIN SESSION REPAIR ? upload now:
-- api/session.php to /crm/api/session.php
-
-After uploading session.php:
-- Close all existing Bolide CRM tabs.
-- Open https://bolide.co.za/crm/login in one new tab and sign in.
-- The CRM now uses an isolated bolide_crm_v2 cookie scoped to /crm/, preventing stale root cookies and other Bolide tools from replacing the active CRM session.
+Duplicate detection now treats a shared company as a portfolio account. A company name by itself never creates a merge warning. A warning requires the same division/product and either the same known site/location or a strongly matching deal title. Values such as site TBC, TBD and unknown are not treated as locations.
