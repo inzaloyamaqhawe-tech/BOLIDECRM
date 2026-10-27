@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { LayoutGrid, Trello, Handshake, Building2, Users, BarChart3, Settings, CheckSquare, X, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { LayoutGrid, Trello, Handshake, Building2, Users, BarChart3, Settings, CheckSquare, X } from "lucide-react";
 
 const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutGrid, end: true },
@@ -18,7 +18,7 @@ const NAV = [
  * permanent column — the Kanban board especially has no room to share the
  * screen with a fixed 256px sidebar on a phone.
  */
-export function Sidebar({ open, onClose, compact, onToggleCompact }: { open: boolean; onClose: () => void;compact:boolean;onToggleCompact:()=>void }) {
+export function Sidebar({ open, onClose, compact }: { open: boolean; onClose: () => void;compact:boolean }) {
   return (
     <>
       {open && <div className="fixed inset-0 z-40 bg-black/40 lg:hidden" onClick={onClose} />}
@@ -56,9 +56,6 @@ export function Sidebar({ open, onClose, compact, onToggleCompact }: { open: boo
           ))}
         </nav>
 
-        <button type="button" onClick={onToggleCompact} className="mx-3 mb-3 hidden items-center justify-center gap-2 rounded-xl border border-neutral-200 p-2.5 text-sm font-semibold text-neutral-600 hover:bg-neutral-50 lg:flex" title={compact?"Show menu names":"Hide menu names"}>
-          {compact?<PanelLeftOpen className="h-5 w-5"/>:<><PanelLeftClose className="h-5 w-5"/><span>Hide menu names</span></>}
-        </button>
         <div className={`mx-4 rounded-2xl bg-gradient-to-br from-pink-50 to-orange-50 p-4 lg:mx-0 ${compact?"lg:hidden":""}`}>
           <div className="text-sm font-bold text-neutral-800">Bolide CRM</div>
           <div className="text-xs text-neutral-500">Internal tool · All values in ZAR, excl. VAT</div>

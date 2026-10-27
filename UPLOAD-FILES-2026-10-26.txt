@@ -1,27 +1,26 @@
-XNEELO CRM UPLOAD ? LATEST CUMULATIVE UPDATE
+﻿XNEELO CRM UPLOAD — TOP MENU CONTROL
 
 Source folder:
 deploy-crm
 
-Upload these files individually into the existing public /crm folder, preserving subfolders:
+Upload ONLY these changed files into the existing /crm folder, preserving the assets subfolder:
 
-1. api/session.php
-2. api/deal-duplicates.php
-3. api/notification-functions.php
-4. api/notifications.php
-5. assets/index-BtHQ1mgZ.js
-6. assets/index-D0q-RhDH.css
-7. assets/vendor-react-PGvNAZat.js
-8. assets/vendor-icons-fChYDaFL.js
-9. assets/vendor-charts-BHuxWsbc.js
-10. assets/vendor-dnd-C-c8qG_2.js
-11. index.html ? upload this last
+1. assets/index-BJycY9I5.css
+2. assets/index-DUoMY_97.js
+3. assets/vendor-icons-Cyt6iVbW.js
+4. index.html — upload this last
 
-This build adds the collapsible icon-only sidebar and optional Bolide dark mode. Light mode remains the default.
+What changed:
+- The desktop show/hide menu control is now an icon-only button in the top bar.
+- The old control beside the logged-in user was removed.
+- Mobile continues to use the existing full hamburger drawer.
 
-After uploading:
-- Close existing CRM tabs, open https://bolide.co.za/crm/login in one new tab, and press Ctrl+F5 if needed.
-- Keep all other API and database files unchanged.
-- Do not create another crm folder inside /crm.
-- Do not upload a ZIP.
-- No SQL import is required.
+Unchanged — do not upload:
+- all api/* files
+- vendor-react-PGvNAZat.js
+- vendor-charts-BHuxWsbc.js
+- vendor-dnd-C-c8qG_2.js
+- database and configuration files
+
+No SQL or database update is required for this interface update.
+Do not upload a ZIP and do not create another crm folder.

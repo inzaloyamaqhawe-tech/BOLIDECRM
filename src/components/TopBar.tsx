@@ -1,13 +1,13 @@
 import { ReminderCenter } from "./ReminderCenter";
 import { useEffect, useRef, useState } from "react";
-import { Plus, LogOut, Menu, Moon, Sun } from "lucide-react";
+import { Plus, LogOut, Menu, Moon, Sun, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { DIVISIONS } from "../lib/seed-data";
 import { useAuth } from "../lib/auth";
 import { Avatar } from "./Avatar";
 import { GlobalSearch } from "./GlobalSearch";
 import { DealModal } from "./DealModal";
 
-export function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
+export function TopBar({ onOpenNav,compactNav,onToggleCompactNav }: { onOpenNav: () => void;compactNav:boolean;onToggleCompactNav:()=>void }) {
   const { user, logout } = useAuth();
   const [showNewDeal, setShowNewDeal] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
@@ -34,6 +34,7 @@ export function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
         <button onClick={onOpenNav} className="text-neutral-500 lg:hidden">
           <Menu className="h-5 w-5" />
         </button>
+        <button type="button" onClick={onToggleCompactNav} className="hidden h-10 w-10 items-center justify-center rounded-xl border border-neutral-200 text-neutral-600 hover:bg-pink-50 hover:text-pink-600 lg:flex" title={compactNav?"Show menu names":"Hide menu names"} aria-label={compactNav?"Show menu names":"Hide menu names"}>{compactNav?<PanelLeftOpen className="h-5 w-5"/>:<PanelLeftClose className="h-5 w-5"/>}</button>
         <GlobalSearch />
         <div className="flex-1" />
         <button type="button" onClick={()=>setDark(value=>!value)} className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 text-neutral-600 hover:bg-pink-50 hover:text-pink-600" title={dark?"Use light mode":"Use dark mode"} aria-label={dark?"Use light mode":"Use dark mode"}>{dark?<Sun className="h-5 w-5"/>:<Moon className="h-5 w-5"/>}</button>

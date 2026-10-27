@@ -16,9 +16,9 @@ export function Layout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-neutral-50">
-      <Sidebar open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} compact={compactNav} onToggleCompact={toggleCompactNav} />
+      <Sidebar open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} compact={compactNav} />
       <div className="flex flex-1 flex-col overflow-hidden">
-        <TopBar onOpenNav={() => setMobileNavOpen(true)} />
+        <TopBar onOpenNav={() => setMobileNavOpen(true)} compactNav={compactNav} onToggleCompactNav={toggleCompactNav} />
         <main className="flex-1 overflow-y-auto scroll-thin px-4 py-6 sm:px-6">
           <Outlet />
         </main>
