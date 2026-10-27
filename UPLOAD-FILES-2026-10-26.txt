@@ -1,27 +1,17 @@
-XNEELO CRM UPLOAD — TOWNSHIP PROSPECTOR INTEGRATION
+XNEELO CRM UPLOAD — ANIMATED LOGIN PAGE
 
 Source folder:
 deploy-crm
 
-Upload these files individually into the existing public /crm folder. Preserve the paths below.
+Upload these files individually into the existing public /crm folder:
 
-1. Upload the protected CRM integration files
-api/.htaccess
-api/config.php
-api/deals-service.php
-api/township-functions.php
-api/township-prospects.php
+1. index.html
+2. assets/index-B34QV1IF.js
 
-2. No SQL upload is required
-The production Xneelo database has already been backed up and updated with:
-- township_leads
-- township_lead_activity
-- township_lead_photos
-- township_lead_promotions
-
-Important:
-- api/config.php must be uploaded in this update because the private integration secret was rotated. The copy inside deploy-crm is the matching private production file.
-- Never upload api/config.php to GitHub or share it publicly.
-- Do not create another crm folder inside the existing crm folder.
+After upload:
+- Keep every vendor file, CSS file, API file and database file unchanged.
+- Do not create another crm folder inside /crm.
 - Do not upload a ZIP.
-- No CRM frontend assets changed for this integration.
+- No SQL or database update is required for this visual change.
+
+The animated person repeats while the login page is open. Successful login navigates away and stops the animation automatically.
