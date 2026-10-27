@@ -1,0 +1,23 @@
+name: PHP 8.5 compatibility
+
+on:
+  push:
+    paths:
+      - "api/**/*.php"
+      - ".github/workflows/php-85.yml"
+  pull_request:
+    paths:
+      - "api/**/*.php"
+      - ".github/workflows/php-85.yml"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.5"
+          extensions: curl, json, pdo_mysql
+      - name: Lint PHP files
+        run: find api -type f -name '*.php' -print0 | xargs -0 -n1 php -l

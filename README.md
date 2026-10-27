@@ -71,7 +71,7 @@ The PHP/database integration check in `test_hosted.py` requires a local, private
 
 See [UPLOAD-INSTRUCTIONS.md](UPLOAD-INSTRUCTIONS.md) for individual file uploads, root redirect exceptions, and HTTPS requirements. The existing production database contains 49 preserved and reconciled deals and 8 users. Do not reinitialize that database.
 
-For a new installation, import `database/schema.sql` into an empty MySQL/MariaDB database, then copy `api/config.example.php` to `api/config.php` and set credentials privately. PHP 8.2+ with PDO MySQL and Apache rewrite support is required.
+For a new installation, import `database/schema.sql` into an empty MySQL/MariaDB database, then copy `api/config.example.php` to `api/config.php` and set credentials privately. PHP 8.2 through PHP 8.5 with PDO MySQL and Apache rewrite support is supported. GitHub Actions syntax-checks every API file on PHP 8.5.
 
 On 26 October 2026, `Deals/Lead Tracker October.xlsx` was reconciled into the 36 tracker-originated Xneelo deals. The database update preserved CRM-owned notes, contacts, tasks and owners while adding the workbook's populated proposal terms, system sizing, rates, savings and financing values. The two Sasol Raceway rows remain consolidated into one deal.
 
