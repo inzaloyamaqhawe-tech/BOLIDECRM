@@ -1,6 +1,6 @@
 import { ReminderCenter } from "./ReminderCenter";
 import { useEffect, useRef, useState } from "react";
-import { Plus, LogOut, Menu } from "lucide-react";
+import { Plus, LogOut, Menu, Moon, Sun } from "lucide-react";
 import { DIVISIONS } from "../lib/seed-data";
 import { useAuth } from "../lib/auth";
 import { Avatar } from "./Avatar";
@@ -11,7 +11,9 @@ export function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
   const { user, logout } = useAuth();
   const [showNewDeal, setShowNewDeal] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
+  const [dark,setDark]=useState(()=>localStorage.getItem("bolide-crm:theme")==="dark");
   const accountMenuRef = useRef<HTMLDivElement>(null);
+  useEffect(()=>{document.documentElement.classList.toggle("dark",dark);localStorage.setItem("bolide-crm:theme",dark?"dark":"light");},[dark]);
 
   // Click-to-toggle instead of hover: the dropdown sits a few pixels below
   // the avatar, so moving the cursor down to reach "Sign out" crossed out of
@@ -34,6 +36,7 @@ export function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
         </button>
         <GlobalSearch />
         <div className="flex-1" />
+        <button type="button" onClick={()=>setDark(value=>!value)} className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 text-neutral-600 hover:bg-pink-50 hover:text-pink-600" title={dark?"Use light mode":"Use dark mode"} aria-label={dark?"Use light mode":"Use dark mode"}>{dark?<Sun className="h-5 w-5"/>:<Moon className="h-5 w-5"/>}</button>
         <ReminderCenter key={user?.id} />
         <button
           type="button"

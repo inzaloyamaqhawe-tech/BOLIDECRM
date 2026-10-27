@@ -9,18 +9,18 @@ Upload these files individually into the existing public /crm folder, preserving
 2. api/deal-duplicates.php
 3. api/notification-functions.php
 4. api/notifications.php
-5. assets/index-wvA7y9M8.js
-6. assets/index-QfoIjSa1.css
+5. assets/index-BtHQ1mgZ.js
+6. assets/index-D0q-RhDH.css
 7. assets/vendor-react-PGvNAZat.js
-8. assets/vendor-icons-Cc-lgg2c.js
+8. assets/vendor-icons-fChYDaFL.js
 9. assets/vendor-charts-BHuxWsbc.js
 10. assets/vendor-dnd-C-c8qG_2.js
 11. index.html ? upload this last
 
+This build adds the collapsible icon-only sidebar and optional Bolide dark mode. Light mode remains the default.
+
 After uploading:
 - Close existing CRM tabs, open https://bolide.co.za/crm/login in one new tab, and press Ctrl+F5 if needed.
-- Opening the reminder inbox once automatically consolidates repeated generated reminders for the logged-in user.
-- Clicking a proposal reminder or deal-linked task opens that deal. An unlinked task opens Tasks.
 - Keep all other API and database files unchanged.
 - Do not create another crm folder inside /crm.
 - Do not upload a ZIP.

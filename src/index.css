@@ -90,3 +90,24 @@ body {
 
 /* Scroll the rows while retaining table labels and search controls. */
 .crm-data-table thead th { position: sticky; top: 0; z-index: 10; background: white; box-shadow: 0 1px 0 #e5e5e5; }
+
+/* Optional Bolide dark mode. Light mode remains the unchanged default. */
+.dark { color-scheme: dark; }
+.dark body { background: #21171d; color: #fffafc; }
+.dark .bg-white { background-color: #2a1c24 !important; }
+.dark .bg-neutral-50 { background-color: #21171d !important; }
+.dark .bg-neutral-100 { background-color: #38262f !important; }
+.dark .bg-pink-50, .dark .bg-pink-50\/60 { background-color: #452333 !important; }
+.dark .from-pink-50 { --tw-gradient-from: #452333 var(--tw-gradient-from-position) !important; }
+.dark .to-orange-50 { --tw-gradient-to: #493022 var(--tw-gradient-to-position) !important; }
+.dark .text-neutral-950, .dark .text-neutral-900, .dark .text-neutral-800 { color: #fffafc !important; }
+.dark .text-neutral-700, .dark .text-neutral-600 { color: #e8dce2 !important; }
+.dark .text-neutral-500, .dark .text-neutral-400 { color: #bdaeb6 !important; }
+.dark .border-neutral-100, .dark .border-neutral-200, .dark .border-neutral-300 { border-color: #59414d !important; }
+.dark .hover\:bg-neutral-50:hover { background-color: #38262f !important; }
+.dark .hover\:bg-pink-50:hover { background-color: #452333 !important; }
+.dark .hover\:text-neutral-900:hover { color: #fffafc !important; }
+.dark .input, .dark input, .dark select, .dark textarea { background-color: #30212a; border-color: #59414d; color: #fffafc; }
+.dark input::placeholder, .dark textarea::placeholder { color: #9f8f97; }
+.dark .crm-data-table thead th { background: #2a1c24; box-shadow: 0 1px 0 #59414d; }
+.dark .shadow-xl, .dark .shadow-2xl, .dark .shadow-sm { --tw-shadow-color: rgb(0 0 0 / .35); }
